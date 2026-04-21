@@ -1,0 +1,28 @@
+PARLIAMENT GAME - FORMAT BRAINSTORM
+=====================================
+
+CORE CONCEPT
+You lead a party, build a coalition, and survive a term.
+
+GAME LOOP
+Each term you face ~10 bills. On each bill you declare your party's stance
+(aye/nay), your coalition partners mostly follow, and opposition parties push
+back. At the end of the term there's an election — your score is driven by:
+  - How many bills you passed that aligned with your party's ideology
+  - How stable your coalition was
+  - Your approval rating
+
+Then seats shift based on performance and you start the next term. Repeat
+until you lose power.
+
+PER-TURN LOOP
+  pick stance → watch vote → coalition drifts or holds → election → new term with shifted seats
+
+CORE TENSION
+Passing centrist bills keeps your coalition intact but erodes your base.
+Playing to your base risks the coalition collapsing.
+
+ALTERNATIVE CONSIDERED
+Opposition mode — you try to block the government rather than govern.
+Rejected: easier to balance but less satisfying since you're always reacting,
+never governing.

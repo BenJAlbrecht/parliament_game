@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parliament</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="parliament.css">
+</head>
+<body>
+
+<!-- ── Party selection screen ── -->
+<div id="screen-select" class="container">
+  <h1>Parliament</h1>
+  <p class="subtitle">Choose a party to lead into the session.</p>
+  <div id="party-grid"></div>
+  <div id="party-detail" style="display:none;">
+    <button id="btn-back" class="back-btn">&#8592; Back</button>
+    <div class="detail-card">
+      <div class="detail-header">
+        <span id="detail-swatch" class="detail-swatch"></span>
+        <div>
+          <div id="detail-name" class="detail-name"></div>
+          <div id="detail-tag" class="detail-tag"></div>
+        </div>
+      </div>
+      <p id="detail-summary" class="detail-summary"></p>
+      <p id="detail-history" class="detail-history"></p>
+      <div class="detail-stats">
+        <span id="detail-seats"></span> &nbsp;&middot;&nbsp; <span id="detail-loyalty"></span>
+      </div>
+      <button id="btn-confirm" class="primary confirm-btn">Lead this party &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main parliament screen ── -->
+<div id="screen-parliament" class="container" style="display:none;">
+  <h1>Parliament</h1>
+  <p class="subtitle" id="playing-as"></p>
+
+  <div class="controls">
+    <button class="primary" id="btn-vote">Call a vote</button>
+    <button id="btn-clear">Clear votes</button>
+    <button id="btn-reset">Reset session</button>
+  </div>
+
+  <div class="bill" id="bill" style="display:none;">
+    <div class="bill-label">Current motion</div>
+    <div class="bill-title" id="bill-title"></div>
+  </div>
+
+  <div class="chamber">
+    <svg id="chamber-svg" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <div class="result" id="result" style="display:none;"></div>
+  <div class="history" id="history"></div>
+</div>
+
+<script type="module" src="js/parliament.js"></script>
+</body>
+</html>
