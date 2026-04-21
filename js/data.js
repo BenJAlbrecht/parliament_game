@@ -9,7 +9,7 @@ export const LAYOUT = {
 export const PARTIES = [
   {
     name: "People's Alliance",
-    color: '#7C3AED',
+    color: '#991B1B',
     seats: 35,
     loyalty: 0.94,
     ideology: 'far-left',
@@ -21,7 +21,7 @@ export const PARTIES = [
   },
   {
     name: 'Social Democrats',
-    color: '#C0392B',
+    color: '#EC4899',
     seats: 125,
     loyalty: 0.93,
     ideology: 'center-left',
