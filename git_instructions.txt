@@ -1,0 +1,52 @@
+GIT WORKFLOW INSTRUCTIONS
+==========================
+
+BRANCHES
+---------
+main  = production (what GitHub Pages serves)
+dev   = work-in-progress (test locally before going live)
+
+
+INITIAL DEV BRANCH SETUP (one time only)
+------------------------------------------
+git checkout -b dev
+git push -u origin dev
+
+
+DAILY WORKFLOW
+---------------
+1. Make sure you're on dev:
+   git checkout dev
+
+2. Make changes, then push to dev:
+   git add <files>
+   git commit -m "description of changes"
+   git push
+
+3. Test locally:
+   python serve.py
+   Open http://localhost:8080
+
+4. When happy, merge to main (goes live on GitHub Pages):
+   git checkout main
+   git merge dev
+   git push
+
+5. Switch back to dev to keep working:
+   git checkout dev
+
+
+CHECKING WHICH BRANCH YOU'RE ON
+---------------------------------
+git branch
+
+
+GITHUB PAGES URL
+-----------------
+https://BenJAlbrecht.github.io/parliament_game/
+
+
+FORCE CACHE BYPASS (if site looks stale)
+------------------------------------------
+https://BenJAlbrecht.github.io/parliament_game/?v=2
+(increment the number each time: ?v=3, ?v=4, etc.)
