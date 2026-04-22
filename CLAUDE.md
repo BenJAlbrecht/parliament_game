@@ -30,23 +30,28 @@ The game is pure HTML/CSS/JS — no frameworks, no bundler. The original `java/P
 data.js  ←  layout.js
 data.js  ←  render.js
 data.js + render.js  ←  vote.js
+data.js  ←  compact.js
 all of the above  ←  parliament.js  (entry point)
 ```
 
 ### What each JS module owns
 
-- **`js/data.js`** — All static content: `PARTIES`, `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel` helpers.
+- **`js/data.js`** — All static content: `PARTIES` (with `goals` per party), `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel`/`leanLabel`/`leanCls`/`logoSrc` helpers.
 - **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
-- **`js/render.js`** — All SVG and DOM manipulation. Key exports: `renderAgenda` (compact bill list), `renderBillDetail` (full breakdown + propose), `renderVoteResult`, `renderLegend`, `renderEnding`. No internal game state.
-- **`js/vote.js`** — Session state and game logic. `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool (flagships first, then random regulars). `proposeBill(bill)` runs the vote and updates loyalty.
-- **`js/parliament.js`** — Entry point. Manages the session agenda pool, turn counter, flagship tracking, and coalition collapse detection. Orchestrates the agenda → bill detail → vote result flow.
+- **`js/render.js`** — All SVG and DOM manipulation. Key exports: `renderAgenda`, `renderBillDetail`, `renderVoteResult`, `renderLegend`, `renderProgramme`, `renderEnding`. No internal game state.
+- **`js/vote.js`** — Session state and game logic. `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool. `proposeBill(bill)` runs the vote and updates loyalty + tracks session stats. Exports `getSessionStats()` returning `{ billsPassed, leftBillsPassed, domainsPassedCount }`.
+- **`js/compact.js`** — Programme for Government screen. `showCompact(party, partners, onBack, onConfirm)` renders goal-selection cards (one per partner, 3 goals each). `onConfirm` receives `{ [partnerName]: goalObj }`.
+- **`js/parliament.js`** — Entry point. Manages session flow, tracks `flagshipsPassed` and `turnsAbstained`, builds end-of-turn stats, and passes `committedGoals` through to `renderProgramme` and `renderEnding`.
 
-### Game flow (per turn)
+### Game flow (full session)
 
-1. `renderAgenda` — compact list of remaining session bills; click any to see detail
-2. `renderBillDetail` — full per-party vote breakdown + loyalty impact; Propose or Back
-3. `proposeBill` → `renderVoteResult` — PASSED/FAILED verdict, loyalty changes in sidebar
-4. Next → increments turn, returns to agenda list
+1. Party selection → Coalition selection → **Programme for Government** (commit 1 goal per partner)
+2. Per turn: Policy home (with live programme status) → Legislative Agenda → Bill detail → Vote result
+3. End of session: Ending screen with mandate results, loyalty, and Programme for Government report
+
+### Goal check functions
+
+Each `PARTIES[i].goals[j]` has `{ id, title, desc, check(policyState, stats) }`. The `stats` object passed at check time contains: `billsPassed`, `leftBillsPassed`, `domainsPassedCount`, `flagshipsPassed`, `turnsAbstained`, `allPartnersLoyalAbove50`, `policyState`.
 
 ### Win condition
 
@@ -54,6 +59,7 @@ all of the above  ←  parliament.js  (entry point)
 - **1–2/3 mandate bills passed** → mid ending
 - **0/3 mandate bills passed** → low ending
 - **Any partner loyalty hits 0%** → coalition collapse ending (immediate)
+- Programme goals are evaluated at session end and shown in the ending stats (Met / Missed)
 
 ### Vote Support Formula (VUF)
 
@@ -73,6 +79,10 @@ Edit `PARTIES` in `js/data.js`. The seat layout recalculates automatically on lo
 ### Adding flagship bills
 
 Add entries to `COALITIONS[id].flagships[partyName]` in `js/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
+
+### Adding or editing party goals
+
+Edit the `goals` array in each party object in `js/data.js`. Each goal is `{ id, title, desc, check(policyState, stats) }`. `STARTING_POLICY` is accessible by closure (defined above `PARTIES` in the same module). Three goals per party is the current standard.
 
 ## Balance Analysis
 

@@ -38,7 +38,7 @@ export function renderCompass(playerParty, partners) {
 
   // Axis labels (outside the plot, in padding)
   const lbl = (x, y, anchor, txt) =>
-    mk('text', { x, y, fill: '#475569', 'font-size': '8', 'font-family': 'Inconsolata, monospace', 'text-anchor': anchor }, txt);
+    mk('text', { x, y, fill: '#64748b', 'font-size': '8', 'font-family': 'Inconsolata, monospace', 'text-anchor': anchor }, txt);
 
   compassSvg.appendChild(lbl(cx, pad - 6, 'middle', 'PROGRESSIVE'));
   compassSvg.appendChild(lbl(cx, pad + plotSize + 14, 'middle', 'TRADITIONAL'));
@@ -476,7 +476,32 @@ export function renderPolicyState(policyState, onOpenAgenda) {
   document.getElementById('btn-open-agenda').onclick = onOpenAgenda;
 }
 
-export function renderEnding(playerParty, coalition, finalLoyalty, billsProposed, flagshipsPassed, collapsed) {
+export function renderProgramme(committedGoals, policyState, stats) {
+  const el = document.getElementById('programme-goals');
+  if (!committedGoals || Object.keys(committedGoals).length === 0) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="panel-section-label" style="margin-top:1.5rem;">Programme for Government</div>
+    <div class="programme-goal-list">
+      ${Object.entries(committedGoals).map(([partnerName, goal]) => {
+        const partner = PARTIES.find(p => p.name === partnerName);
+        const met     = goal.check(policyState, stats);
+        return `
+          <div class="programme-goal-item ${met ? 'programme-goal--met' : 'programme-goal--unmet'}">
+            <span class="programme-goal-icon">${met ? '✓' : '·'}</span>
+            <div class="programme-goal-body">
+              <div class="programme-goal-partner" style="color:${partner?.color ?? '#94a3b8'}">${partnerName}</div>
+              <div class="programme-goal-title">${goal.title}</div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+export function renderEnding(playerParty, coalition, finalLoyalty, billsProposed, flagshipsPassed, collapsed, committedGoals, stats) {
   document.getElementById('screen-parliament').style.display = 'none';
   const screen = document.getElementById('screen-ending');
   screen.style.display = 'block';
@@ -497,6 +522,20 @@ export function renderEnding(playerParty, coalition, finalLoyalty, billsProposed
     ? `<div class="ending-stat-row ending-stat-collapse">Coalition collapsed mid-session</div>`
     : '';
 
+  const goalRows = (committedGoals && stats)
+    ? Object.entries(committedGoals).map(([partnerName, goal]) => {
+        const partner = PARTIES.find(p => p.name === partnerName);
+        const met     = goal.check(stats.policyState ?? {}, stats);
+        const cls     = met ? 'loyalty-up' : 'loyalty-down';
+        const icon    = met ? '✓' : '✗';
+        return `<div class="ending-stat-row">
+          <span class="swatch" style="background:${partner?.color ?? '#94a3b8'}"></span>
+          <span style="color:${partner?.color ?? '#94a3b8'}">${partnerName}</span>
+          — ${goal.title}: <strong class="${cls}">${icon} ${met ? 'Met' : 'Missed'}</strong>
+        </div>`;
+      }).join('')
+    : '';
+
   document.getElementById('ending-stats').innerHTML = `
     ${collapsedRow}
     <div class="ending-stat-row">Mandate bills passed: <strong class="${mandateCls}">${flagshipsPassed} / 3</strong></div>
@@ -509,5 +548,6 @@ export function renderEnding(playerParty, coalition, finalLoyalty, billsProposed
         ${p.name} final loyalty: <strong class="${cls}">${loy.toFixed(1)}%</strong>
       </div>`;
     }).join('')}
+    ${goalRows ? `<div class="ending-stat-divider"></div><div class="ending-stat-section-label">Programme for Government</div>${goalRows}` : ''}
   `;
 }

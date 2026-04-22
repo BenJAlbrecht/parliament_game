@@ -1,17 +1,23 @@
 import { PARTIES, BILLS, STARTING_POLICY } from './data.js';
 
-let seats       = [];
-let playerParty = null;
-let partners    = [];
-let loyalty     = {};   // { partnerName: 0–100 }
-let policyState = {};
+let seats            = [];
+let playerParty      = null;
+let partners         = [];
+let loyalty          = {};   // { partnerName: 0–100 }
+let policyState      = {};
+let billsPassed      = 0;
+let leftBillsPassed  = 0;
+let domainsPassedSet = new Set();
 
 export function init(computedSeats, party, coalitionPartners) {
-  seats       = computedSeats;
-  playerParty = party;
-  partners    = coalitionPartners;
-  loyalty     = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
-  policyState = { ...STARTING_POLICY };
+  seats            = computedSeats;
+  playerParty      = party;
+  partners         = coalitionPartners;
+  loyalty          = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
+  policyState      = { ...STARTING_POLICY };
+  billsPassed      = 0;
+  leftBillsPassed  = 0;
+  domainsPassedSet = new Set();
 }
 
 export function initAgenda(flagships) {
@@ -47,6 +53,13 @@ export function proposeBill(bill) {
   const majority  = Math.floor(total / 2) + 1;
   const passed    = totalAyes >= majority;
 
+  // Session stats (only on pass)
+  if (passed) {
+    billsPassed++;
+    if (bill.score <= -2) leftBillsPassed++;
+    if (bill.dimension)   domainsPassedSet.add(bill.dimension);
+  }
+
   // Loyalty update + policy state (only on pass)
   const loyaltyChanges = {};
   if (passed) {
@@ -73,8 +86,11 @@ export function proposeBill(bill) {
   };
 }
 
-export function getLoyalty() { return { ...loyalty }; }
-export function getPolicyState() { return { ...policyState }; }
+export function getLoyalty()      { return { ...loyalty }; }
+export function getPolicyState()  { return { ...policyState }; }
+export function getSessionStats() {
+  return { billsPassed, leftBillsPassed, domainsPassedCount: domainsPassedSet.size };
+}
 
 // ── internal ────────────────────────────────────────────────────────────────
 

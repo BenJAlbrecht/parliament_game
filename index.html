@@ -10,6 +10,7 @@
 
 <!-- ── Party selection screen ── -->
 <div id="screen-select" class="container">
+  <img class="homepage-decal" src="images/parliament_homepage.svg" alt="">
   <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
   <p class="subtitle">Choose a party to lead into the session.</p>
   <div class="select-body">
@@ -52,6 +53,16 @@
   </div>
 </div>
 
+<!-- ── Programme for Government screen ── -->
+<div id="screen-compact" class="container" style="display:none;">
+  <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
+  <button id="btn-compact-back" class="back-btn">&#8592; Back</button>
+  <div class="compact-screen-title">Programme for Government</div>
+  <div class="compact-screen-subtitle">Before the session begins, commit to one goal per coalition partner. These goals will be tracked throughout the term.</div>
+  <div id="compact-partners"></div>
+  <button id="btn-confirm-programme" class="primary compact-confirm-btn" disabled>Confirm Programme &#8594;</button>
+</div>
+
 <!-- ── Main parliament screen ── -->
 <div id="screen-parliament" class="container" style="display:none;">
   <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
@@ -67,6 +78,7 @@
       <div id="phase-policy" style="display:none;">
         <div class="panel-section-label">Policy State</div>
         <div id="policy-dim-list"></div>
+        <div id="programme-goals" style="display:none;"></div>
         <div class="panel-section-label" style="margin-top:1.5rem;">Actions</div>
         <div id="phase-policy-actions">
           <button id="btn-open-agenda" class="primary" style="margin-top:0.75rem;">Legislative Agenda &#8594;</button>
