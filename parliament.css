@@ -5,8 +5,8 @@
 
 body {
   font-family: 'Inconsolata', monospace;
-  background: #000;
-  color: #66ff88;
+  background: #0f172a;
+  color: #e2e8f0;
   margin: 0;
   padding: 2rem;
   line-height: 1.8;
@@ -21,7 +21,7 @@ h1 {
   font-family: 'Press Start 2P', monospace;
   font-size: 22px;
   margin: 0 0 0.5rem;
-  text-shadow: 3px 3px #226644;
+  text-shadow: 3px 3px #0a1122;
   letter-spacing: 2px;
   display: flex;
   align-items: center;
@@ -36,8 +36,8 @@ h1::after {
   width: 100%;
   height: 2px;
   margin-top: 0.5rem;
-  background: linear-gradient(to right, transparent, #66ff88 25%, #66ff88 75%, transparent);
-  box-shadow: 0 0 10px #66ff8866;
+  background: linear-gradient(to right, transparent, #475569 25%, #475569 75%, transparent);
+  box-shadow: 0 0 10px #47556944;
 }
 
 .header-flag {
@@ -48,7 +48,7 @@ h1::after {
 }
 
 .subtitle {
-  color: #33aa55;
+  color: #94a3b8;
   margin: 0 0 1.5rem;
   font-size: 16px;
   text-align: center;
@@ -65,18 +65,17 @@ button {
   font-family: 'Inconsolata', monospace;
   font-size: 18px;
   padding: 10px 14px;
-  background: #000;
-  border: 2px solid #66ff88;
+  background: #0f172a;
+  border: 2px solid #475569;
   cursor: pointer;
-  color: #66ff88;
+  color: #94a3b8;
   text-transform: uppercase;
-  /* 8-bit raised effect */
-  box-shadow: 4px 4px 0px #226644;
+  box-shadow: 4px 4px 0px #0a1122;
 }
 
 button:hover {
-  background: #1a4433;
-  box-shadow: 2px 2px 0px #226644;
+  background: #1e293b;
+  box-shadow: 2px 2px 0px #0a1122;
   transform: translate(2px, 2px);
 }
 
@@ -86,50 +85,64 @@ button:active {
 }
 
 button.primary {
-  background: #66ff88;
-  color: #000;
-  border-color: #66ff88;
-  box-shadow: 4px 4px 0px #226644;
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: 4px 4px 0px #0a1122;
 }
 
 button.primary:hover {
-  background: #55dd77;
+  background: #cbd5e1;
 }
 
 .bill {
-  background: #000;
-  border: 2px solid #66ff88;
+  background: #1e293b;
+  border: 2px solid #475569;
   padding: 12px 16px;
   margin-bottom: 1rem;
   font-size: 16px;
-  box-shadow: 4px 4px 0px #226644;
+  box-shadow: 4px 4px 0px #0a1122;
 }
 
 .bill-label {
-  color: #33aa55;
+  color: #94a3b8;
   font-size: 14px;
   margin-bottom: 8px;
   text-transform: uppercase;
 }
 
 .bill-title {
-  color: #66ff88;
   font-size: 17px;
 }
 
-
 .chamber {
-  background: #000;
-  border: 2px solid #66ff88;
-  padding: 1rem;
-  box-shadow: 4px 4px 0px #226644;
+  background: #0f172a;
+  border: 2px solid #475569;
+  padding: 0.75rem 1rem 1rem;
+  box-shadow: 4px 4px 0px #0a1122;
+}
+
+.compass {
+  background: #0f172a;
+  border: 2px solid #475569;
+  padding: 0.75rem 1rem 0.75rem;
+  box-shadow: 4px 4px 0px #0a1122;
+  margin-top: 1rem;
+}
+
+.sidebar-box-title {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.5rem;
 }
 
 svg {
   width: 100%;
   height: auto;
   display: block;
-  background: #000;
+  background: #0f172a;
 }
 
 circle {
@@ -141,24 +154,24 @@ circle {
   font-size: 14px;
 }
 
-.legend-group-label {
+.legend-group-label,
+.panel-section-label {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-bottom: 5px;
   margin: 0.75rem 0 0.5rem;
-  border-bottom: 2px solid #33aa55;
+  border-bottom: 2px solid #334155;
 }
 
 .legend-group-stats {
-  color: #226644;
+  color: #475569;
   letter-spacing: 0;
 }
-
 
 .legend-group {
   display: flex;
@@ -167,7 +180,7 @@ circle {
 
 .legend-item {
   padding: 8px 0;
-  border-bottom: 1px solid #1a4433;
+  border-bottom: 1px solid #1e293b;
 }
 
 .legend-item--opp {
@@ -190,7 +203,7 @@ circle {
 
 .legend-item-seats {
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   white-space: nowrap;
 }
 
@@ -203,7 +216,7 @@ circle {
 
 .legend-item-ideology {
   font-size: 12px;
-  color: #226644;
+  color: #475569;
 }
 
 .legend-item-loyalty {
@@ -216,15 +229,15 @@ circle {
   height: 10px;
   border-radius: 0;
   flex-shrink: 0;
-  border: 1px solid #226644;
+  border: 1px solid #334155;
 }
 
 .result {
   margin-top: 1rem;
   padding: 14px 18px;
-  background: #000;
-  border: 2px solid #66ff88;
-  box-shadow: 4px 4px 0px #226644;
+  background: #1e293b;
+  border: 2px solid #475569;
+  box-shadow: 4px 4px 0px #0a1122;
 }
 
 .result-title {
@@ -234,127 +247,109 @@ circle {
 }
 
 .result-passed {
-  color: #66ff88;
-  text-shadow: 2px 2px #226644;
+  color: #4ade80;
+  text-shadow: 2px 2px #14532d;
 }
 
 .result-failed {
-  color: #ff0000;
-  text-shadow: 2px 2px #550000;
+  color: #f87171;
+  text-shadow: 2px 2px #7f1d1d;
 }
 
 .result-tally {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
 }
 
 .history {
   margin-top: 1rem;
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
 }
 
 .history-item {
   padding: 6px 0;
-  border-top: 1px solid #1a4433;
-}
-
-/* ── Homepage background art ── */
-#homepage-art {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 42vw;
-  pointer-events: none;
-  z-index: 0;
-  display: block;
-  image-rendering: auto;
+  border-top: 1px solid #1e293b;
 }
 
 /* ── Party selection layout ── */
 .select-body {
   display: flex;
-  align-items: flex-start;
-  gap: 2.5rem;
-}
-
-.select-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.select-quote {
-  width: 260px;
-  flex-shrink: 0;
-  padding-top: 1.75rem;
-}
-
-.select-quote-text {
-  font-style: italic;
-  font-size: 15px;
-  color: #55dd77;
-  line-height: 2;
-  margin: 0 0 0.75rem;
-}
-
-.select-quote-attr {
-  font-size: 13px;
-  color: #33aa55;
-  margin: 0;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ── Party selection grid ── */
 #party-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   margin-top: 1.5rem;
-  max-width: 860px;
+  width: 100%;
+  max-width: 780px;
 }
 
 .party-card {
-  background: #000;
-  border: 2px solid #66ff88;
-  padding: 14px;
+  background: #1e293b;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #334155;
+  padding: 18px 20px;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #226644;
-  transition: transform 0.05s, box-shadow 0.05s;
+  transition: transform 0.05s, background 0.05s;
+  display: flex;
+  flex-direction: column;
 }
 
 .party-card:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 #226644;
+  background: #243044;
+  transform: translateX(3px);
 }
 
 .party-card-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+.party-card-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
 }
 
 .party-card-name {
-  font-size: 17px;
-  color: #66ff88;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .party-card-tag {
-  font-size: 13px;
-  color: #33aa55;
-  margin-bottom: 10px;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 12px;
   text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
 .party-card-summary {
   font-size: 14px;
-  color: #55dd77;
+  color: #94a3b8;
   line-height: 1.8;
-  margin-bottom: 10px;
+  flex: 1;
 }
 
-.party-card-seats {
-  font-size: 13px;
-  color: #226644;
+.party-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.party-card-seats-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ── Party detail panel ── */
@@ -363,97 +358,243 @@ circle {
   margin-bottom: 1rem;
 }
 
-.detail-card {
-  background: #000;
-  border: 2px solid #66ff88;
-  padding: 20px 24px;
-  box-shadow: 4px 4px 0 #226644;
-  margin-top: 0.5rem;
+.confirm-btn {
+  font-size: 16px;
+  padding: 10px 16px;
 }
 
-.detail-header {
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.detail-col-stats {
+  background: #1e293b;
+  border: 2px solid #475569;
+  padding: 18px 20px;
+  box-shadow: 4px 4px 0 #0a1122;
+}
+
+.detail-col-narrative {
+  background: #1e293b;
+  border: 2px solid #475569;
+  padding: 18px 20px;
+  box-shadow: 4px 4px 0 #0a1122;
+}
+
+.detail-top-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-.detail-swatch {
-  width: 20px;
-  height: 20px;
+.detail-logo {
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
-  border: 1px solid #226644;
-  display: inline-block;
 }
 
-.detail-name {
-  font-size: 19px;
-  color: #66ff88;
+.detail-party-heading {
+  font-size: 20px;
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
-.detail-tag {
-  font-size: 13px;
-  color: #33aa55;
+.detail-ideology-tag {
+  font-size: 11px;
+  color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0;
 }
 
-.detail-summary {
+.detail-stat-block {
+  margin-bottom: 14px;
+}
+
+.detail-stat-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 5px;
+}
+
+.detail-seat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detail-seat-track {
+  flex: 1;
+  height: 6px;
+  background: #334155;
+}
+
+.detail-seat-fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.detail-seat-count {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.detail-seat-pct {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.detail-pos-label {
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+
+.detail-pos-track {
+  position: relative;
+  height: 6px;
+  background: #334155;
+}
+
+.detail-pos-fill {
+  position: absolute;
+  top: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.detail-coalition-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.detail-coalition-name {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-right: 4px;
+  min-width: 100%;
+  margin-bottom: 2px;
+}
+
+.detail-partner-swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.detail-partner-name {
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.detail-partner-sep {
+  font-size: 11px;
+  color: #475569;
+}
+
+.detail-no-coalition {
+  font-size: 12px;
+  color: #475569;
+}
+
+.detail-summary-text {
   font-size: 16px;
-  color: #66ff88;
-  margin: 0 0 14px;
-  line-height: 2;
-}
-
-.detail-history {
-  font-size: 15px;
-  color: #33aa55;
   line-height: 2;
   margin: 0 0 16px;
 }
 
-.detail-stats {
+.detail-history-text {
   font-size: 14px;
-  color: #226644;
-  margin-bottom: 20px;
-}
-
-.confirm-btn {
-  font-size: 18px;
-  padding: 12px 18px;
+  color: #94a3b8;
+  line-height: 2;
+  margin: 0;
 }
 
 /* ── Coalition formation screen ── */
+#coalition-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin-top: 0.75rem;
+}
+
 .coalition-option-card {
-  background: #000;
-  border: 2px solid #66ff88;
-  padding: 16px;
-  margin-bottom: 12px;
+  background: #1e293b;
+  border: 2px solid #334155;
+  padding: 20px 18px 16px;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #226644;
+  box-shadow: 4px 4px 0 #0a1122;
   transition: transform 0.05s, box-shadow 0.05s;
+  display: flex;
+  flex-direction: column;
 }
 
 .coalition-option-card:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 #226644;
+  box-shadow: 2px 2px 0 #0a1122;
 }
 
 .coalition-option-name {
-  font-size: 18px;
-  color: #66ff88;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+.coalition-option-logos {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex: 1;
+  margin-bottom: 18px;
+}
+
+.coalition-option-party-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.coalition-option-logo {
+  width: 48px;
+  height: 48px;
+}
+
+.coalition-option-party-label {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 72px;
+}
+
+.coalition-option-seat-track {
+  height: 4px;
+  background: #0f172a;
   margin-bottom: 10px;
 }
 
-.coalition-option-partners {
-  font-size: 13px;
-  color: #33aa55;
-  text-transform: uppercase;
-  margin-bottom: 8px;
+.coalition-option-seat-fill {
+  height: 100%;
+  background: #475569;
 }
 
-.coalition-option-seats {
-  font-size: 14px;
+.coalition-option-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
 }
 
 .coalition-detail-layout {
@@ -475,93 +616,100 @@ circle {
 
 .coalition-scenario-title {
   font-size: 24px;
-  color: #66ff88;
-  text-shadow: 2px 2px #226644;
+  text-shadow: 2px 2px #0a1122;
   letter-spacing: 1px;
   margin: 1rem 0 0.5rem;
 }
 
 .coalition-scenario {
   font-size: 15px;
-  color: #55dd77;
+  color: #94a3b8;
   line-height: 2;
   margin: 1rem 0 1.5rem;
 }
 
 .coalition-partner-blurb {
   font-size: 14px;
-  color: #44bb66;
+  color: #94a3b8;
   line-height: 1.8;
   margin-bottom: 10px;
 }
 
-
 .coalition-section-label {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   margin: 1.5rem 0 0.75rem;
   letter-spacing: 1px;
 }
 
 .coalition-card {
-  background: #000;
-  border: 2px solid #66ff88;
+  background: #1e293b;
+  border: 2px solid #475569;
   padding: 14px;
   margin-bottom: 14px;
-  box-shadow: 4px 4px 0 #226644;
+  box-shadow: 4px 4px 0 #0a1122;
 }
 
 .coalition-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 8px;
+}
+
+.coalition-card-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .coalition-card-name {
   font-size: 17px;
-  color: #66ff88;
 }
 
 .coalition-card-tag {
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
 
 .coalition-card-summary {
   font-size: 14px;
-  color: #55dd77;
+  color: #94a3b8;
   line-height: 1.8;
   margin-bottom: 10px;
 }
 
 .coalition-card-stats {
   font-size: 13px;
-  color: #226644;
+  color: #475569;
   margin-bottom: 10px;
 }
 
 .coalition-loyalty {
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
 }
 
 .loyalty-value {
-  color: #66ff88;
+  color: #e2e8f0;
 }
 
 .coalition-summary {
   font-size: 16px;
-  color: #33aa55;
   margin-top: 1rem;
 }
 
-.majority-ok  { color: #66ff88; }
-.majority-fail { color: #ff0000; }
+.coalition-seats-meta {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.majority-ok   { color: #4ade80; }
+.majority-fail { color: #f87171; }
 
 /* ── Parliament two-column layout ── */
 .parliament-layout {
@@ -590,6 +738,12 @@ circle {
   flex-wrap: wrap;
 }
 
+.party-header-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
 .party-header-name {
   font-family: 'Press Start 2P', monospace;
   font-size: 15px;
@@ -600,25 +754,25 @@ circle {
 .party-header-role {
   font-family: 'Inconsolata', monospace;
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
   line-height: 1.6;
 }
 
 /* ── Turn counter ── */
 .turn-counter {
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #1a4433;
+  border-bottom: 1px solid #1e293b;
 }
 
 /* ── Phase label (extensible action slot header) ── */
 .phase-label {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.75rem;
@@ -627,7 +781,7 @@ circle {
 /* ── section-label kept for other screens ── */
 .section-label {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 0.75rem;
@@ -643,7 +797,7 @@ circle {
 
 .bill-card-type {
   font-size: 12px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -653,192 +807,286 @@ circle {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: #fff;
-  color: #000;
+  background: #cbd5e1;
+  color: #0f172a;
   padding: 1px 5px;
   vertical-align: middle;
 }
 
 /* ── Agenda list ── */
+.agenda-group {
+  margin-bottom: 1.25rem;
+}
+
+.agenda-group-label {
+  font-size: 10px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #1e293b;
+  margin-bottom: 6px;
+}
+
 .agenda-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  border: 2px solid #66ff88;
-  margin-bottom: 6px;
+  padding: 9px 12px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  margin-bottom: 5px;
   cursor: pointer;
-  box-shadow: 3px 3px 0 #226644;
-  transition: transform 0.05s, box-shadow 0.05s;
+  transition: transform 0.05s, border-color 0.05s;
   gap: 12px;
 }
 
 .agenda-item--passable:hover {
-  background: #0d1f17;
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 #226644;
+  transform: translateX(3px);
+  border-color: #475569;
 }
 
 .agenda-item--blocked {
-  opacity: 0.45;
-  border-color: #442222;
-  box-shadow: 3px 3px 0 #221111;
+  opacity: 0.4;
   cursor: pointer;
 }
 
 .agenda-item--blocked:hover {
-  background: #0d0808;
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 #221111;
+  opacity: 0.6;
+  transform: translateX(3px);
 }
 
-.agenda-item-info {
+.agenda-item-body {
   min-width: 0;
+  flex: 1;
 }
 
 .agenda-item-title {
-  font-size: 14px;
-  color: #66ff88;
-  line-height: 1.6;
-  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 5px;
 }
 
 .agenda-item-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
+
+.bill-lean-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 1px 5px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.lean-left   { color: #60a5fa; border-color: #60a5fa50; }
+.lean-right  { color: #fb923c; border-color: #fb923c50; }
+.lean-centre { color: #94a3b8; border-color: #47556950; }
 
 /* ── Bill detail view ── */
 #phase-bill-detail {
   padding-bottom: 1rem;
 }
 
-.bill-detail-title {
-  font-size: 18px;
-  color: #66ff88;
-  line-height: 1.7;
-  margin: 0.75rem 0 0.5rem;
-}
-
-.bill-detail-position {
-  font-size: 13px;
-  color: #33aa55;
-  margin-bottom: 1rem;
-}
-
-.bill-detail-section {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid #1a4433;
-}
-
-.bill-detail-section-label {
-  font-size: 12px;
-  color: #33aa55;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.75rem;
-}
-
-.bill-detail-section-note {
-  font-size: 11px;
-  color: #226644;
-  text-transform: none;
-  letter-spacing: 0;
-  margin-left: 6px;
-}
-
-.bill-breakdown {
-  display: flex;
-  flex-direction: column;
-}
-
-.breakdown-row {
-  display: grid;
-  grid-template-columns: 14px 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  padding: 5px 0;
-  border-bottom: 1px solid #1a4433;
-  font-size: 13px;
-}
-
-.breakdown-row--opp {
-  opacity: 0.35;
-}
-
-.breakdown-name {
-  color: #66ff88;
-}
-
-.breakdown-ayes {
-  color: #66ff88;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.breakdown-nays {
-  color: #33aa55;
-  text-align: right;
-  white-space: nowrap;
-  min-width: 48px;
-}
-
-.breakdown-total {
+.bill-header-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-top: 3px solid #475569;
+  padding: 16px 18px;
+  margin: 0.75rem 0 10px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: 4px 4px 0 #0a1122;
+}
+
+.bill-header-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.bill-header-title {
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.bill-header-meta {
+  display: flex;
   align-items: center;
-  padding-top: 8px;
-  margin-top: 2px;
-  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.breakdown-total-ayes {
-  color: #33aa55;
+.bill-position-tag {
+  font-size: 11px;
+  color: #64748b;
 }
 
-.bill-detail-propose {
-  margin-top: 1.5rem;
+.bill-verdict {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border: 1px solid;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.bill-verdict--pass  { color: #4ade80; border-color: #4ade8080; background: #4ade8010; }
+.bill-verdict--block { color: #f87171; border-color: #f8717180; background: #f8717110; }
+
+.bill-section {
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+}
+
+.bill-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.bill-section-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.bill-section-note {
+  font-size: 11px;
+  color: #475569;
+}
+
+.bill-bd-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #0f172a;
+  font-size: 12px;
+}
+
+.bill-bd-row:last-child {
+  border-bottom: none;
+}
+
+.bill-bd-row--opp {
+  opacity: 0.3;
+}
+
+.bill-bd-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bill-bd-name {
+  flex: 1;
+  color: #e2e8f0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bill-bd-bar {
+  width: 72px;
+  height: 5px;
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.bill-bd-bar-fill {
+  height: 100%;
+}
+
+.bill-bd-counts {
+  font-size: 12px;
+  color: #94a3b8;
+  white-space: nowrap;
+  text-align: right;
+  min-width: 52px;
+}
+
+.bill-bd-sep {
+  color: #334155;
+}
+
+.bill-loy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #0f172a;
+  font-size: 12px;
+}
+
+.bill-loy-row:last-child {
+  border-bottom: none;
+}
+
+.bill-loy-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bill-loy-name {
+  flex: 1;
+  color: #e2e8f0;
+}
+
+.bill-loy-meter {
+  width: 72px;
+  height: 5px;
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.bill-loy-fill {
+  height: 100%;
+}
+
+.bill-loy-pct {
+  font-size: 11px;
+  color: #64748b;
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bill-loy-delta {
+  font-size: 12px;
+  font-weight: 600;
+  width: 42px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bill-propose-btn {
+  margin-top: 4px;
   width: 100%;
 }
 
-.bill-detail-blocked-msg {
-  margin-top: 1.5rem;
+.bill-blocked-msg {
+  margin-top: 4px;
   font-size: 13px;
-  color: #ff4444;
+  color: #f87171;
   padding: 10px 14px;
-  border: 2px solid #442222;
-  box-shadow: 3px 3px 0 #221111;
-}
-
-.bill-loyalty-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #1a4433;
-}
-
-.bill-loyalty-label {
-  font-size: 11px;
-  color: #33aa55;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 2px;
-}
-
-.bill-loyalty-partner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.bill-loyalty-name {
-  flex: 1;
-  color: #66ff88;
+  border: 1px solid #3b1f1f;
+  background: #f8717108;
 }
 
 .bill-pass-status {
@@ -847,57 +1095,56 @@ circle {
   letter-spacing: 1px;
 }
 
-.bill-pass-status.pass  { color: #66ff88; }
-.bill-pass-status.block { color: #ff4444; }
+.bill-pass-status.pass  { color: #4ade80; }
+.bill-pass-status.block { color: #f87171; }
 
 /* ── All-blocked / abstain banner ── */
 .blocked-banner {
   font-size: 14px;
-  color: #ff4444;
+  color: #f87171;
   padding: 12px 16px;
-  border: 2px solid #442222;
-  box-shadow: 4px 4px 0 #221111;
+  border: 2px solid #3b1f1f;
+  box-shadow: 4px 4px 0 #1a0a0a;
   margin-bottom: 1rem;
   line-height: 1.8;
 }
 
 /* ── Vote verdict (left panel, after vote) ── */
 #phase-result {
-  border: 2px solid #66ff88;
+  border: 2px solid #475569;
   padding: 20px 24px;
-  box-shadow: 4px 4px 0 #226644;
+  box-shadow: 4px 4px 0 #0a1122;
 }
 
 .vote-result-bill {
   font-size: 16px;
-  color: #66ff88;
   margin-bottom: 10px;
 }
 
 .vote-verdict-passed {
   font-size: 26px;
-  color: #66ff88;
-  text-shadow: 2px 2px #226644;
+  color: #4ade80;
+  text-shadow: 2px 2px #14532d;
   letter-spacing: 2px;
 }
 
 .vote-verdict-failed {
   font-size: 26px;
-  color: #ff0000;
-  text-shadow: 2px 2px #550000;
+  color: #f87171;
+  text-shadow: 2px 2px #7f1d1d;
   letter-spacing: 2px;
 }
 
 .vote-verdict-abstained {
   font-size: 26px;
-  color: #33aa55;
-  text-shadow: 2px 2px #1a4433;
+  color: #94a3b8;
+  text-shadow: 2px 2px #1e293b;
   letter-spacing: 2px;
 }
 
 .vote-result-note {
   font-size: 13px;
-  color: #33aa55;
+  color: #94a3b8;
   margin-top: 8px;
 }
 
@@ -905,12 +1152,12 @@ circle {
 .vote-sidebar-section {
   margin-top: 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #1a4433;
+  border-top: 1px solid #1e293b;
 }
 
 .vote-sidebar-label {
   font-size: 12px;
-  color: #33aa55;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 6px;
@@ -918,7 +1165,7 @@ circle {
 
 .vote-sidebar-tally {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
 }
 
 .vote-loyalty-change {
@@ -926,16 +1173,14 @@ circle {
   margin-top: 4px;
 }
 
-.loyalty-up      { color: #66ff88; }
-.loyalty-down    { color: #ff0000; }
-.loyalty-neutral { color: #33aa55; }
-
+.loyalty-up      { color: #4ade80; }
+.loyalty-down    { color: #f87171; }
+.loyalty-neutral { color: #94a3b8; }
 
 /* ── Ending screen ── */
 .ending-coalition-title {
   font-size: 20px;
-  color: #66ff88;
-  text-shadow: 2px 2px #226644;
+  text-shadow: 2px 2px #0a1122;
   letter-spacing: 1px;
   margin: 0.5rem 0 1.25rem;
   text-align: center;
@@ -946,38 +1191,38 @@ circle {
   flex-direction: column;
   gap: 8px;
   padding: 14px 18px;
-  border: 2px solid #226644;
-  box-shadow: 4px 4px 0 #1a4433;
+  border: 2px solid #334155;
+  box-shadow: 4px 4px 0 #0a1122;
   margin-bottom: 1.5rem;
 }
 
 .ending-stat-row {
   font-size: 14px;
-  color: #33aa55;
+  color: #94a3b8;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.ending-stat-row strong { color: #66ff88; }
+.ending-stat-row strong { color: #e2e8f0; }
 
 .ending-stat-collapse {
-  color: #ff4444;
+  color: #f87171;
   font-size: 15px;
   letter-spacing: 1px;
   text-transform: uppercase;
   padding-bottom: 4px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #442222;
+  border-bottom: 1px solid #3b1f1f;
 }
 
 .ending-text {
   font-size: 17px;
-  color: #55dd77;
+  color: #94a3b8;
   line-height: 2;
   padding: 20px 24px;
-  border: 2px solid #226644;
-  box-shadow: 4px 4px 0 #1a4433;
+  border: 2px solid #334155;
+  box-shadow: 4px 4px 0 #0a1122;
   margin-bottom: 1.5rem;
 }
 
@@ -996,13 +1241,134 @@ circle {
   .context-sidebar {
     position: static;
   }
+  #policy-dim-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .you-tag {
   font-size: 12px;
-  background: #66ff88;
-  color: #000;
+  background: #cbd5e1;
+  color: #0f172a;
   padding: 1px 4px;
   margin-left: 4px;
   vertical-align: middle;
+}
+
+/* ── Policy spectrum bars ── */
+#policy-dim-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin-bottom: 1.25rem;
+}
+
+.policy-dimension {
+  padding: 10px 12px;
+  border: 1px solid #1e293b;
+  background: #162032;
+}
+
+.policy-dim-name {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 7px;
+}
+
+.policy-spectrum {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.policy-spectrum--compact {
+  margin-bottom: 4px;
+}
+
+.policy-pole {
+  font-size: 9px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  width: 58px;
+  flex-shrink: 0;
+}
+
+.policy-pole--left  { text-align: right; }
+.policy-pole--right { text-align: left;  }
+
+.policy-track {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+}
+
+.policy-step {
+  flex: 1;
+  height: 18px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.policy-step--active {
+  background: #475569;
+  border-color: #64748b;
+  box-shadow: 0 0 8px #47556966;
+}
+
+.policy-step--dim {
+  background: #1e293b;
+  border-color: #0f172a;
+}
+
+.policy-step--up {
+  background: #4ade80;
+  border-color: #4ade80;
+  box-shadow: 0 0 8px #4ade8066;
+}
+
+.policy-step--down {
+  background: #f87171;
+  border-color: #f87171;
+  box-shadow: 0 0 8px #f8717166;
+}
+
+.policy-dim-desc {
+  font-size: 11px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* ── Policy effect in bill detail ── */
+.bill-policy-dim-name {
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.bill-policy-transition {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.bill-policy-from {
+  font-size: 11px;
+  color: #475569;
+}
+
+.bill-policy-arrow {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.bill-policy-to {
+  font-size: 11px;
 }

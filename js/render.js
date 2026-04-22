@@ -1,4 +1,4 @@
-import { PARTIES, ENDINGS, econLabel, socialLabel } from './data.js';
+import { PARTIES, ENDINGS, POLICY_SCALES, econLabel, socialLabel, leanLabel, leanCls } from './data.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const svg    = document.getElementById('chamber-svg');
@@ -8,6 +8,64 @@ let _govIndices = new Set();
 export function setCoalitionState(playerParty, partners) {
   const govNames = new Set([playerParty.name, ...partners.map(p => p.name)]);
   _govIndices = new Set(PARTIES.map((p, i) => govNames.has(p.name) ? i : -1).filter(i => i >= 0));
+}
+
+export function renderCompass(playerParty, partners) {
+  const compassSvg = document.getElementById('compass-svg');
+  compassSvg.innerHTML = '';
+
+  const W = 280, pad = 38, plotSize = W - 2 * pad;
+  const mapX = e => pad + ((e + 10) / 20) * plotSize;
+  const mapY = s => pad + ((s + 10) / 20) * plotSize;
+  const cx = mapX(0), cy = mapY(0);
+
+  const mk = (tag, attrs = {}, text) => {
+    const el = document.createElementNS(SVG_NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    if (text !== undefined) el.textContent = text;
+    return el;
+  };
+
+  // Plot area background
+  compassSvg.appendChild(mk('rect', { x: pad, y: pad, width: plotSize, height: plotSize, fill: '#162032' }));
+
+  // Plot border
+  compassSvg.appendChild(mk('rect', { x: pad, y: pad, width: plotSize, height: plotSize, fill: 'none', stroke: '#1e293b', 'stroke-width': '1' }));
+
+  // Center crosshairs
+  compassSvg.appendChild(mk('line', { x1: pad, y1: cy, x2: pad + plotSize, y2: cy, stroke: '#1e293b', 'stroke-width': '1' }));
+  compassSvg.appendChild(mk('line', { x1: cx, y1: pad, x2: cx, y2: pad + plotSize, stroke: '#1e293b', 'stroke-width': '1' }));
+
+  // Axis labels (outside the plot, in padding)
+  const lbl = (x, y, anchor, txt) =>
+    mk('text', { x, y, fill: '#475569', 'font-size': '8', 'font-family': 'Inconsolata, monospace', 'text-anchor': anchor }, txt);
+
+  compassSvg.appendChild(lbl(cx, pad - 6, 'middle', 'PROGRESSIVE'));
+  compassSvg.appendChild(lbl(cx, pad + plotSize + 14, 'middle', 'TRADITIONAL'));
+  compassSvg.appendChild(lbl(pad - 4, cy + 4, 'end', 'LEFT'));
+  compassSvg.appendChild(lbl(pad + plotSize + 4, cy + 4, 'start', 'RIGHT'));
+
+  // Party dots
+  PARTIES.forEach(p => {
+    const x        = mapX(p.economic);
+    const y        = mapY(p.social);
+    const isPlayer = p === playerParty;
+
+    const dot = mk('circle', { cx: x, cy: y, r: isPlayer ? '7' : '5', fill: p.color, opacity: '1' });
+    dot.appendChild(mk('title', {}, p.name));
+    compassSvg.appendChild(dot);
+
+    // Short label: initials, or first 2 chars for single-word names
+    const words = p.name.split(/\s+/);
+    const abbr  = words.length > 1 ? words.map(w => w[0]).join('') : p.name.slice(0, 2).toUpperCase();
+    const onLeft = x <= cx;
+    compassSvg.appendChild(mk('text', {
+      x: x + (onLeft ? 9 : -9), y: y + 4,
+      fill: p.color,
+      'font-size': '8', 'font-family': 'Inconsolata, monospace',
+      'text-anchor': onLeft ? 'start' : 'end',
+    }, abbr));
+  });
 }
 
 function restoreCoalitionAppearance(seats) {
@@ -95,16 +153,21 @@ export function renderTurnCounter(turn, total) {
 
 // ── Agenda list ──────────────────────────────────────────────────────────────
 
-export function renderAgenda(agenda, loyalty, player, partners, onSelect, onAbstain) {
+export function renderAgenda(agenda, loyalty, player, partners, onSelect, onAbstain, onBack) {
   const total    = PARTIES.reduce((s, p) => s + p.seats, 0);
   const majority = Math.floor(total / 2) + 1;
 
+  document.getElementById('phase-policy').style.display      = 'none';
   document.getElementById('phase-agenda').style.display      = 'block';
   document.getElementById('phase-bill-detail').style.display = 'none';
   document.getElementById('phase-result').style.display      = 'none';
   document.getElementById('vote-sidebar').style.display      = 'none';
 
-  const agendaData = agenda.map(bill => {
+  document.getElementById('btn-agenda-back').onclick = onBack;
+
+  const DOMAIN_ORDER = Object.keys(POLICY_SCALES);
+
+  const agendaData = agenda.map((bill, i) => {
     let ayes = player.seats;
     for (const p of partners) {
       const L = loyalty[p.name] / 100;
@@ -112,32 +175,53 @@ export function renderAgenda(agenda, loyalty, player, partners, onSelect, onAbst
       const c = Math.max(0, 1 - k / 10);
       ayes   += Math.floor((L + (1 - L) * c) * p.seats);
     }
-    return { bill, passable: ayes >= majority };
+    return { bill, passable: ayes >= majority, idx: i };
   });
 
   const allBlocked = agendaData.every(d => !d.passable);
 
-  document.getElementById('agenda-list').innerHTML = agendaData.map((d, i) => {
-    const { bill, passable } = d;
-    const itemCls    = passable ? 'agenda-item--passable' : 'agenda-item--blocked';
-    const statusCls  = passable ? 'pass' : 'block';
-    const statusText = passable ? 'Passable &#10003;' : 'Blocked &#10007;';
-    const mandateTag = bill.flagship ? `<span class="bill-mandate-tag">Mandate</span>` : '';
-    return `
-      <div class="agenda-item ${itemCls}" data-index="${i}">
-        <div class="agenda-item-info">
-          <div class="agenda-item-title">${bill.title}</div>
-          <div class="agenda-item-meta">
-            <span class="bill-card-type">${bill.type}</span>
-            ${mandateTag}
+  // Group by dimension, preserving POLICY_SCALES order
+  const groupMap = new Map();
+  agendaData.forEach(d => {
+    const dim = d.bill.dimension ?? 'other';
+    if (!groupMap.has(dim)) groupMap.set(dim, []);
+    groupMap.get(dim).push(d);
+  });
+  const groups = [...groupMap.entries()].sort(([a], [b]) => {
+    return (DOMAIN_ORDER.indexOf(a) + 1 || 99) - (DOMAIN_ORDER.indexOf(b) + 1 || 99);
+  });
+
+  document.getElementById('agenda-list').innerHTML = groups.map(([dim, items]) => {
+    const groupLabel = POLICY_SCALES[dim]?.label ?? 'Other';
+    const billsHTML  = items.map(d => {
+      const { bill, passable } = d;
+      const statusCls  = passable ? 'pass' : 'block';
+      const statusWord = passable ? 'Passable &#10003;' : 'Blocked &#10007;';
+      const mandateTag = bill.flagship ? `<span class="bill-mandate-tag">Mandate</span>` : '';
+      return `
+        <div class="agenda-item ${passable ? 'agenda-item--passable' : 'agenda-item--blocked'}" data-agenda-idx="${d.idx}">
+          <div class="agenda-item-body">
+            <div class="agenda-item-title">${bill.title}</div>
+            <div class="agenda-item-meta">
+              <span class="bill-lean-tag ${leanCls(bill.score)}">${leanLabel(bill.score)}</span>
+              ${mandateTag}
+            </div>
           </div>
-        </div>
-        <span class="bill-pass-status ${statusCls}">${statusText}</span>
+          <span class="bill-pass-status ${statusCls}">${statusWord}</span>
+        </div>`;
+    }).join('');
+    return `
+      <div class="agenda-group">
+        <div class="agenda-group-label">${groupLabel}</div>
+        ${billsHTML}
       </div>`;
   }).join('');
 
-  document.getElementById('agenda-list').querySelectorAll('.agenda-item').forEach((item, i) => {
-    item.addEventListener('click', () => onSelect(agendaData[i].bill));
+  document.getElementById('agenda-list').querySelectorAll('.agenda-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const d = agendaData[+item.dataset.agendaIdx];
+      onSelect(d.bill);
+    });
   });
 
   const blockedDiv = document.getElementById('phase-agenda-blocked');
@@ -149,15 +233,15 @@ export function renderAgenda(agenda, loyalty, player, partners, onSelect, onAbst
 
 // ── Bill detail ──────────────────────────────────────────────────────────────
 
-export function renderBillDetail(bill, loyalty, player, partners, onBack, onPropose) {
+export function renderBillDetail(bill, loyalty, player, partners, policyState, onBack, onPropose) {
   const total    = PARTIES.reduce((s, p) => s + p.seats, 0);
   const majority = Math.floor(total / 2) + 1;
 
+  document.getElementById('phase-policy').style.display      = 'none';
   document.getElementById('phase-agenda').style.display      = 'none';
   document.getElementById('phase-bill-detail').style.display = 'block';
   document.getElementById('phase-result').style.display      = 'none';
 
-  // Per-party vote breakdown
   const breakdown = PARTIES.map(p => {
     if (p === player) return { party: p, ayes: p.seats, nays: 0, role: 'player' };
     if (partners.includes(p)) {
@@ -171,72 +255,112 @@ export function renderBillDetail(bill, loyalty, player, partners, onBack, onProp
   });
 
   const totalAyes = breakdown.reduce((s, b) => s + b.ayes, 0);
+  const totalNays = total - totalAyes;
   const passable  = totalAyes >= majority;
 
-  // Show government first, then opposition
   const govRows = breakdown.filter(b => b.role !== 'opposition');
   const oppRows = breakdown.filter(b => b.role === 'opposition');
 
   const breakdownRows = [...govRows, ...oppRows].map(b => {
     const isPlayer = b.role === 'player';
-    const rowCls   = b.role === 'opposition' ? 'breakdown-row--opp' : '';
+    const isOpp    = b.role === 'opposition';
+    const ayePct   = (b.ayes / b.party.seats) * 100;
+    const youTag   = isPlayer ? ` <span class="you-tag">YOU</span>` : '';
     return `
-      <div class="breakdown-row ${rowCls}">
-        <span class="swatch" style="background:${b.party.color}"></span>
-        <span class="breakdown-name">${b.party.name}${isPlayer ? ' <span class="you-tag">YOU</span>' : ''}</span>
-        <span class="breakdown-ayes">${b.ayes} aye</span>
-        <span class="breakdown-nays">${b.nays} nay</span>
+      <div class="bill-bd-row${isOpp ? ' bill-bd-row--opp' : ''}">
+        <span class="bill-bd-dot" style="background:${b.party.color};"></span>
+        <span class="bill-bd-name">${b.party.name}${youTag}</span>
+        <div class="bill-bd-bar"><div class="bill-bd-bar-fill" style="width:${ayePct}%; background:${b.party.color};"></div></div>
+        <span class="bill-bd-counts"><span style="color:${b.party.color}">${b.ayes}</span><span class="bill-bd-sep"> / </span>${b.nays}</span>
       </div>`;
   }).join('');
 
-  // Loyalty deltas for partners
   const loyaltyRows = partners.map(p => {
-    const distance = Math.abs(bill.score - p[bill.type]);
-    const delta    = Math.max(-20, Math.min(5, 5 - distance * 1.5));
-    const sign     = delta >= 0 ? '+' : '';
-    const cls      = delta > 0 ? 'loyalty-up' : delta < 0 ? 'loyalty-down' : 'loyalty-neutral';
-    return `<div class="bill-loyalty-partner">
-      <span class="swatch" style="background:${p.color}"></span>
-      <span class="bill-loyalty-name">${p.name}</span>
-      <span class="${cls}">${sign}${delta.toFixed(1)}%</span>
-    </div>`;
+    const distance   = Math.abs(bill.score - p[bill.type]);
+    const delta      = Math.max(-20, Math.min(5, 5 - distance * 1.5));
+    const sign       = delta >= 0 ? '+' : '';
+    const cls        = delta > 0 ? 'loyalty-up' : delta < 0 ? 'loyalty-down' : 'loyalty-neutral';
+    const currentLoy = loyalty[p.name] ?? 100;
+    return `
+      <div class="bill-loy-row">
+        <span class="bill-loy-dot" style="background:${p.color};"></span>
+        <span class="bill-loy-name">${p.name}</span>
+        <div class="bill-loy-meter"><div class="bill-loy-fill" style="width:${currentLoy}%; background:${p.color}40;"></div></div>
+        <span class="bill-loy-pct">${currentLoy.toFixed(0)}%</span>
+        <span class="bill-loy-delta ${cls}">${sign}${delta.toFixed(1)}</span>
+      </div>`;
   }).join('');
 
-  const mandateTag = bill.flagship ? `<span class="bill-mandate-tag">Mandate</span>` : '';
-  const totalCls   = passable ? 'pass' : 'block';
-  const totalText  = passable ? 'PASSES &#10003;' : 'BLOCKED &#10007;';
+  const mandateTag  = bill.flagship ? `<span class="bill-mandate-tag">Mandate</span>` : '';
+  const posLabel    = bill.type === 'economic' ? econLabel(bill.score) : socialLabel(bill.score);
+  const verdictCls  = passable ? 'pass' : 'block';
+  const verdictText = passable ? 'PASSES &#10003;' : 'BLOCKED &#10007;';
+  const accentColor = passable ? '#4ade80' : '#f87171';
+
+  const policySection = bill.dimension && bill.delta ? (() => {
+    const scale      = POLICY_SCALES[bill.dimension];
+    const curVal     = policyState[bill.dimension] ?? 1;
+    const newVal     = Math.max(1, Math.min(5, curVal + bill.delta));
+    const signCls    = bill.delta > 0 ? 'policy-step--up' : 'policy-step--down';
+    const [lp, rp]   = scale.poles;
+    const deltaSign  = bill.delta > 0 ? '+' : '';
+    const deltaColor = bill.delta > 0 ? 'loyalty-up' : 'loyalty-down';
+    return `
+      <div class="bill-section">
+        <div class="bill-section-header">
+          <span class="bill-section-label">Policy Effect</span>
+          <span class="bill-section-note">if passed &nbsp;<span class="${deltaColor}">${deltaSign}${bill.delta}</span></span>
+        </div>
+        <div class="bill-policy-dim-name">${scale.label}</div>
+        <div class="policy-spectrum policy-spectrum--compact">
+          <span class="policy-pole policy-pole--left">${lp}</span>
+          <div class="policy-track">${policyTrack(newVal, curVal, signCls)}</div>
+          <span class="policy-pole policy-pole--right">${rp}</span>
+        </div>
+        <div class="bill-policy-transition">
+          <span class="bill-policy-from">${scale.steps[curVal - 1]}</span>
+          <span class="bill-policy-arrow ${deltaColor}">&#8594;</span>
+          <span class="bill-policy-to ${deltaColor}">${scale.steps[newVal - 1]}</span>
+        </div>
+      </div>`;
+  })() : '';
 
   const proposeSection = passable
-    ? `<button id="btn-propose" class="primary bill-detail-propose">Propose Bill &#8594;</button>`
-    : `<div class="bill-detail-blocked-msg">Coalition support too low — cannot bring this bill to the floor.</div>`;
+    ? `<button id="btn-propose" class="primary bill-propose-btn">Propose Bill &#8594;</button>`
+    : `<div class="bill-blocked-msg">Coalition support too low — cannot bring this bill to the floor.</div>`;
 
   document.getElementById('bill-detail-content').innerHTML = `
     <button class="back-btn" id="btn-bill-back">&#8592; Back to Agenda</button>
 
-    <div class="bill-detail-title">${bill.title}</div>
-    <div class="bill-card-meta">
-      <span class="bill-card-type">${bill.type}</span>
-      ${mandateTag}
-    </div>
-    <div class="bill-detail-position">${bill.type === 'economic' ? econLabel(bill.score) : socialLabel(bill.score)}</div>
-
-    <div class="bill-detail-section">
-      <div class="bill-detail-section-label">Vote Breakdown</div>
-      <div class="bill-breakdown">
-        ${breakdownRows}
-        <div class="breakdown-total">
-          <span class="breakdown-total-ayes">Total ayes: ${totalAyes} / ${majority}</span>
-          <span class="bill-pass-status ${totalCls}">${totalText}</span>
+    <div class="bill-header-card" style="border-top-color:${accentColor};">
+      <div class="bill-header-body">
+        <div class="bill-header-title">${bill.title}</div>
+        <div class="bill-header-meta">
+          <span class="bill-card-type">${bill.type}</span>
+          ${mandateTag}
+          <span class="bill-position-tag">${posLabel}</span>
         </div>
       </div>
+      <div class="bill-verdict bill-verdict--${verdictCls}">${verdictText}</div>
     </div>
 
-    <div class="bill-detail-section">
-      <div class="bill-detail-section-label">Coalition Loyalty Impact <span class="bill-detail-section-note">if passed</span></div>
-      <div class="bill-loyalty-preview">
-        ${loyaltyRows}
+    <div class="bill-section">
+      <div class="bill-section-header">
+        <span class="bill-section-label">Vote Breakdown</span>
+        <span class="bill-section-note">${totalAyes} aye &nbsp;&middot;&nbsp; ${totalNays} nay &nbsp;&middot;&nbsp; need ${majority}</span>
       </div>
+      ${breakdownRows}
     </div>
+
+    <div class="bill-section">
+      <div class="bill-section-header">
+        <span class="bill-section-label">Coalition Loyalty</span>
+        <span class="bill-section-note">if passed</span>
+      </div>
+      ${loyaltyRows}
+    </div>
+
+    ${policySection}
 
     ${proposeSection}
   `;
@@ -251,6 +375,7 @@ export function renderVoteResult(bill, result) {
   const total    = PARTIES.reduce((s, p) => s + p.seats, 0);
   const majority = Math.floor(total / 2) + 1;
 
+  document.getElementById('phase-policy').style.display      = 'none';
   document.getElementById('phase-agenda').style.display      = 'none';
   document.getElementById('phase-bill-detail').style.display = 'none';
   document.getElementById('phase-result').style.display      = 'block';
@@ -277,6 +402,7 @@ export function renderVoteResult(bill, result) {
 }
 
 export function renderAbstainResult() {
+  document.getElementById('phase-policy').style.display      = 'none';
   document.getElementById('phase-agenda').style.display      = 'none';
   document.getElementById('phase-bill-detail').style.display = 'none';
   document.getElementById('phase-result').style.display      = 'block';
@@ -310,6 +436,44 @@ export function applyVoteAppearance(seats, votes) {
 export function clearVoteDisplay(seats) {
   restoreCoalitionAppearance(seats);
   document.getElementById('vote-sidebar').style.display = 'none';
+}
+
+function policyTrack(activeVal, dimVal = null, activeCls = 'policy-step--active') {
+  return Array.from({ length: 5 }, (_, i) => {
+    const step = i + 1;
+    let cls = 'policy-step';
+    if (step === activeVal)  cls += ` ${activeCls}`;
+    else if (step === dimVal) cls += ' policy-step--dim';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+export function renderPolicyState(policyState, onOpenAgenda) {
+  document.getElementById('phase-policy').style.display      = 'block';
+  document.getElementById('phase-agenda').style.display      = 'none';
+  document.getElementById('phase-bill-detail').style.display = 'none';
+  document.getElementById('phase-result').style.display      = 'none';
+  document.getElementById('vote-sidebar').style.display      = 'none';
+
+  const scales = Object.entries(POLICY_SCALES);
+  document.getElementById('policy-dim-list').innerHTML =
+    scales.map(([key, scale], idx) => {
+      const val  = policyState[key] ?? 1;
+      const desc = scale.steps[val - 1] ?? '';
+      const [leftPole, rightPole] = scale.poles;
+      return `
+        <div class="policy-dimension">
+          <div class="policy-dim-name">${scale.label}</div>
+          <div class="policy-spectrum">
+            <span class="policy-pole policy-pole--left">${leftPole}</span>
+            <div class="policy-track">${policyTrack(val)}</div>
+            <span class="policy-pole policy-pole--right">${rightPole}</span>
+          </div>
+          <div class="policy-dim-desc">${desc}</div>
+        </div>`;
+    }).join('');
+
+  document.getElementById('btn-open-agenda').onclick = onOpenAgenda;
 }
 
 export function renderEnding(playerParty, coalition, finalLoyalty, billsProposed, flagshipsPassed, collapsed) {
