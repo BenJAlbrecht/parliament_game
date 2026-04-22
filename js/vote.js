@@ -1,15 +1,17 @@
-import { PARTIES, BILLS } from './data.js';
+import { PARTIES, BILLS, STARTING_POLICY } from './data.js';
 
 let seats       = [];
 let playerParty = null;
 let partners    = [];
 let loyalty     = {};   // { partnerName: 0–100 }
+let policyState = {};
 
 export function init(computedSeats, party, coalitionPartners) {
   seats       = computedSeats;
   playerParty = party;
   partners    = coalitionPartners;
   loyalty     = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
+  policyState = { ...STARTING_POLICY };
 }
 
 export function initAgenda(flagships) {
@@ -45,7 +47,7 @@ export function proposeBill(bill) {
   const majority  = Math.floor(total / 2) + 1;
   const passed    = totalAyes >= majority;
 
-  // Loyalty update (only on pass)
+  // Loyalty update + policy state (only on pass)
   const loyaltyChanges = {};
   if (passed) {
     partners.forEach(p => {
@@ -55,6 +57,9 @@ export function proposeBill(bill) {
       loyaltyChanges[p.name] = { delta, prev: loyalty[p.name], next };
       loyalty[p.name] = next;
     });
+    if (bill.dimension && bill.delta) {
+      policyState[bill.dimension] = Math.max(1, Math.min(5, policyState[bill.dimension] + bill.delta));
+    }
   }
 
   return {
@@ -69,6 +74,7 @@ export function proposeBill(bill) {
 }
 
 export function getLoyalty() { return { ...loyalty }; }
+export function getPolicyState() { return { ...policyState }; }
 
 // ── internal ────────────────────────────────────────────────────────────────
 

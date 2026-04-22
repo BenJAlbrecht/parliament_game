@@ -1,5 +1,5 @@
 // Page 3 — Coalition Formation (see pages.txt)
-import { PARTIES, COALITIONS, ENDINGS, econLabel, socialLabel } from './data.js';
+import { PARTIES, COALITIONS, ENDINGS, econLabel, socialLabel, logoSrc } from './data.js';
 
 const coalitionScreen = document.getElementById('screen-coalition');
 
@@ -8,8 +8,6 @@ function coalitionTotalSeats(coalition) {
 }
 
 export function showCoalition(playerParty, onBack, onConfirm) {
-  document.getElementById('homepage-art').style.display = 'none';
-
   const options = playerParty.coalitions.map(id => COALITIONS.find(c => c.id === id));
 
   coalitionScreen.style.display = 'block';
@@ -25,15 +23,30 @@ function showChoice(playerParty, options, onBack, onConfirm) {
   const majority = Math.floor(totalAll / 2) + 1;
 
   document.getElementById('coalition-options').innerHTML = options.map(c => {
-    const seats = coalitionTotalSeats(c);
-    const partners = c.parties.filter(n => n !== playerParty.name);
+    const seats       = coalitionTotalSeats(c);
+    const partnerObjs = c.parties
+      .filter(n => n !== playerParty.name)
+      .map(n => PARTIES.find(p => p.name === n));
     const over = seats >= majority;
+    const pct  = Math.round(seats / totalAll * 100);
+
+    const logosHTML = partnerObjs.map(p => `
+      <div class="coalition-option-party-col">
+        <img class="coalition-option-logo" src="${logoSrc(p.name)}" alt="">
+        <span class="coalition-option-party-label" style="color:${p.color};">${p.name}</span>
+      </div>
+    `).join('');
+
     return `
       <div class="coalition-option-card" data-id="${c.id}">
         <div class="coalition-option-name">${c.name}</div>
-        <div class="coalition-option-partners">Coalition Partners: ${partners.join(' &middot; ')}</div>
-        <div class="coalition-option-seats majority-ok">
-          ${seats} seats
+        <div class="coalition-option-logos">${logosHTML}</div>
+        <div class="coalition-option-seat-track">
+          <div class="coalition-option-seat-fill" style="width:${pct}%;"></div>
+        </div>
+        <div class="coalition-option-footer">
+          <span class="${over ? 'majority-ok' : 'majority-fail'}">${seats} seats &middot; ${pct}%</span>
+          <span class="${over ? 'majority-ok' : 'majority-fail'}">${over ? 'Majority &#10003;' : 'No majority &#10007;'}</span>
         </div>
       </div>
     `;
@@ -68,8 +81,10 @@ function showDetail(playerParty, coalition, showBack, onBack, onConfirm) {
         onBack();
       };
 
-  document.getElementById('coalition-scenario-title').textContent =
-    coalition.titles[playerParty.name];
+  const titleEl = document.getElementById('coalition-scenario-title');
+  titleEl.textContent = coalition.titles[playerParty.name];
+  titleEl.style.color = playerParty.color;
+
   document.getElementById('coalition-scenario').textContent =
     coalition.scenarios[playerParty.name];
 
@@ -80,7 +95,7 @@ function showDetail(playerParty, coalition, showBack, onBack, onConfirm) {
   document.getElementById('coalition-partners').innerHTML = partners.map(p => `
     <div class="coalition-card" style="border-color:${p.color}; box-shadow: 4px 4px 0 ${p.color}40;">
       <div class="coalition-card-header">
-        <span class="swatch" style="background:${p.color}; width:14px; height:14px;"></span>
+        <img class="coalition-card-logo" src="${logoSrc(p.name)}" alt="">
         <span class="coalition-card-name">${p.name}</span>
       </div>
       <div class="coalition-card-tag">${p.ideology}</div>
@@ -90,13 +105,21 @@ function showDetail(playerParty, coalition, showBack, onBack, onConfirm) {
     </div>
   `).join('');
 
-  const totalAll = PARTIES.reduce((sum, p) => sum + p.seats, 0);
-  const seats    = coalitionTotalSeats(coalition);
-  const pct      = Math.round(seats / totalAll * 100);
-  document.getElementById('coalition-seats').textContent =
-    `Total seats: ${seats}, out of ${totalAll} | ${pct}%`;
+  const totalAll   = PARTIES.reduce((sum, p) => sum + p.seats, 0);
+  const majority   = Math.floor(totalAll / 2) + 1;
+  const seats      = coalitionTotalSeats(coalition);
+  const pct        = Math.round(seats / totalAll * 100);
+  const over       = seats >= majority;
+  document.getElementById('coalition-seats').innerHTML =
+    `<span class="${over ? 'majority-ok' : 'majority-fail'}">${seats} seats</span>` +
+    `<span class="coalition-seats-meta"> of ${totalAll} &nbsp;&middot;&nbsp; ${pct}% &nbsp;&middot;&nbsp; ` +
+    `${over ? 'majority' : 'no majority'}</span>`;
 
-  document.getElementById('btn-form-coalition').onclick = () => {
+  const formBtn = document.getElementById('btn-form-coalition');
+  formBtn.style.borderColor = playerParty.color;
+  formBtn.style.color       = playerParty.color;
+
+  formBtn.onclick = () => {
     coalitionScreen.style.display = 'none';
     onConfirm(partners, coalition);
   };

@@ -10,12 +10,127 @@ export function socialLabel(n) {
   return 'Traditional';
 }
 
+export function leanLabel(score) {
+  if (score <= -5) return 'Far Left';
+  if (score <=  -2) return 'Left';
+  if (score <   +2) return 'Centre';
+  if (score <=  +5) return 'Right';
+  return 'Far Right';
+}
+
+export function leanCls(score) {
+  if (score <= -2) return 'lean-left';
+  if (score >=  2) return 'lean-right';
+  return 'lean-centre';
+}
+
+const LOGO_FILES = {
+  "People's Alliance":  'logo-pa',
+  'Socialist Party':    'logo-sp',
+  'Renewal':            'logo-r',
+  'Christian Democrats':'logo-cd',
+  'National Front':     'logo-nf',
+};
+export function logoSrc(partyName) {
+  return `images/party_logos/${LOGO_FILES[partyName]}.svg`;
+}
+
 export const LAYOUT = {
   centerX: 340,
   centerY: 310,
   radiusInner: 110,
   radiusOuter: 280,
   rows: 8,
+};
+
+export const POLICY_SCALES = {
+  wages_unions: {
+    label: 'Wages & Unions',
+    poles: ['No Rights', 'Worker Power'],
+    steps: [
+      'No minimum wage, unions suppressed',
+      'Below living cost minimum, limited union rights',
+      'Living wage, basic union recognition',
+      'Strong minimum wage, collective bargaining protected',
+      'Maximum wage cap, full union rights and worker ownership',
+    ],
+  },
+  market_regulation: {
+    label: 'Market Regulation',
+    poles: ['Free Market', 'State-Led'],
+    steps: [
+      'Fully deregulated free market',
+      'Light-touch regulation',
+      'Mixed economy with oversight',
+      'Significant state intervention',
+      'State-led, nationalised key industries',
+    ],
+  },
+  public_services: {
+    label: 'Public Services',
+    poles: ['Privatised', 'Universal'],
+    steps: [
+      'Fully privatised',
+      'Minimal safety net',
+      'Basic public provision',
+      'Comprehensive public services',
+      'Universal provision, free at point of use',
+    ],
+  },
+  fiscal_policy: {
+    label: 'Fiscal Policy',
+    poles: ['Low Tax', 'Redistribute'],
+    steps: [
+      'Flat low tax, minimal redistribution',
+      'Low progressive taxation',
+      'Moderate taxation',
+      'High progressive taxation',
+      'Heavy redistribution, wealth taxes',
+    ],
+  },
+  border_policy: {
+    label: 'Border Policy',
+    poles: ['Open Borders', 'Closed'],
+    steps: [
+      'Open borders, free movement',
+      'Liberal immigration, easy entry',
+      'Controlled immigration, standard checks',
+      'Strict border controls, limited immigration',
+      'Closed borders, zero-net migration',
+    ],
+  },
+  social_policy: {
+    label: 'Social Policy',
+    poles: ['Progressive', 'Traditional'],
+    steps: [
+      'Fully progressive, liberal social framework',
+      'Liberal-leaning social consensus',
+      'Moderate social consensus',
+      'Conservative-leaning social norms',
+      'Traditional values, religious influence on law',
+    ],
+  },
+  foreign_policy: {
+    label: 'Foreign Policy',
+    poles: ['Multilateral', 'Nationalist'],
+    steps: [
+      'Deep European integration, multilateral cooperation',
+      'Pro-international, active treaty participation',
+      'Balanced sovereignty and cooperation',
+      'Eurosceptic, national interest first',
+      'Nationalist, withdrawn from international obligations',
+    ],
+  },
+};
+
+export const STARTING_POLICY = {
+  wages_unions:      2,
+  market_regulation: 2,
+  public_services:   3,
+  fiscal_policy:     2,
+  border_policy:     3,
+  social_policy:     3,
+  foreign_policy:    2,
 };
 
 export const PARTIES = [
@@ -117,19 +232,19 @@ export const COALITIONS = [
     },
     flagships: {
       "People's Alliance": [
-        { title: 'Nationalise the energy sector',                  type: 'economic', score: -8 },
-        { title: 'Cap executive pay at ten times the median wage', type: 'economic', score: -9 },
-        { title: 'Universal rent control act',                     type: 'economic', score: -7 },
+        { title: 'Nationalise the energy sector',                  type: 'economic', score: -8, dimension: 'market_regulation', delta: +2 },
+        { title: 'Cap executive pay at ten times the median wage', type: 'economic', score: -9, dimension: 'wages_unions',       delta: +2 },
+        { title: 'Universal rent control act',                     type: 'economic', score: -7, dimension: 'market_regulation', delta: +2 },
       ],
       'Socialist Party': [
-        { title: 'National housing construction programme',        type: 'economic', score: -6 },
-        { title: 'Nationalise the national rail network',          type: 'economic', score: -7 },
-        { title: 'Universal free university tuition',              type: 'economic', score: -5 },
+        { title: 'National housing construction programme',        type: 'economic', score: -6, dimension: 'public_services',   delta: +2 },
+        { title: 'Nationalise the national rail network',          type: 'economic', score: -7, dimension: 'market_regulation', delta: +2 },
+        { title: 'Universal free university tuition',              type: 'economic', score: -5, dimension: 'public_services',   delta: +2 },
       ],
       'Renewal': [
-        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4 },
-        { title: 'Digital public services modernisation act',        type: 'economic', score: -1 },
-        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3 },
+        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4, dimension: 'social_policy',     delta: -1 },
+        { title: 'Digital public services modernisation act',        type: 'economic', score: -1, dimension: 'public_services',   delta: +1 },
+        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3, dimension: 'social_policy',     delta: -1 },
       ],
     },
   },
@@ -155,14 +270,14 @@ export const COALITIONS = [
     },
     flagships: {
       'Socialist Party': [
-        { title: 'Expand mental health services nationwide',       type: 'economic', score: -5 },
-        { title: 'Public housing fund for low earners',            type: 'economic', score: -4 },
-        { title: 'Raise the minimum wage to a living wage',        type: 'economic', score: -5 },
+        { title: 'Expand mental health services nationwide',       type: 'economic', score: -5, dimension: 'public_services',   delta: +1 },
+        { title: 'Public housing fund for low earners',            type: 'economic', score: -4, dimension: 'public_services',   delta: +1 },
+        { title: 'Raise the minimum wage to a living wage',        type: 'economic', score: -5, dimension: 'wages_unions',      delta: +1 },
       ],
       'Christian Democrats': [
-        { title: 'Balanced budget consolidation act',              type: 'economic', score: +3 },
-        { title: 'Pension system modernisation',                   type: 'economic', score: +4 },
-        { title: 'Renew European defence commitments',             type: 'social',   score: +5 },
+        { title: 'Balanced budget consolidation act',              type: 'economic', score: +3, dimension: 'fiscal_policy',     delta: -2 },
+        { title: 'Pension system modernisation',                   type: 'economic', score: +4, dimension: 'fiscal_policy',     delta: -1 },
+        { title: 'Renew European defence commitments',             type: 'social',   score: +5, dimension: 'foreign_policy',    delta: -1 },
       ],
     },
   },
@@ -196,19 +311,19 @@ export const COALITIONS = [
     },
     flagships: {
       'Renewal': [
-        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4 },
-        { title: 'Open markets free trade agreement',                type: 'economic', score: +3 },
-        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3 },
+        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4, dimension: 'social_policy',     delta: -1 },
+        { title: 'Open markets free trade agreement',                type: 'economic', score: +3, dimension: 'market_regulation', delta: -2 },
+        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3, dimension: 'social_policy',     delta: -1 },
       ],
       'Christian Democrats': [
-        { title: 'Business tax reform and investment package',       type: 'economic', score: +5 },
-        { title: 'Pension system modernisation',                     type: 'economic', score: +4 },
-        { title: 'Border security enhancement act',                  type: 'social',   score: +6 },
+        { title: 'Business tax reform and investment package',       type: 'economic', score: +5, dimension: 'fiscal_policy',     delta: -2 },
+        { title: 'Pension system modernisation',                     type: 'economic', score: +4, dimension: 'fiscal_policy',     delta: -1 },
+        { title: 'Border security enhancement act',                  type: 'social',   score: +6, dimension: 'border_policy',     delta: +2 },
       ],
       'National Front': [
-        { title: 'Strict immigration and border controls act',       type: 'social',   score: +8 },
-        { title: 'Withdrawal from European treaty obligations',      type: 'social',   score: +7 },
-        { title: 'National industry and jobs protection act',        type: 'economic', score: +2 },
+        { title: 'Strict immigration and border controls act',       type: 'social',   score: +8, dimension: 'border_policy',     delta: +2 },
+        { title: 'Withdrawal from European treaty obligations',      type: 'social',   score: +7, dimension: 'foreign_policy',    delta: +2 },
+        { title: 'National industry and jobs protection act',        type: 'economic', score: +2, dimension: 'market_regulation', delta: +1 },
       ],
     },
   },
@@ -272,19 +387,19 @@ export const ENDINGS = {
 };
 
 export const BILLS = [
-  { title: 'Fund public transit expansion', type: 'economic', score: -3 },
-  { title: 'Raise the minimum wage',        type: 'economic', score: -5 },
-  { title: 'Cut corporate tax rate',        type: 'economic', score: +6 },
-  { title: 'Ratify climate accord',         type: 'social',   score: -4 },
-  { title: 'Expand healthcare coverage',    type: 'economic', score: -5 },
-  { title: 'Tighten border controls',       type: 'social',   score: +7 },
-  { title: 'Invest in renewable energy',    type: 'economic', score: -3 },
-  { title: 'Deregulate financial markets',  type: 'economic', score: +7 },
-  { title: 'Fund public education',         type: 'economic', score: -4 },
-  { title: 'Increase defense spending',     type: 'social',   score: +4 },
-  { title: 'Legalize cannabis nationwide',  type: 'social',   score: -6 },
-  { title: 'Reform the tax code',           type: 'economic', score: +2 },
-  { title: 'Ban single-use plastics',       type: 'social',   score: -3 },
-  { title: 'Expand rural broadband',        type: 'economic', score: -1 },
-  { title: 'Privatize postal service',      type: 'economic', score: +8 },
+  { title: 'Fund public transit expansion', type: 'economic', score:  -3, dimension: 'public_services',   delta: +1 },
+  { title: 'Raise the minimum wage',        type: 'economic', score:  -5, dimension: 'wages_unions',       delta: +1 },
+  { title: 'Cut corporate tax rate',        type: 'economic', score:  +6, dimension: 'fiscal_policy',      delta: -1 },
+  { title: 'Ratify climate accord',         type: 'social',   score:  -4, dimension: 'foreign_policy',     delta: -1 },
+  { title: 'Expand healthcare coverage',    type: 'economic', score:  -5, dimension: 'public_services',    delta: +1 },
+  { title: 'Tighten border controls',       type: 'social',   score:  +7, dimension: 'border_policy',      delta: +1 },
+  { title: 'Invest in renewable energy',    type: 'economic', score:  -3, dimension: 'public_services',    delta: +1 },
+  { title: 'Deregulate financial markets',  type: 'economic', score:  +7, dimension: 'market_regulation',  delta: -1 },
+  { title: 'Fund public education',         type: 'economic', score:  -4, dimension: 'public_services',    delta: +1 },
+  { title: 'Increase defense spending',     type: 'social',   score:  +4, dimension: 'foreign_policy',     delta: +1 },
+  { title: 'Legalize cannabis nationwide',  type: 'social',   score:  -6, dimension: 'social_policy',      delta: -1 },
+  { title: 'Reform the tax code',           type: 'economic', score:  +2, dimension: 'fiscal_policy',      delta: -1 },
+  { title: 'Ban single-use plastics',       type: 'social',   score:  -3, dimension: 'social_policy',      delta: -1 },
+  { title: 'Expand rural broadband',        type: 'economic', score:  -1, dimension: 'public_services',    delta: +1 },
+  { title: 'Privatize postal service',      type: 'economic', score:  +8, dimension: 'market_regulation',  delta: -1 },
 ];

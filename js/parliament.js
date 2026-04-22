@@ -1,17 +1,16 @@
 // Page 4 — Parliament Chamber entry point (see pages.txt)
-import { PARTIES } from './data.js';
+import { PARTIES, logoSrc } from './data.js';
 import { calculateSeats } from './layout.js';
 import { renderSeats, renderLegend, renderTurnCounter, renderAgenda, renderBillDetail,
-         renderVoteResult, renderAbstainResult,
+         renderVoteResult, renderAbstainResult, renderPolicyState, renderCompass,
          applyVoteAppearance, clearVoteDisplay, setCoalitionState, renderEnding } from './render.js';
-import { init, initAgenda, proposeBill, getLoyalty } from './vote.js';
+import { init, initAgenda, proposeBill, getLoyalty, getPolicyState } from './vote.js';
 import { showPartySelect } from './select.js';
 import { showCoalition } from './coalition.js';
 
 function startFlow() {
   document.getElementById('screen-coalition').style.display = 'none';
   document.getElementById('screen-select').style.display   = 'block';
-  document.getElementById('homepage-art').style.display    = 'block';
 
   showPartySelect(party => {
     showCoalition(party, startFlow, (partners, coalition) => {
@@ -29,12 +28,14 @@ function startFlow() {
 
       const partyHeader = document.getElementById('party-header');
       partyHeader.innerHTML =
+        `<img class="party-header-logo" src="${logoSrc(party.name)}" alt="">` +
         `<span class="party-header-name" style="color:${party.color}">${party.name}</span>` +
         `<span class="party-header-role">Leader of the ${coalition.name}</span>`;
 
       setCoalitionState(party, partners);
       init(seats, party, partners);
       renderSeats(seats);
+      renderCompass(party, partners);
       renderLegend(party, partners, Object.fromEntries(partners.map(p => [p.name, 100])));
 
       function finishTurn(collapsed = false) {
@@ -51,6 +52,10 @@ function startFlow() {
         }
       }
 
+      function showPolicyHome() {
+        renderPolicyState(getPolicyState(), () => showAgenda());
+      }
+
       function showAgenda() {
         renderAgenda(
           agenda,
@@ -58,7 +63,8 @@ function startFlow() {
           party,
           partners,
           bill => showBillDetail(bill),
-          () => { renderAbstainResult(); finishTurn(false); }
+          () => { renderAbstainResult(); finishTurn(false); },
+          () => showPolicyHome()
         );
       }
 
@@ -68,6 +74,7 @@ function startFlow() {
           getLoyalty(),
           party,
           partners,
+          getPolicyState(),
           () => showAgenda(),
           () => {
             billsProposed++;
@@ -87,7 +94,7 @@ function startFlow() {
         turnCount++;
         renderTurnCounter(turnCount, BILL_LIMIT);
         clearVoteDisplay(seats);
-        showAgenda();
+        showPolicyHome();
       }
 
       nextTurn();
