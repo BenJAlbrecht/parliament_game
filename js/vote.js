@@ -1,28 +1,27 @@
 import { PARTIES, BILLS } from './data.js';
 
-let seats        = [];
-let playerParty  = null;
-let partners     = [];
-let loyalty      = {};   // { partnerName: 0–100 }
-let agendaScore  = 0;
-let billsProposed = 0;
+let seats       = [];
+let playerParty = null;
+let partners    = [];
+let loyalty     = {};   // { partnerName: 0–100 }
 
 export function init(computedSeats, party, coalitionPartners) {
-  seats         = computedSeats;
-  playerParty   = party;
-  partners      = coalitionPartners;
-  loyalty       = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
-  agendaScore   = 0;
-  billsProposed = 0;
+  seats       = computedSeats;
+  playerParty = party;
+  partners    = coalitionPartners;
+  loyalty     = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
 }
 
-export function dealBills() {
-  const shuffled = [...BILLS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 3);
+export function initAgenda(flagships) {
+  const regularCount = 10 - flagships.length;
+  const shuffled     = [...BILLS].sort(() => Math.random() - 0.5);
+  return [
+    ...flagships.map(f => ({ ...f, flagship: true })),
+    ...shuffled.slice(0, regularCount),
+  ];
 }
 
 export function proposeBill(bill) {
-  billsProposed++;
 
   // Build per-party vote counts
   const breakdown = PARTIES.map(p => {
@@ -30,8 +29,11 @@ export function proposeBill(bill) {
       return { party: p, ayes: p.seats, nays: 0, role: 'player' };
     }
     if (partners.includes(p)) {
-      const pct  = loyalty[p.name] / 100;
-      const ayes = Math.floor(pct * p.seats);
+      const L    = loyalty[p.name] / 100;
+      const k    = Math.abs(bill.score - p[bill.type]);
+      const c    = Math.max(0, 1 - k / 10);
+      const vuf  = L + (1 - L) * c;
+      const ayes = Math.floor(vuf * p.seats);
       return { party: p, ayes, nays: p.seats - ayes, role: 'partner' };
     }
     return { party: p, ayes: 0, nays: p.seats, role: 'opposition' };
@@ -48,15 +50,11 @@ export function proposeBill(bill) {
   if (passed) {
     partners.forEach(p => {
       const distance = Math.abs(bill.score - p[bill.type]);
-      const delta    = Math.max(-8, Math.min(3, 3 - distance * 0.6));
+      const delta    = Math.max(-20, Math.min(5, 5 - distance * 1.5));
       const next     = Math.max(0, Math.min(100, loyalty[p.name] + delta));
       loyaltyChanges[p.name] = { delta, prev: loyalty[p.name], next };
       loyalty[p.name] = next;
     });
-
-    // Agenda points for player's own alignment
-    const playerDist = Math.abs(bill.score - playerParty[bill.type]);
-    agendaScore += Math.max(0, 3 - playerDist * 0.6);
   }
 
   return {
@@ -66,14 +64,11 @@ export function proposeBill(bill) {
     breakdown,
     votes:   buildVoteArray(breakdown),
     loyaltyChanges,
-    newLoyalty:    { ...loyalty },
-    agendaScore,
-    billsProposed,
+    newLoyalty: { ...loyalty },
   };
 }
 
-export function getLoyalty()      { return { ...loyalty }; }
-export function getAgendaScore()  { return agendaScore; }
+export function getLoyalty() { return { ...loyalty }; }
 
 // ── internal ────────────────────────────────────────────────────────────────
 

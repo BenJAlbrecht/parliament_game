@@ -12,8 +12,10 @@
 <div id="screen-select" class="container">
   <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
   <p class="subtitle">Choose a party to lead into the session.</p>
-  <div id="party-grid"></div>
-  <div id="party-detail" style="display:none;">
+  <div class="select-body">
+    <div class="select-left">
+      <div id="party-grid"></div>
+      <div id="party-detail" style="display:none;">
     <button id="btn-back" class="back-btn">&#8592; Back</button>
     <div class="detail-card">
       <div class="detail-header">
@@ -31,6 +33,12 @@
       <button id="btn-confirm" class="primary confirm-btn">Lead this party &#8594;</button>
     </div>
   </div>
+    </div><!-- /.select-left -->
+    <aside class="select-quote">
+      <p class="select-quote-text">&#8220;My function in life is not to be a politician in Parliament: it is to get something done.&#8221;</p>
+      <p class="select-quote-attr">Bernadette Devlin</p>
+    </aside>
+  </div><!-- /.select-body -->
 </div>
 
 <!-- ── Coalition formation screen ── -->
@@ -66,29 +74,50 @@
 <div id="screen-parliament" class="container" style="display:none;">
   <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
 
-  <div class="agenda-bar">
-    <span class="agenda-label">Agenda Score</span>
-    <span class="agenda-value" id="agenda-score">0.0</span>
-    <span class="agenda-bills" id="agenda-bills">0 bills proposed</span>
-  </div>
+  <div class="parliament-layout">
 
-  <div id="bill-proposal">
-    <div class="section-label">Propose a bill</div>
-    <div class="bill-cards" id="bill-cards"></div>
-  </div>
+    <!-- LEFT: Action panel (extensible — different phases slot in here) -->
+    <div class="action-panel">
+      <div id="party-header" class="party-header"></div>
+      <div class="turn-counter" id="turn-counter"></div>
 
-  <div id="vote-result" style="display:none;">
-    <div class="vote-result-header" id="vote-result-header"></div>
-    <div class="vote-result-tally" id="vote-result-tally"></div>
-    <div class="vote-result-loyalty" id="vote-result-loyalty"></div>
-    <button id="btn-next-bills" class="primary" style="margin-top:1rem;">Next →</button>
-  </div>
+      <!-- Phase: legislative agenda -->
+      <div id="phase-agenda" style="display:none;">
+        <div class="phase-label">Legislative Agenda</div>
+        <div id="agenda-list"></div>
+        <div id="phase-agenda-blocked" style="display:none;">
+          <div class="blocked-banner">All remaining bills are blocked — coalition support too low.</div>
+          <button id="btn-abstain" class="primary">Abstain (skip turn) &#8594;</button>
+        </div>
+      </div>
 
-  <div class="parliament-lower">
-    <div class="legend" id="legend"></div>
-    <div class="chamber">
-      <svg id="chamber-svg" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+      <!-- Phase: bill detail -->
+      <div id="phase-bill-detail" style="display:none;">
+        <div id="bill-detail-content"></div>
+      </div>
+
+      <!-- Phase: vote result -->
+      <div id="phase-result" style="display:none;">
+        <div id="vote-verdict"></div>
+        <button id="btn-next-bills" class="primary" style="margin-top:1.25rem;">Next &#8594;</button>
+      </div>
     </div>
+
+    <!-- RIGHT: Context sidebar (chamber + coalition state + vote data) -->
+    <div class="context-sidebar">
+      <div class="chamber">
+        <svg id="chamber-svg" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div id="vote-sidebar" style="display:none;">
+        <div class="vote-sidebar-section">
+          <div class="vote-sidebar-label">Vote tally</div>
+          <div class="vote-sidebar-tally" id="vote-sidebar-tally"></div>
+        </div>
+        <div id="vote-sidebar-loyalty"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -96,11 +125,7 @@
 <div id="screen-ending" class="container" style="display:none;">
   <h1><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""><span>Parliament</span><img class="header-flag" src="images/party_flags/flag-base.svg" alt=""></h1>
   <div class="ending-coalition-title" id="ending-coalition-title"></div>
-  <div class="ending-score-bar">
-    <span class="ending-score-label">Final Agenda Score</span>
-    <span class="ending-score-value" id="ending-score-value"></span>
-    <span class="ending-tier" id="ending-tier"></span>
-  </div>
+  <div class="ending-stats" id="ending-stats"></div>
   <div class="ending-text" id="ending-text"></div>
   <button class="primary ending-replay-btn" onclick="location.reload()">Play Again ↺</button>
 </div>

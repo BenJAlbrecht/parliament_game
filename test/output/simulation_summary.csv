@@ -1,0 +1,25 @@
+Party,Coalition,Strategy,N,Mean_bills_passed,Std_bills_passed,Min_bills_passed,Max_bills_passed,P1_name,P1_mean_final_loyalty,P2_name,P2_mean_final_loyalty
+People's Alliance,left,random,10000,8.44,1.33,2,10,Socialist Party,90.8,Renewal,84.2
+People's Alliance,left,pass-focused,10000,9.98,0.14,8,10,Socialist Party,96.6,Renewal,94.4
+People's Alliance,left,loyal,10000,10.00,0.06,7,10,Socialist Party,98.9,Renewal,96.7
+Socialist Party,grand,random,10000,9.47,0.84,5,10,Christian Democrats,66.6,,
+Socialist Party,grand,pass-focused,10000,10.00,0.00,10,10,Christian Democrats,92.5,,
+Socialist Party,grand,loyal,10000,10.00,0.00,10,10,Christian Democrats,96.2,,
+Socialist Party,left,random,10000,7.79,1.47,2,10,People's Alliance,54.1,Renewal,86.1
+Socialist Party,left,pass-focused,10000,9.97,0.20,7,10,People's Alliance,72.4,Renewal,93.7
+Socialist Party,left,loyal,10000,9.99,0.11,7,10,People's Alliance,80.3,Renewal,95.0
+Renewal,left,random,10000,7.97,1.46,2,10,People's Alliance,57.4,Socialist Party,94.1
+Renewal,left,pass-focused,10000,9.96,0.21,7,10,People's Alliance,76.2,Socialist Party,99.1
+Renewal,left,loyal,10000,9.99,0.07,8,10,People's Alliance,86.8,Socialist Party,99.5
+Renewal,right,random,10000,9.47,0.82,4,10,Christian Democrats,66.6,National Front,62.5
+Renewal,right,pass-focused,10000,10.00,0.00,10,10,Christian Democrats,92.6,National Front,88.4
+Renewal,right,loyal,10000,10.00,0.00,10,10,Christian Democrats,94.9,National Front,92.8
+Christian Democrats,grand,random,10000,9.78,0.58,5,10,Socialist Party,78.1,,
+Christian Democrats,grand,pass-focused,10000,10.00,0.00,10,10,Socialist Party,96.1,,
+Christian Democrats,grand,loyal,10000,10.00,0.00,10,10,Socialist Party,99.6,,
+Christian Democrats,right,random,10000,10.00,0.04,8,10,Renewal,74.9,National Front,55.9
+Christian Democrats,right,pass-focused,10000,10.00,0.00,10,10,Renewal,86.9,National Front,79.1
+Christian Democrats,right,loyal,10000,10.00,0.00,10,10,Renewal,88.9,National Front,90.5
+National Front,right,random,10000,9.82,0.47,6,10,Renewal,75.0,Christian Democrats,63.6
+National Front,right,pass-focused,10000,10.00,0.00,10,10,Renewal,84.7,Christian Democrats,87.3
+National Front,right,loyal,10000,10.00,0.01,9,10,Renewal,92.0,Christian Democrats,86.4

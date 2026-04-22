@@ -3,14 +3,14 @@ PARLIAMENT GAME - FORMAT & DESIGN
 
 CORE CONCEPT
 You lead a party, build a coalition, and survive a term. Each turn you propose
-a bill. Passing bills that align with your party's ideology builds your agenda
-score. But bills that are far from your coalition partners' ideologies erode
-their loyalty — and a partner that falls to 0% loyalty leaves the coalition,
+a bill. Bills that are far from your coalition partners' ideologies erode their
+loyalty — and a partner that falls to 0% loyalty leaves the coalition,
 potentially collapsing your government.
 
 CORE TENSION
-Pushing your agenda risks the coalition. Playing it safe keeps partners happy
-but wins you nothing. Every bill is a negotiation between ambition and survival.
+Every bill is a negotiation between ambition and survival. Pushing controversial
+bills gets things done but costs you coalition health. Playing it safe keeps
+partners stable but may leave your agenda unfinished.
 
 
 IDEOLOGY AXES
@@ -33,7 +33,26 @@ Each bill has:
   score   — position on that axis, -10 to +10
 
 The bill's score is compared against each coalition partner's value on the
-same axis to compute ideological distance.
+same axis to compute ideological distance (IDIS, k).
+
+
+VOTE SUPPORT FORMULA (VUF)
+The fraction of a partner's MPs who vote Aye is:
+
+  k   = | bill.score - partner[bill.type] |     // ideology distance, 0–20
+  c   = max(0, 1 - k/10)                        // ideology support, 0–1
+  L   = loyalty / 100                           // normalised loyalty, 0–1
+
+  VUF = L + (1 - L) × c
+
+Interpretation:
+  - At L=1 (full loyalty): VUF = 1. Full coalition discipline — partner votes
+    Aye on everything regardless of ideology.
+  - At L=0 (zero loyalty): VUF = c. Partner votes purely by their own ideology.
+  - At k=0 (perfect alignment): VUF = 1 at any loyalty level.
+  - At k≥10 (strong opposition): c=0, so VUF = L. Only discipline drives votes.
+
+  ayes from partner = floor(VUF × partner.seats)
 
 
 COALITION LOYALTY
@@ -42,15 +61,16 @@ Loyalty is tracked per partner and persists across the session.
 
 When a bill PASSES, loyalty changes for each partner:
 
-  distance    = | bill.score - partner[bill.type] |   // 0–20 range
-  loyaltyDelta = 3 - (distance × 0.6)                 // clamp to [-8, +3]
+  distance     = | bill.score - partner[bill.type] |   // 0–20 range
+  loyaltyDelta = max(-20, min(5, 5 - distance × 1.5))
 
   Examples:
-    distance 0  → +3   (perfectly aligned)
-    distance 5  → 0    (neutral)
-    distance 8  → -1.8 (mildly damaging)
-    distance 13 → -4.8 (seriously damaging)
-    distance 20 → -9   (clamped to -8, maximally opposed)
+    distance 0   → +5    (perfect alignment — loyalty grows)
+    distance 3.3 → 0     (breakeven — no change)
+    distance 5   → -2.5
+    distance 10  → -10
+    distance 15  → -17.5 → clamped to -20
+    distance 17  → -20   (capped)
 
 When a bill FAILS, no loyalty changes (wasted turn).
 
@@ -58,49 +78,34 @@ If a partner's loyalty reaches 0%, they leave the coalition. If the coalition
 loses its majority as a result, the government falls.
 
 
-AGENDA SCORE
-Passing a bill also scores agenda points for the player's own party:
-
-  agendaPoints = 3 - (distance_from_player × 0.6)   // same formula, player as reference
-                 clamped to [0, +3]                   // only positive — no penalty for
-                                                      // passing bills far from your base,
-                                                      // just no reward
-
-The player's goal is to maximise agenda score across the term while keeping
-the coalition alive.
-
-
 PER-TURN LOOP
   1. Player is dealt 3 random bills to choose from
   2. Player picks one to propose
-  3. Vote resolves — coalition partners vote based on loyalty (high loyalty =
-     votes with player even on uncomfortable bills; low loyalty = may defect)
-  4. If passed: loyalty updates per partner, agenda score updates for player
-  5. If failed: wasted turn
-  6. Repeat for ~10 bills per term
+  3. Vote resolves — each coalition partner contributes floor(VUF × seats) Ayes;
+     opposition votes entirely Nay; player's own party always votes Aye
+  4. If passed: loyalty updates per partner (delta = 5 - distance × 1.5, clamped)
+  5. If failed: wasted turn, no loyalty change
+  6. Repeat for 10 bills per term
 
-After ~10 bills: election (not yet implemented).
-
-
-VOTE RESOLUTION (to implement)
-Partner vote probability is a function of loyalty and bill distance:
-  TBD — rough idea: high loyalty partners mostly follow the player's stance;
-  low loyalty partners defect on bills that are far from their own position.
+After 10 bills: session ends. Win condition TBD.
 
 
 COALITION STRUCTURE
 Three pre-set coalition blocs, each with a narrative scenario:
-  Left Bloc      — People's Alliance + Social Democrats + Renewal  (251 seats)
-  Grand Coalition — Social Democrats + Christian Democrats          (278 seats)
-  Right Bloc     — Renewal + Christian Democrats + National Front  (298 seats)
+  Left Bloc       — People's Alliance + Social Democrats + Renewal  (251 seats)
+  Grand Coalition — Social Democrats + Christian Democrats           (278 seats)
+  Right Bloc      — Renewal + Christian Democrats + National Front  (298 seats)
 
 Parties with multiple options (SD, Renewal, CD) choose their coalition on
 Page 3 before the game begins. Coalition loyalty starts at 100% for all
 partners regardless of coalition chosen.
 
+Total seats: 466. Majority: 234.
+
 
 FUTURE / NOT YET IMPLEMENTED
-  - Election at end of term (seats shift based on agenda score + approval)
+  - Win condition / scoring (agenda score system removed, replacement TBD)
+  - Election at end of term (seats shift based on performance)
   - Approval rating (separate from coalition loyalty — public opinion)
   - Multi-term play
   - Opposition actions / events that force reactive votes

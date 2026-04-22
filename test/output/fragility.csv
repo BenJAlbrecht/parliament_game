@@ -1,0 +1,9 @@
+Party,Coalition,Total_seats,Majority,Margin_at_100pct,P1_name,P1_seats,P1_loyalty_floor_pct,P2_name,P2_seats,P2_loyalty_floor_pct
+People's Alliance,left,251,234,17,Socialist Party,133,88,Renewal,83,80
+Socialist Party,grand,278,234,44,Christian Democrats,145,70,,,
+Socialist Party,left,251,234,17,People's Alliance,35,52,Renewal,83,80
+Renewal,left,251,234,17,People's Alliance,35,52,Socialist Party,133,88
+Renewal,right,298,234,64,Christian Democrats,145,56,National Front,70,9
+Christian Democrats,grand,278,234,44,Socialist Party,133,67,,,
+Christian Democrats,right,298,234,64,Renewal,83,23,National Front,70,9
+National Front,right,298,234,64,Renewal,83,23,Christian Democrats,145,56
