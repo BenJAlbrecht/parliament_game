@@ -18,7 +18,7 @@ Then open `http://localhost:8000` in a browser. There is no build step, no compi
 
 ## Project Goal
 
-A browser-based, single-player parliament simulator. The player calls votes on bills; MPs vote mostly along party lines with occasional defections based on a per-party loyalty probability. Future goal: multiplayer support.
+A browser-based, single-player parliament simulator. The player calls votes on bills; MPs vote strictly along party lines. Future goal: multiplayer support.
 
 ## Architecture
 
@@ -35,10 +35,10 @@ all of the above  ←  parliament.js  (entry point)
 
 ### What each JS module owns
 
-- **`js/data.js`** — All static content: `PARTIES` (name, color, seats, loyalty), `BILLS` list, and `LAYOUT` geometry constants. Edit here to add parties, change seat counts, or add bills.
+- **`js/data.js`** — All static content: `PARTIES` (name, color, seats, ideology), `BILLS` list, and `LAYOUT` geometry constants. Edit here to add parties, change seat counts, or add bills.
 - **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows proportional to arc circumference, sorts by angle, and assigns party blocks left-to-right. No DOM access.
 - **`js/render.js`** — All SVG and DOM manipulation. Functions receive data as arguments; no internal game state. The SVG `<circle>` elements are created once by `renderSeats()` and mutated in place on each vote by `applyVoteAppearance()`.
-- **`js/vote.js`** — Session state (`votesPassed`, `votesFailed`, `totalVotes`, `history`) and game logic. `init(seats)` must be called before any votes. `callVote()` picks a random bill, assigns party stances, rolls loyalty per MP, then delegates all rendering to `render.js`.
+- **`js/vote.js`** — Session state (`votesPassed`, `votesFailed`, `totalVotes`, `history`) and game logic. `init(seats)` must be called before any votes. `callVote()` picks a random bill, assigns party stances, then delegates all rendering to `render.js`.
 - **`js/parliament.js`** — Entry point only. Computes seats, calls `init`, renders the initial view, and wires button event listeners.
 
 ### Seat coloring convention
