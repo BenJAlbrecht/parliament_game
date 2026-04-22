@@ -1,60 +1,94 @@
 import { PARTIES, BILLS } from './data.js';
-import { renderResult, renderHistory, applyVoteAppearance, clearVoteDisplay } from './render.js';
 
-let seats = [];
+let seats       = [];
 let playerParty = null;
-let votesPassed = 0;
-let votesFailed = 0;
-let totalVotes = 0;
-let history = [];
+let partners    = [];
+let loyalty     = {};   // { partnerName: 0–100 }
 
-export function init(computedSeats, party) {
-  seats = computedSeats;
+export function init(computedSeats, party, coalitionPartners) {
+  seats       = computedSeats;
   playerParty = party;
+  partners    = coalitionPartners;
+  loyalty     = Object.fromEntries(coalitionPartners.map(p => [p.name, 100]));
 }
 
-export function callVote() {
-  const bill = BILLS[Math.floor(Math.random() * BILLS.length)];
-  document.getElementById('bill').style.display = 'block';
-  document.getElementById('bill-title').textContent = bill;
+export function initAgenda(flagships) {
+  const regularCount = 10 - flagships.length;
+  const shuffled     = [...BILLS].sort(() => Math.random() - 0.5);
+  return [
+    ...flagships.map(f => ({ ...f, flagship: true })),
+    ...shuffled.slice(0, regularCount),
+  ];
+}
 
-  // Each party randomly picks a stance for this bill
-  const partyStance = PARTIES.map(() => Math.random() < 0.5 ? 'aye' : 'nay');
-  const partyTally = PARTIES.map(() => ({ aye: 0, nay: 0 }));
-  let ayes = 0, nays = 0;
+export function proposeBill(bill) {
 
-  // Roll loyalty for each MP and record their vote
-  const votes = seats.map(s => {
-    const party = PARTIES[s.partyIndex];
-    const stance = partyStance[s.partyIndex];
-    const vote = Math.random() < party.loyalty ? stance : (stance === 'aye' ? 'nay' : 'aye');
-    if (vote === 'aye') { ayes++; partyTally[s.partyIndex].aye++; }
-    else                { nays++; partyTally[s.partyIndex].nay++; }
-    return vote;
+  // Build per-party vote counts
+  const breakdown = PARTIES.map(p => {
+    if (p === playerParty) {
+      return { party: p, ayes: p.seats, nays: 0, role: 'player' };
+    }
+    if (partners.includes(p)) {
+      const L    = loyalty[p.name] / 100;
+      const k    = Math.abs(bill.score - p[bill.type]);
+      const c    = Math.max(0, 1 - k / 10);
+      const vuf  = L + (1 - L) * c;
+      const ayes = Math.floor(vuf * p.seats);
+      return { party: p, ayes, nays: p.seats - ayes, role: 'partner' };
+    }
+    return { party: p, ayes: 0, nays: p.seats, role: 'opposition' };
   });
 
-  applyVoteAppearance(seats, votes);
+  const totalAyes = breakdown.reduce((s, b) => s + b.ayes, 0);
+  const totalNays = breakdown.reduce((s, b) => s + b.nays, 0);
+  const total     = PARTIES.reduce((s, p) => s + p.seats, 0);
+  const majority  = Math.floor(total / 2) + 1;
+  const passed    = totalAyes >= majority;
 
-  totalVotes++;
-  const passed = ayes > nays;
-  if (passed) votesPassed++; else votesFailed++;
+  // Loyalty update (only on pass)
+  const loyaltyChanges = {};
+  if (passed) {
+    partners.forEach(p => {
+      const distance = Math.abs(bill.score - p[bill.type]);
+      const delta    = Math.max(-20, Math.min(5, 5 - distance * 1.5));
+      const next     = Math.max(0, Math.min(100, loyalty[p.name] + delta));
+      loyaltyChanges[p.name] = { delta, prev: loyalty[p.name], next };
+      loyalty[p.name] = next;
+    });
+  }
 
-  renderResult(passed, ayes, nays, partyTally);
-
-  history.unshift({ bill, ayes, nays, passed });
-  if (history.length > 8) history.pop();
-  renderHistory(history, votesPassed, votesFailed, totalVotes);
+  return {
+    passed,
+    ayes:    totalAyes,
+    nays:    totalNays,
+    breakdown,
+    votes:   buildVoteArray(breakdown),
+    loyaltyChanges,
+    newLoyalty: { ...loyalty },
+  };
 }
 
-export function clearVotes() {
-  clearVoteDisplay(seats);
-}
+export function getLoyalty() { return { ...loyalty }; }
 
-export function resetSession() {
-  clearVotes();
-  votesPassed = 0;
-  votesFailed = 0;
-  totalVotes = 0;
-  history = [];
-  renderHistory(history, votesPassed, votesFailed, totalVotes);
+// ── internal ────────────────────────────────────────────────────────────────
+
+function buildVoteArray(breakdown) {
+  // For each party, bucket their seat indices then randomly assign ayes
+  const ayesLeft = {};
+  breakdown.forEach(b => { ayesLeft[b.party.name] = b.ayes; });
+
+  const byParty = {};
+  seats.forEach((s, i) => {
+    const name = PARTIES[s.partyIndex].name;
+    (byParty[name] ??= []).push(i);
+  });
+
+  const votes = new Array(seats.length);
+  Object.entries(byParty).forEach(([name, indices]) => {
+    const shuffled = [...indices].sort(() => Math.random() - 0.5);
+    const ayeCount = ayesLeft[name] ?? 0;
+    shuffled.forEach((idx, j) => { votes[idx] = j < ayeCount ? 'aye' : 'nay'; });
+  });
+
+  return votes;
 }

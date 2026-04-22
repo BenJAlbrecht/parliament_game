@@ -18,7 +18,7 @@ Then open `http://localhost:8000` in a browser. There is no build step, no compi
 
 ## Project Goal
 
-A browser-based, single-player parliament simulator. The player calls votes on bills; MPs vote mostly along party lines with occasional defections based on a per-party loyalty probability. Future goal: multiplayer support.
+A browser-based, single-player parliament simulator. The player leads a coalition and passes bills over a 10-turn session. Future goals: multi-session play, additional action types (negotiations, events), multiplayer support.
 
 ## Architecture
 
@@ -35,11 +35,31 @@ all of the above  ←  parliament.js  (entry point)
 
 ### What each JS module owns
 
-- **`js/data.js`** — All static content: `PARTIES` (name, color, seats, loyalty), `BILLS` list, and `LAYOUT` geometry constants. Edit here to add parties, change seat counts, or add bills.
-- **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows proportional to arc circumference, sorts by angle, and assigns party blocks left-to-right. No DOM access.
-- **`js/render.js`** — All SVG and DOM manipulation. Functions receive data as arguments; no internal game state. The SVG `<circle>` elements are created once by `renderSeats()` and mutated in place on each vote by `applyVoteAppearance()`.
-- **`js/vote.js`** — Session state (`votesPassed`, `votesFailed`, `totalVotes`, `history`) and game logic. `init(seats)` must be called before any votes. `callVote()` picks a random bill, assigns party stances, rolls loyalty per MP, then delegates all rendering to `render.js`.
-- **`js/parliament.js`** — Entry point only. Computes seats, calls `init`, renders the initial view, and wires button event listeners.
+- **`js/data.js`** — All static content: `PARTIES`, `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel` helpers.
+- **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
+- **`js/render.js`** — All SVG and DOM manipulation. Key exports: `renderAgenda` (compact bill list), `renderBillDetail` (full breakdown + propose), `renderVoteResult`, `renderLegend`, `renderEnding`. No internal game state.
+- **`js/vote.js`** — Session state and game logic. `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool (flagships first, then random regulars). `proposeBill(bill)` runs the vote and updates loyalty.
+- **`js/parliament.js`** — Entry point. Manages the session agenda pool, turn counter, flagship tracking, and coalition collapse detection. Orchestrates the agenda → bill detail → vote result flow.
+
+### Game flow (per turn)
+
+1. `renderAgenda` — compact list of remaining session bills; click any to see detail
+2. `renderBillDetail` — full per-party vote breakdown + loyalty impact; Propose or Back
+3. `proposeBill` → `renderVoteResult` — PASSED/FAILED verdict, loyalty changes in sidebar
+4. Next → increments turn, returns to agenda list
+
+### Win condition
+
+- **3/3 mandate bills passed** → high ending
+- **1–2/3 mandate bills passed** → mid ending
+- **0/3 mandate bills passed** → low ending
+- **Any partner loyalty hits 0%** → coalition collapse ending (immediate)
+
+### Vote Support Formula (VUF)
+
+Partner vote share: `L + (1 - L) * c` where `L = loyalty/100`, `k = |bill.score - partner[bill.type]|`, `c = max(0, 1 - k/10)`.
+
+Loyalty delta (fires only on passed bills): `max(-20, min(5, 5 - distance * 1.5))`.
 
 ### Seat coloring convention
 
@@ -48,4 +68,18 @@ all of the above  ←  parliament.js  (entry point)
 
 ### Adding a new party
 
-Edit `PARTIES` in `js/data.js`. The seat layout recalculates automatically on load — no other files need to change.
+Edit `PARTIES` in `js/data.js`. The seat layout recalculates automatically on load — no other files need to change. Also add the party to relevant `COALITIONS` entries and `ENDINGS`.
+
+### Adding flagship bills
+
+Add entries to `COALITIONS[id].flagships[partyName]` in `js/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
+
+## Balance Analysis
+
+`test/analyze.py` is a headless balance analyser. Run from the project root:
+
+```bash
+python test/analyze.py
+```
+
+Writes CSVs to `test/output/`. The data mirrors `js/data.js` — if parties, bills, or formulas change there, update `analyze.py` to match.

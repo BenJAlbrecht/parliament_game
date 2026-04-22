@@ -1,0 +1,121 @@
+Party,Coalition,Bill,Score,Type,Passes_at_full_loyalty,Expected_ayes_full_loyalty,Partner_loyalty_sum,Partner_loyalty_min,Partner_details
+People's Alliance,left,Fund public transit expansion,-3,economic,yes,251,1.00,-2.50,Socialist Party:3.5 | Renewal:-2.5
+People's Alliance,left,Raise the minimum wage,-5,economic,yes,251,-2.00,-5.50,Socialist Party:3.5 | Renewal:-5.5
+People's Alliance,left,Cut corporate tax rate,6,economic,yes,251,-11.00,-10.00,Socialist Party:-10.0 | Renewal:-1.0
+People's Alliance,left,Ratify climate accord,-4,social,yes,251,8.50,3.50,Socialist Party:5.0 | Renewal:3.5
+People's Alliance,left,Expand healthcare coverage,-5,economic,yes,251,-2.00,-5.50,Socialist Party:3.5 | Renewal:-5.5
+People's Alliance,left,Tighten border controls,7,social,yes,251,-24.50,-13.00,Socialist Party:-11.5 | Renewal:-13.0
+People's Alliance,left,Invest in renewable energy,-3,economic,yes,251,1.00,-2.50,Socialist Party:3.5 | Renewal:-2.5
+People's Alliance,left,Deregulate financial markets,7,economic,yes,251,-14.00,-11.50,Socialist Party:-11.5 | Renewal:-2.5
+People's Alliance,left,Fund public education,-4,economic,yes,251,1.00,-4.00,Socialist Party:5.0 | Renewal:-4.0
+People's Alliance,left,Increase defense spending,4,social,yes,251,-15.50,-8.50,Socialist Party:-7.0 | Renewal:-8.5
+People's Alliance,left,Legalize cannabis nationwide,-6,social,yes,251,5.50,2.00,Socialist Party:2.0 | Renewal:3.5
+People's Alliance,left,Reform the tax code,2,economic,yes,251,1.00,-4.00,Socialist Party:-4.0 | Renewal:5.0
+People's Alliance,left,Ban single-use plastics,-3,social,yes,251,5.50,2.00,Socialist Party:3.5 | Renewal:2.0
+People's Alliance,left,Expand rural broadband,-1,economic,yes,251,1.00,0.50,Socialist Party:0.5 | Renewal:0.5
+People's Alliance,left,Privatize postal service,8,economic,yes,251,-17.00,-13.00,Socialist Party:-13.0 | Renewal:-4.0
+Socialist Party,grand,Fund public transit expansion,-3,economic,yes,278,-5.50,-5.50,Christian Democrats:-5.5
+Socialist Party,grand,Raise the minimum wage,-5,economic,yes,278,-8.50,-8.50,Christian Democrats:-8.5
+Socialist Party,grand,Cut corporate tax rate,6,economic,yes,278,2.00,2.00,Christian Democrats:2.0
+Socialist Party,grand,Ratify climate accord,-4,social,yes,278,-8.50,-8.50,Christian Democrats:-8.5
+Socialist Party,grand,Expand healthcare coverage,-5,economic,yes,278,-8.50,-8.50,Christian Democrats:-8.5
+Socialist Party,grand,Tighten border controls,7,social,yes,278,2.00,2.00,Christian Democrats:2.0
+Socialist Party,grand,Invest in renewable energy,-3,economic,yes,278,-5.50,-5.50,Christian Democrats:-5.5
+Socialist Party,grand,Deregulate financial markets,7,economic,yes,278,0.50,0.50,Christian Democrats:0.5
+Socialist Party,grand,Fund public education,-4,economic,yes,278,-7.00,-7.00,Christian Democrats:-7.0
+Socialist Party,grand,Increase defense spending,4,social,yes,278,3.50,3.50,Christian Democrats:3.5
+Socialist Party,grand,Legalize cannabis nationwide,-6,social,yes,278,-11.50,-11.50,Christian Democrats:-11.5
+Socialist Party,grand,Reform the tax code,2,economic,yes,278,2.00,2.00,Christian Democrats:2.0
+Socialist Party,grand,Ban single-use plastics,-3,social,yes,278,-7.00,-7.00,Christian Democrats:-7.0
+Socialist Party,grand,Expand rural broadband,-1,economic,yes,278,-2.50,-2.50,Christian Democrats:-2.5
+Socialist Party,grand,Privatize postal service,8,economic,yes,278,-1.00,-1.00,Christian Democrats:-1.0
+Socialist Party,left,Fund public transit expansion,-3,economic,yes,251,-6.50,-4.00,People's Alliance:-4.0 | Renewal:-2.5
+Socialist Party,left,Raise the minimum wage,-5,economic,yes,251,-6.50,-5.50,People's Alliance:-1.0 | Renewal:-5.5
+Socialist Party,left,Cut corporate tax rate,6,economic,yes,251,-18.50,-17.50,People's Alliance:-17.5 | Renewal:-1.0
+Socialist Party,left,Ratify climate accord,-4,social,yes,251,4.00,0.50,People's Alliance:0.5 | Renewal:3.5
+Socialist Party,left,Expand healthcare coverage,-5,economic,yes,251,-6.50,-5.50,People's Alliance:-1.0 | Renewal:-5.5
+Socialist Party,left,Tighten border controls,7,social,yes,251,-29.00,-16.00,People's Alliance:-16.0 | Renewal:-13.0
+Socialist Party,left,Invest in renewable energy,-3,economic,yes,251,-6.50,-4.00,People's Alliance:-4.0 | Renewal:-2.5
+Socialist Party,left,Deregulate financial markets,7,economic,yes,251,-21.50,-19.00,People's Alliance:-19.0 | Renewal:-2.5
+Socialist Party,left,Fund public education,-4,economic,yes,251,-6.50,-4.00,People's Alliance:-2.5 | Renewal:-4.0
+Socialist Party,left,Increase defense spending,4,social,yes,251,-20.00,-11.50,People's Alliance:-11.5 | Renewal:-8.5
+Socialist Party,left,Legalize cannabis nationwide,-6,social,yes,251,7.00,3.50,People's Alliance:3.5 | Renewal:3.5
+Socialist Party,left,Reform the tax code,2,economic,yes,251,-6.50,-11.50,People's Alliance:-11.5 | Renewal:5.0
+Socialist Party,left,Ban single-use plastics,-3,social,yes,251,1.00,-1.00,People's Alliance:-1.0 | Renewal:2.0
+Socialist Party,left,Expand rural broadband,-1,economic,yes,251,-6.50,-7.00,People's Alliance:-7.0 | Renewal:0.5
+Socialist Party,left,Privatize postal service,8,economic,yes,251,-24.00,-20.00,People's Alliance:-20.0 | Renewal:-4.0
+Renewal,left,Fund public transit expansion,-3,economic,yes,251,-0.50,-4.00,People's Alliance:-4.0 | Socialist Party:3.5
+Renewal,left,Raise the minimum wage,-5,economic,yes,251,2.50,-1.00,People's Alliance:-1.0 | Socialist Party:3.5
+Renewal,left,Cut corporate tax rate,6,economic,yes,251,-27.50,-17.50,People's Alliance:-17.5 | Socialist Party:-10.0
+Renewal,left,Ratify climate accord,-4,social,yes,251,5.50,0.50,People's Alliance:0.5 | Socialist Party:5.0
+Renewal,left,Expand healthcare coverage,-5,economic,yes,251,2.50,-1.00,People's Alliance:-1.0 | Socialist Party:3.5
+Renewal,left,Tighten border controls,7,social,yes,251,-27.50,-16.00,People's Alliance:-16.0 | Socialist Party:-11.5
+Renewal,left,Invest in renewable energy,-3,economic,yes,251,-0.50,-4.00,People's Alliance:-4.0 | Socialist Party:3.5
+Renewal,left,Deregulate financial markets,7,economic,yes,251,-30.50,-19.00,People's Alliance:-19.0 | Socialist Party:-11.5
+Renewal,left,Fund public education,-4,economic,yes,251,2.50,-2.50,People's Alliance:-2.5 | Socialist Party:5.0
+Renewal,left,Increase defense spending,4,social,yes,251,-18.50,-11.50,People's Alliance:-11.5 | Socialist Party:-7.0
+Renewal,left,Legalize cannabis nationwide,-6,social,yes,251,5.50,2.00,People's Alliance:3.5 | Socialist Party:2.0
+Renewal,left,Reform the tax code,2,economic,yes,251,-15.50,-11.50,People's Alliance:-11.5 | Socialist Party:-4.0
+Renewal,left,Ban single-use plastics,-3,social,yes,251,2.50,-1.00,People's Alliance:-1.0 | Socialist Party:3.5
+Renewal,left,Expand rural broadband,-1,economic,yes,251,-6.50,-7.00,People's Alliance:-7.0 | Socialist Party:0.5
+Renewal,left,Privatize postal service,8,economic,yes,251,-33.00,-20.00,People's Alliance:-20.0 | Socialist Party:-13.0
+Renewal,right,Fund public transit expansion,-3,economic,yes,298,-6.50,-5.50,Christian Democrats:-5.5 | National Front:-1.0
+Renewal,right,Raise the minimum wage,-5,economic,yes,298,-12.50,-8.50,Christian Democrats:-8.5 | National Front:-4.0
+Renewal,right,Cut corporate tax rate,6,economic,yes,298,-0.50,-2.50,Christian Democrats:2.0 | National Front:-2.5
+Renewal,right,Ratify climate accord,-4,social,yes,298,-23.00,-14.50,Christian Democrats:-8.5 | National Front:-14.5
+Renewal,right,Expand healthcare coverage,-5,economic,yes,298,-12.50,-8.50,Christian Democrats:-8.5 | National Front:-4.0
+Renewal,right,Tighten border controls,7,social,yes,298,4.00,2.00,Christian Democrats:2.0 | National Front:2.0
+Renewal,right,Invest in renewable energy,-3,economic,yes,298,-6.50,-5.50,Christian Democrats:-5.5 | National Front:-1.0
+Renewal,right,Deregulate financial markets,7,economic,yes,298,-3.50,-4.00,Christian Democrats:0.5 | National Front:-4.0
+Renewal,right,Fund public education,-4,economic,yes,298,-9.50,-7.00,Christian Democrats:-7.0 | National Front:-2.5
+Renewal,right,Increase defense spending,4,social,yes,298,1.00,-2.50,Christian Democrats:3.5 | National Front:-2.5
+Renewal,right,Legalize cannabis nationwide,-6,social,yes,298,-29.00,-17.50,Christian Democrats:-11.5 | National Front:-17.5
+Renewal,right,Reform the tax code,2,economic,yes,298,5.50,2.00,Christian Democrats:2.0 | National Front:3.5
+Renewal,right,Ban single-use plastics,-3,social,yes,298,-20.00,-13.00,Christian Democrats:-7.0 | National Front:-13.0
+Renewal,right,Expand rural broadband,-1,economic,yes,298,-0.50,-2.50,Christian Democrats:-2.5 | National Front:2.0
+Renewal,right,Privatize postal service,8,economic,yes,298,-6.50,-5.50,Christian Democrats:-1.0 | National Front:-5.5
+Christian Democrats,grand,Fund public transit expansion,-3,economic,yes,278,3.50,3.50,Socialist Party:3.5
+Christian Democrats,grand,Raise the minimum wage,-5,economic,yes,278,3.50,3.50,Socialist Party:3.5
+Christian Democrats,grand,Cut corporate tax rate,6,economic,yes,278,-10.00,-10.00,Socialist Party:-10.0
+Christian Democrats,grand,Ratify climate accord,-4,social,yes,278,5.00,5.00,Socialist Party:5.0
+Christian Democrats,grand,Expand healthcare coverage,-5,economic,yes,278,3.50,3.50,Socialist Party:3.5
+Christian Democrats,grand,Tighten border controls,7,social,yes,278,-11.50,-11.50,Socialist Party:-11.5
+Christian Democrats,grand,Invest in renewable energy,-3,economic,yes,278,3.50,3.50,Socialist Party:3.5
+Christian Democrats,grand,Deregulate financial markets,7,economic,yes,278,-11.50,-11.50,Socialist Party:-11.5
+Christian Democrats,grand,Fund public education,-4,economic,yes,278,5.00,5.00,Socialist Party:5.0
+Christian Democrats,grand,Increase defense spending,4,social,yes,278,-7.00,-7.00,Socialist Party:-7.0
+Christian Democrats,grand,Legalize cannabis nationwide,-6,social,yes,278,2.00,2.00,Socialist Party:2.0
+Christian Democrats,grand,Reform the tax code,2,economic,yes,278,-4.00,-4.00,Socialist Party:-4.0
+Christian Democrats,grand,Ban single-use plastics,-3,social,yes,278,3.50,3.50,Socialist Party:3.5
+Christian Democrats,grand,Expand rural broadband,-1,economic,yes,278,0.50,0.50,Socialist Party:0.5
+Christian Democrats,grand,Privatize postal service,8,economic,yes,278,-13.00,-13.00,Socialist Party:-13.0
+Christian Democrats,right,Fund public transit expansion,-3,economic,yes,298,-3.50,-2.50,Renewal:-2.5 | National Front:-1.0
+Christian Democrats,right,Raise the minimum wage,-5,economic,yes,298,-9.50,-5.50,Renewal:-5.5 | National Front:-4.0
+Christian Democrats,right,Cut corporate tax rate,6,economic,yes,298,-3.50,-2.50,Renewal:-1.0 | National Front:-2.5
+Christian Democrats,right,Ratify climate accord,-4,social,yes,298,-11.00,-14.50,Renewal:3.5 | National Front:-14.5
+Christian Democrats,right,Expand healthcare coverage,-5,economic,yes,298,-9.50,-5.50,Renewal:-5.5 | National Front:-4.0
+Christian Democrats,right,Tighten border controls,7,social,yes,298,-11.00,-13.00,Renewal:-13.0 | National Front:2.0
+Christian Democrats,right,Invest in renewable energy,-3,economic,yes,298,-3.50,-2.50,Renewal:-2.5 | National Front:-1.0
+Christian Democrats,right,Deregulate financial markets,7,economic,yes,298,-6.50,-4.00,Renewal:-2.5 | National Front:-4.0
+Christian Democrats,right,Fund public education,-4,economic,yes,298,-6.50,-4.00,Renewal:-4.0 | National Front:-2.5
+Christian Democrats,right,Increase defense spending,4,social,yes,298,-11.00,-8.50,Renewal:-8.5 | National Front:-2.5
+Christian Democrats,right,Legalize cannabis nationwide,-6,social,yes,298,-14.00,-17.50,Renewal:3.5 | National Front:-17.5
+Christian Democrats,right,Reform the tax code,2,economic,yes,298,8.50,3.50,Renewal:5.0 | National Front:3.5
+Christian Democrats,right,Ban single-use plastics,-3,social,yes,298,-11.00,-13.00,Renewal:2.0 | National Front:-13.0
+Christian Democrats,right,Expand rural broadband,-1,economic,yes,298,2.50,0.50,Renewal:0.5 | National Front:2.0
+Christian Democrats,right,Privatize postal service,8,economic,yes,298,-9.50,-5.50,Renewal:-4.0 | National Front:-5.5
+National Front,right,Fund public transit expansion,-3,economic,yes,298,-8.00,-5.50,Renewal:-2.5 | Christian Democrats:-5.5
+National Front,right,Raise the minimum wage,-5,economic,yes,298,-14.00,-8.50,Renewal:-5.5 | Christian Democrats:-8.5
+National Front,right,Cut corporate tax rate,6,economic,yes,298,1.00,-1.00,Renewal:-1.0 | Christian Democrats:2.0
+National Front,right,Ratify climate accord,-4,social,yes,298,-5.00,-8.50,Renewal:3.5 | Christian Democrats:-8.5
+National Front,right,Expand healthcare coverage,-5,economic,yes,298,-14.00,-8.50,Renewal:-5.5 | Christian Democrats:-8.5
+National Front,right,Tighten border controls,7,social,yes,298,-11.00,-13.00,Renewal:-13.0 | Christian Democrats:2.0
+National Front,right,Invest in renewable energy,-3,economic,yes,298,-8.00,-5.50,Renewal:-2.5 | Christian Democrats:-5.5
+National Front,right,Deregulate financial markets,7,economic,yes,298,-2.00,-2.50,Renewal:-2.5 | Christian Democrats:0.5
+National Front,right,Fund public education,-4,economic,yes,298,-11.00,-7.00,Renewal:-4.0 | Christian Democrats:-7.0
+National Front,right,Increase defense spending,4,social,yes,298,-5.00,-8.50,Renewal:-8.5 | Christian Democrats:3.5
+National Front,right,Legalize cannabis nationwide,-6,social,yes,298,-8.00,-11.50,Renewal:3.5 | Christian Democrats:-11.5
+National Front,right,Reform the tax code,2,economic,yes,298,7.00,2.00,Renewal:5.0 | Christian Democrats:2.0
+National Front,right,Ban single-use plastics,-3,social,yes,298,-5.00,-7.00,Renewal:2.0 | Christian Democrats:-7.0
+National Front,right,Expand rural broadband,-1,economic,yes,298,-2.00,-2.50,Renewal:0.5 | Christian Democrats:-2.5
+National Front,right,Privatize postal service,8,economic,yes,298,-5.00,-4.00,Renewal:-4.0 | Christian Democrats:-1.0

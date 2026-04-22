@@ -1,0 +1,58 @@
+PARLIAMENT GAME — SCREENS
+=========================
+
+Flow:
+
+  [Page 1: Party Grid] --> [Page 2: Party Detail] --> [Page 3: Coalition Formation] --> [Page 4: Parliament Chamber]
+
+
+────────────────────────────────────────────────────────────
+PAGE 1: Party Grid
+────────────────────────────────────────────────────────────
+  HTML:  index.html  #screen-select > #party-grid
+  JS:    js/select.js  (renderGrid)
+
+  The opening screen. All parties are shown as clickable
+  cards. Clicking a card advances to Page 2.
+
+
+────────────────────────────────────────────────────────────
+PAGE 2: Party Detail
+────────────────────────────────────────────────────────────
+  HTML:  index.html  #screen-select > #party-detail
+  JS:    js/select.js  (showDetail)
+
+  Shown after clicking a party card on Page 1. Displays
+  full party info (summary, history, seats) and
+  a "Lead this party" confirm button. Back arrow returns
+  to Page 1.
+
+
+────────────────────────────────────────────────────────────
+PAGE 3: Coalition Formation
+────────────────────────────────────────────────────────────
+  HTML:  index.html  #screen-coalition
+  JS:    js/coalition.js  (showCoalition)
+
+  Shown after confirming a party on Page 2. Displays the
+  player's pre-set coalition partner(s) with their stats
+  and starting coalition loyalty (100%). Confirm advances
+  to Page 4.
+
+
+────────────────────────────────────────────────────────────
+PAGE 4: Parliament Chamber
+────────────────────────────────────────────────────────────
+  HTML:  index.html  #screen-parliament
+  JS:    js/parliament.js  (entry point + button wiring)
+         js/render.js      (SVG seats, legend, results, history)
+         js/vote.js        (session state + vote logic)
+
+  The main game screen. Player calls votes on bills; MPs
+  vote strictly along party lines. Coalition loyalty
+  (stored per partner in vote.js) will modify partner MP
+  votes once modifiers are implemented.
+
+  Support modules (no direct DOM ownership):
+    js/data.js    -- PARTIES, BILLS, LAYOUT constants
+    js/layout.js  -- seat distribution math

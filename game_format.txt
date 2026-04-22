@@ -1,28 +1,112 @@
-PARLIAMENT GAME - FORMAT BRAINSTORM
-=====================================
+PARLIAMENT GAME - FORMAT & DESIGN
+===================================
 
 CORE CONCEPT
-You lead a party, build a coalition, and survive a term.
-
-GAME LOOP
-Each term you face ~10 bills. On each bill you declare your party's stance
-(aye/nay), your coalition partners mostly follow, and opposition parties push
-back. At the end of the term there's an election — your score is driven by:
-  - How many bills you passed that aligned with your party's ideology
-  - How stable your coalition was
-  - Your approval rating
-
-Then seats shift based on performance and you start the next term. Repeat
-until you lose power.
-
-PER-TURN LOOP
-  pick stance → watch vote → coalition drifts or holds → election → new term with shifted seats
+You lead a party, build a coalition, and survive a term. Each turn you propose
+a bill. Bills that are far from your coalition partners' ideologies erode their
+loyalty — and a partner that falls to 0% loyalty leaves the coalition,
+potentially collapsing your government.
 
 CORE TENSION
-Passing centrist bills keeps your coalition intact but erodes your base.
-Playing to your base risks the coalition collapsing.
+Every bill is a negotiation between ambition and survival. Pushing controversial
+bills gets things done but costs you coalition health. Playing it safe keeps
+partners stable but may leave your agenda unfinished.
 
-ALTERNATIVE CONSIDERED
-Opposition mode — you try to block the government rather than govern.
-Rejected: easier to balance but less satisfying since you're always reacting,
-never governing.
+
+IDEOLOGY AXES
+Each party has two scores, each from -10 to +10:
+  economic  (-10 = fully state-led / collectivist, +10 = fully free market)
+  social    (-10 = fully progressive / libertarian, +10 = fully traditional / authoritarian)
+
+Current party positions:
+  People's Alliance   econ: -9   social: -7
+  Social Democrats    econ: -4   social: -4
+  Renewal             econ: +2   social: -5
+  Christian Democrats econ: +4   social: +5
+  National Front      econ: +1   social: +9
+
+
+BILLS
+Each bill has:
+  title   — display name
+  type    — 'economic' or 'social' (which axis it acts on)
+  score   — position on that axis, -10 to +10
+
+The bill's score is compared against each coalition partner's value on the
+same axis to compute ideological distance (IDIS, k).
+
+
+VOTE SUPPORT FORMULA (VUF)
+The fraction of a partner's MPs who vote Aye is:
+
+  k   = | bill.score - partner[bill.type] |     // ideology distance, 0–20
+  c   = max(0, 1 - k/10)                        // ideology support, 0–1
+  L   = loyalty / 100                           // normalised loyalty, 0–1
+
+  VUF = L + (1 - L) × c
+
+Interpretation:
+  - At L=1 (full loyalty): VUF = 1. Full coalition discipline — partner votes
+    Aye on everything regardless of ideology.
+  - At L=0 (zero loyalty): VUF = c. Partner votes purely by their own ideology.
+  - At k=0 (perfect alignment): VUF = 1 at any loyalty level.
+  - At k≥10 (strong opposition): c=0, so VUF = L. Only discipline drives votes.
+
+  ayes from partner = floor(VUF × partner.seats)
+
+
+COALITION LOYALTY
+Each coalition partner starts at 100% loyalty.
+Loyalty is tracked per partner and persists across the session.
+
+When a bill PASSES, loyalty changes for each partner:
+
+  distance     = | bill.score - partner[bill.type] |   // 0–20 range
+  loyaltyDelta = max(-20, min(5, 5 - distance × 1.5))
+
+  Examples:
+    distance 0   → +5    (perfect alignment — loyalty grows)
+    distance 3.3 → 0     (breakeven — no change)
+    distance 5   → -2.5
+    distance 10  → -10
+    distance 15  → -17.5 → clamped to -20
+    distance 17  → -20   (capped)
+
+When a bill FAILS, no loyalty changes (wasted turn).
+
+If a partner's loyalty reaches 0%, they leave the coalition. If the coalition
+loses its majority as a result, the government falls.
+
+
+PER-TURN LOOP
+  1. Player is dealt 3 random bills to choose from
+  2. Player picks one to propose
+  3. Vote resolves — each coalition partner contributes floor(VUF × seats) Ayes;
+     opposition votes entirely Nay; player's own party always votes Aye
+  4. If passed: loyalty updates per partner (delta = 5 - distance × 1.5, clamped)
+  5. If failed: wasted turn, no loyalty change
+  6. Repeat for 10 bills per term
+
+After 10 bills: session ends. Win condition TBD.
+
+
+COALITION STRUCTURE
+Three pre-set coalition blocs, each with a narrative scenario:
+  Left Bloc       — People's Alliance + Social Democrats + Renewal  (251 seats)
+  Grand Coalition — Social Democrats + Christian Democrats           (278 seats)
+  Right Bloc      — Renewal + Christian Democrats + National Front  (298 seats)
+
+Parties with multiple options (SD, Renewal, CD) choose their coalition on
+Page 3 before the game begins. Coalition loyalty starts at 100% for all
+partners regardless of coalition chosen.
+
+Total seats: 466. Majority: 234.
+
+
+FUTURE / NOT YET IMPLEMENTED
+  - Win condition / scoring (agenda score system removed, replacement TBD)
+  - Election at end of term (seats shift based on performance)
+  - Approval rating (separate from coalition loyalty — public opinion)
+  - Multi-term play
+  - Opposition actions / events that force reactive votes
+  - 2D bill positions (economic AND social score per bill)
