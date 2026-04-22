@@ -146,6 +146,11 @@ export const PARTIES = [
       summary: 'A radical party of workers, students, and activists demanding systemic change.',
       history: "Born from the labour strikes and campus uprisings of the early 1970s, the People's Alliance has spent decades on the fringes of parliament — principled, combative, and perpetually outgunned. It champions full public ownership of utilities, a maximum wage, and unilateral disarmament. Coalition partners have always found it difficult; the party itself considers compromise a form of surrender. Its small caucus punches above its weight through protest, obstruction, and the occasional surprise defection that tips a vote.",
     },
+    goals: [
+      { id: 'workers_first',    title: 'Workers First',    desc: 'Raise wages & unions to level 3 or above',      check: (ps)     => ps.wages_unions >= 3 },
+      { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 2 or more left-leaning bills this session', check: (ps, st) => st.leftBillsPassed >= 2 },
+      { id: 'no_austerity',     title: 'No Austerity',     desc: 'Keep fiscal policy at or above its starting level', check: (ps) => ps.fiscal_policy >= STARTING_POLICY.fiscal_policy },
+    ],
   },
   {
     name: 'Socialist Party',
@@ -159,6 +164,11 @@ export const PARTIES = [
       summary: 'The historic party of organised labour, reformed into a broad progressive coalition.',
       history: 'Founded by trade union leaders at the turn of the twentieth century, the Socialist Party governed for most of the postwar decades and built the modern welfare state. A bruising stint in opposition during the 1990s forced a painful modernisation: the party shed its nationalisation commitments, embraced regulated markets, and repositioned itself as the party of public services and European integration. It remains the largest left-of-centre force, drawing support from public-sector workers, urban professionals, and minority communities.',
     },
+    goals: [
+      { id: 'welfare_state',    title: 'Welfare State',    desc: 'Raise public services to level 4 or above',         check: (ps)     => ps.public_services >= 4 },
+      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass all 3 mandate bills this session',             check: (ps, st) => st.flagshipsPassed >= 3 },
+      { id: 'stable_coalition', title: 'Stable Coalition', desc: 'Keep all partner loyalties above 50% by session end', check: (ps, st) => st.allPartnersLoyalAbove50 },
+    ],
   },
   {
     name: 'Renewal',
@@ -172,6 +182,11 @@ export const PARTIES = [
       summary: 'A technocratic movement promising competence over ideology.',
       history: 'Renewal was founded just twelve years ago by defectors from both the Socialist Party and the Christian Democrats who believed that partisan trench warfare was destroying public trust in government. It surged to prominence on a platform of electoral reform, digital public services, and pro-European centrism. Critics call it a party without a soul; supporters call it the only party without an axe to grind. Its electoral coalition is volatile — urban, educated, and quick to punish perceived betrayal.',
     },
+    goals: [
+      { id: 'fiscal_responsibility', title: 'Fiscal Responsibility', desc: 'Keep fiscal policy within 1 step of where it started', check: (ps) => Math.abs(ps.fiscal_policy - STARTING_POLICY.fiscal_policy) <= 1 },
+      { id: 'broad_mandate',         title: 'Broad Mandate',         desc: 'Pass bills across 4 or more policy domains',           check: (ps, st) => st.domainsPassedCount >= 4 },
+      { id: 'active_legislature',    title: 'Active Legislature',    desc: 'Pass 6 or more bills this session',                    check: (ps, st) => st.billsPassed >= 6 },
+    ],
   },
   {
     name: 'Christian Democrats',
@@ -185,6 +200,11 @@ export const PARTIES = [
       summary: 'The dominant party of the postwar era, rooted in Catholic social tradition.',
       history: 'The Christian Democrats emerged from the rubble of the Second World War as the guarantors of stability, democracy, and Western alliance. Anchored in Catholic social teaching, the party has always balanced free-market economics with a robust social safety net — suspicious of both socialism and libertarianism. It has led or participated in government for most of the republic\'s history, making it the natural party of cautious, incremental reform. Its broad church includes rural conservatives, business interests, and religious communities.',
     },
+    goals: [
+      { id: 'fiscal_discipline',  title: 'Fiscal Discipline',  desc: 'Keep fiscal policy at level 2 or below',             check: (ps)     => ps.fiscal_policy <= 2 },
+      { id: 'social_stability',   title: 'Social Stability',   desc: 'Keep social policy at or above its starting level',  check: (ps)     => ps.social_policy >= STARTING_POLICY.social_policy },
+      { id: 'governing_majority', title: 'Governing Majority', desc: 'Pass 5 or more bills without abstaining any turn',   check: (ps, st) => st.billsPassed >= 5 && st.turnsAbstained === 0 },
+    ],
   },
   {
     name: 'National Front',
@@ -198,6 +218,11 @@ export const PARTIES = [
       summary: 'A nationalist party surging on anti-immigration sentiment and Euroscepticism.',
       history: 'The National Front spent its first two decades as a pariah — tolerated on the ballot but excluded from every coalition negotiation. That changed when economic stagnation and a series of high-profile immigration controversies pushed it into double digits. The party is ruthlessly disciplined, ideologically rigid, and deeply suspicious of international institutions. It draws support from deindustrialised towns, small-business owners, and younger voters who feel abandoned by the mainstream. Mainstream parties still refuse to govern with it — for now.',
     },
+    goals: [
+      { id: 'secure_border',     title: 'Secure the Border', desc: 'Raise border policy to level 4 or above',              check: (ps) => ps.border_policy >= 4 },
+      { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 4 or above',             check: (ps) => ps.foreign_policy >= 4 },
+      { id: 'free_market',       title: 'Free Market',       desc: 'Keep market regulation at or below its starting level', check: (ps) => ps.market_regulation <= STARTING_POLICY.market_regulation },
+    ],
   },
 ];
 

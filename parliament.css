@@ -6,7 +6,7 @@
 body {
   font-family: 'Inconsolata', monospace;
   background: #0f172a;
-  color: #e2e8f0;
+  color: #f1f5f9;
   margin: 0;
   padding: 2rem;
   line-height: 1.8;
@@ -47,8 +47,18 @@ h1::after {
   image-rendering: auto;
 }
 
+.homepage-decal {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 780px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .subtitle {
-  color: #94a3b8;
+  color: #cbd5e1;
   margin: 0 0 1.5rem;
   font-size: 16px;
   text-align: center;
@@ -68,7 +78,7 @@ button {
   background: #0f172a;
   border: 2px solid #475569;
   cursor: pointer;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   box-shadow: 4px 4px 0px #0a1122;
 }
@@ -87,7 +97,7 @@ button:active {
 button.primary {
   background: #e2e8f0;
   color: #0f172a;
-  border-color: #e2e8f0;
+  border-color: #f1f5f9;
   box-shadow: 4px 4px 0px #0a1122;
 }
 
@@ -105,7 +115,7 @@ button.primary:hover {
 }
 
 .bill-label {
-  color: #94a3b8;
+  color: #cbd5e1;
   font-size: 14px;
   margin-bottom: 8px;
   text-transform: uppercase;
@@ -132,7 +142,7 @@ button.primary:hover {
 
 .sidebar-box-title {
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-bottom: 0.5rem;
@@ -160,7 +170,7 @@ circle {
   justify-content: space-between;
   align-items: baseline;
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-bottom: 5px;
@@ -169,7 +179,7 @@ circle {
 }
 
 .legend-group-stats {
-  color: #475569;
+  color: #64748b;
   letter-spacing: 0;
 }
 
@@ -203,7 +213,7 @@ circle {
 
 .legend-item-seats {
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   white-space: nowrap;
 }
 
@@ -216,7 +226,7 @@ circle {
 
 .legend-item-ideology {
   font-size: 12px;
-  color: #475569;
+  color: #64748b;
 }
 
 .legend-item-loyalty {
@@ -258,13 +268,13 @@ circle {
 
 .result-tally {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 .history {
   margin-top: 1rem;
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 .history-item {
@@ -325,7 +335,7 @@ circle {
 
 .party-card-tag {
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -333,7 +343,7 @@ circle {
 
 .party-card-summary {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 1.8;
   flex: 1;
 }
@@ -405,7 +415,7 @@ circle {
 
 .detail-ideology-tag {
   font-size: 11px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 0;
@@ -417,7 +427,7 @@ circle {
 
 .detail-stat-label {
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 5px;
@@ -446,13 +456,13 @@ circle {
 }
 
 .detail-seat-pct {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 11px;
 }
 
 .detail-pos-label {
   font-size: 12px;
-  color: #cbd5e1;
+  color: #e2e8f0;
   margin-bottom: 4px;
 }
 
@@ -481,7 +491,7 @@ circle {
 
 .detail-coalition-name {
   font-size: 11px;
-  color: #94a3b8;
+  color: #cbd5e1;
   margin-right: 4px;
   min-width: 100%;
   margin-bottom: 2px;
@@ -497,17 +507,17 @@ circle {
 
 .detail-partner-name {
   font-size: 11px;
-  color: #cbd5e1;
+  color: #e2e8f0;
 }
 
 .detail-partner-sep {
   font-size: 11px;
-  color: #475569;
+  color: #64748b;
 }
 
 .detail-no-coalition {
   font-size: 12px;
-  color: #475569;
+  color: #64748b;
 }
 
 .detail-summary-text {
@@ -518,7 +528,7 @@ circle {
 
 .detail-history-text {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 2;
   margin: 0;
 }
@@ -623,21 +633,21 @@ circle {
 
 .coalition-scenario {
   font-size: 15px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 2;
   margin: 1rem 0 1.5rem;
 }
 
 .coalition-partner-blurb {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 1.8;
   margin-bottom: 10px;
 }
 
 .coalition-section-label {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   margin: 1.5rem 0 0.75rem;
   letter-spacing: 1px;
@@ -670,32 +680,32 @@ circle {
 
 .coalition-card-tag {
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
 
 .coalition-card-summary {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 1.8;
   margin-bottom: 10px;
 }
 
 .coalition-card-stats {
   font-size: 13px;
-  color: #475569;
+  color: #64748b;
   margin-bottom: 10px;
 }
 
 .coalition-loyalty {
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
 }
 
 .loyalty-value {
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .coalition-summary {
@@ -705,7 +715,7 @@ circle {
 
 .coalition-seats-meta {
   font-size: 14px;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .majority-ok   { color: #4ade80; }
@@ -754,14 +764,14 @@ circle {
 .party-header-role {
   font-family: 'Inconsolata', monospace;
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 1.6;
 }
 
 /* ── Turn counter ── */
 .turn-counter {
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-bottom: 0.75rem;
@@ -772,7 +782,7 @@ circle {
 /* ── Phase label (extensible action slot header) ── */
 .phase-label {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.75rem;
@@ -781,7 +791,7 @@ circle {
 /* ── section-label kept for other screens ── */
 .section-label {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 0.75rem;
@@ -797,7 +807,7 @@ circle {
 
 .bill-card-type {
   font-size: 12px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -820,7 +830,7 @@ circle {
 
 .agenda-group-label {
   font-size: 10px;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 1.4px;
   padding-bottom: 6px;
@@ -843,7 +853,7 @@ circle {
 
 .agenda-item--passable:hover {
   transform: translateX(3px);
-  border-color: #475569;
+  border-color: #64748b;
 }
 
 .agenda-item--blocked {
@@ -884,7 +894,7 @@ circle {
 
 .lean-left   { color: #60a5fa; border-color: #60a5fa50; }
 .lean-right  { color: #fb923c; border-color: #fb923c50; }
-.lean-centre { color: #94a3b8; border-color: #47556950; }
+.lean-centre { color: #cbd5e1; border-color: #64748b50; }
 
 /* ── Bill detail view ── */
 #phase-bill-detail {
@@ -924,7 +934,7 @@ circle {
 
 .bill-position-tag {
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .bill-verdict {
@@ -957,14 +967,14 @@ circle {
 
 .bill-section-label {
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1.2px;
 }
 
 .bill-section-note {
   font-size: 11px;
-  color: #475569;
+  color: #64748b;
 }
 
 .bill-bd-row {
@@ -993,7 +1003,7 @@ circle {
 
 .bill-bd-name {
   flex: 1;
-  color: #e2e8f0;
+  color: #f1f5f9;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1013,14 +1023,14 @@ circle {
 
 .bill-bd-counts {
   font-size: 12px;
-  color: #94a3b8;
+  color: #cbd5e1;
   white-space: nowrap;
   text-align: right;
   min-width: 52px;
 }
 
 .bill-bd-sep {
-  color: #334155;
+  color: #475569;
 }
 
 .bill-loy-row {
@@ -1045,7 +1055,7 @@ circle {
 
 .bill-loy-name {
   flex: 1;
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .bill-loy-meter {
@@ -1061,7 +1071,7 @@ circle {
 
 .bill-loy-pct {
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
   width: 30px;
   text-align: right;
   flex-shrink: 0;
@@ -1137,14 +1147,14 @@ circle {
 
 .vote-verdict-abstained {
   font-size: 26px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-shadow: 2px 2px #1e293b;
   letter-spacing: 2px;
 }
 
 .vote-result-note {
   font-size: 13px;
-  color: #94a3b8;
+  color: #cbd5e1;
   margin-top: 8px;
 }
 
@@ -1157,7 +1167,7 @@ circle {
 
 .vote-sidebar-label {
   font-size: 12px;
-  color: #94a3b8;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 6px;
@@ -1165,7 +1175,7 @@ circle {
 
 .vote-sidebar-tally {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 .vote-loyalty-change {
@@ -1175,7 +1185,7 @@ circle {
 
 .loyalty-up      { color: #4ade80; }
 .loyalty-down    { color: #f87171; }
-.loyalty-neutral { color: #94a3b8; }
+.loyalty-neutral { color: #cbd5e1; }
 
 /* ── Ending screen ── */
 .ending-coalition-title {
@@ -1198,13 +1208,13 @@ circle {
 
 .ending-stat-row {
   font-size: 14px;
-  color: #94a3b8;
+  color: #cbd5e1;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.ending-stat-row strong { color: #e2e8f0; }
+.ending-stat-row strong { color: #f1f5f9; }
 
 .ending-stat-collapse {
   color: #f87171;
@@ -1218,7 +1228,7 @@ circle {
 
 .ending-text {
   font-size: 17px;
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 2;
   padding: 20px 24px;
   border: 2px solid #334155;
@@ -1270,10 +1280,9 @@ circle {
 }
 
 .policy-dim-name {
-  font-size: 10px;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
   margin-bottom: 7px;
 }
 
@@ -1290,7 +1299,7 @@ circle {
 
 .policy-pole {
   font-size: 9px;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -1317,7 +1326,7 @@ circle {
 
 .policy-step--active {
   background: #475569;
-  border-color: #64748b;
+  border-color: #94a3b8;
   box-shadow: 0 0 8px #47556966;
 }
 
@@ -1340,14 +1349,14 @@ circle {
 
 .policy-dim-desc {
   font-size: 11px;
-  color: #475569;
+  color: #64748b;
   line-height: 1.5;
 }
 
 /* ── Policy effect in bill detail ── */
 .bill-policy-dim-name {
   font-size: 12px;
-  color: #cbd5e1;
+  color: #e2e8f0;
   margin-bottom: 6px;
 }
 
@@ -1361,7 +1370,7 @@ circle {
 
 .bill-policy-from {
   font-size: 11px;
-  color: #475569;
+  color: #64748b;
 }
 
 .bill-policy-arrow {
@@ -1371,4 +1380,166 @@ circle {
 
 .bill-policy-to {
   font-size: 11px;
+}
+
+/* ── Programme for Government screen ── */
+.compact-screen-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin: 1rem 0 0.5rem;
+  text-shadow: 2px 2px #0a1122;
+}
+
+.compact-screen-subtitle {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 2;
+  margin-bottom: 1.5rem;
+  max-width: 680px;
+}
+
+.compact-confirm-btn {
+  display: block;
+  margin-top: 2rem;
+}
+
+.compact-partner-section {
+  background: #1e293b;
+  border: 2px solid #334155;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: 4px 4px 0 #0a1122;
+}
+
+.compact-partner-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.compact-partner-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.compact-partner-name {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.compact-partner-prompt {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 3px;
+}
+
+.compact-goal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.compact-goal-card {
+  background: #0f172a;
+  border: 2px solid #334155;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.1s, transform 0.05s;
+}
+
+.compact-goal-card:hover {
+  border-color: #64748b;
+  transform: translateY(-1px);
+}
+
+.compact-goal-card--selected {
+  border-color: #cbd5e1;
+  background: #162032;
+  box-shadow: 0 0 0 1px #475569;
+}
+
+.compact-goal-title {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  color: #f1f5f9;
+}
+
+.compact-goal-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* ── Programme goals in policy home ── */
+.programme-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.programme-goal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #162032;
+  border: 1px solid #1e293b;
+}
+
+.programme-goal--met {
+  border-color: #166534;
+  background: #0f2a1a;
+}
+
+.programme-goal-icon {
+  font-size: 14px;
+  width: 16px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.programme-goal--met    .programme-goal-icon { color: #4ade80; }
+.programme-goal--unmet  .programme-goal-icon { color: #64748b; }
+
+.programme-goal-body {
+  min-width: 0;
+}
+
+.programme-goal-partner {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1px;
+}
+
+.programme-goal-title {
+  font-size: 12px;
+  color: #e2e8f0;
+}
+
+/* ── Programme report in ending screen ── */
+.ending-stat-divider {
+  height: 1px;
+  background: #334155;
+  margin: 6px 0;
+}
+
+.ending-stat-section-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 700px) {
+  .compact-goal-grid {
+    grid-template-columns: 1fr;
+  }
 }
