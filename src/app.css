@@ -105,6 +105,13 @@ button.primary:hover {
   background: #cbd5e1;
 }
 
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0px #0a1122;
+}
+
 .bill {
   background: #1e293b;
   border: 2px solid #475569;
@@ -897,7 +904,7 @@ circle {
 .lean-centre { color: #cbd5e1; border-color: #64748b50; }
 
 /* ── Bill detail view ── */
-#phase-bill-detail {
+.phase-bill-detail {
   padding-bottom: 1rem;
 }
 
@@ -1120,7 +1127,7 @@ circle {
 }
 
 /* ── Vote verdict (left panel, after vote) ── */
-#phase-result {
+.phase-result {
   border: 2px solid #475569;
   padding: 20px 24px;
   box-shadow: 4px 4px 0 #0a1122;
@@ -1266,7 +1273,7 @@ circle {
 }
 
 /* ── Policy spectrum bars ── */
-#policy-dim-list {
+.policy-dim-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px 16px;

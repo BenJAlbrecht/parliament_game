@@ -32,7 +32,7 @@ const LOGO_FILES = {
   'National Front':     'logo-nf',
 };
 export function logoSrc(partyName) {
-  return `images/party_logos/${LOGO_FILES[partyName]}.svg`;
+  return `/images/party_logos/${LOGO_FILES[partyName]}.svg`;
 }
 
 export const LAYOUT = {
@@ -198,7 +198,7 @@ export const PARTIES = [
     coalitions: ['grand', 'right'],
     bio: {
       summary: 'The dominant party of the postwar era, rooted in Catholic social tradition.',
-      history: 'The Christian Democrats emerged from the rubble of the Second World War as the guarantors of stability, democracy, and Western alliance. Anchored in Catholic social teaching, the party has always balanced free-market economics with a robust social safety net — suspicious of both socialism and libertarianism. It has led or participated in government for most of the republic\'s history, making it the natural party of cautious, incremental reform. Its broad church includes rural conservatives, business interests, and religious communities.',
+      history: "The Christian Democrats emerged from the rubble of the Second World War as the guarantors of stability, democracy, and Western alliance. Anchored in Catholic social teaching, the party has always balanced free-market economics with a robust social safety net — suspicious of both socialism and libertarianism. It has led or participated in government for most of the republic's history, making it the natural party of cautious, incremental reform. Its broad church includes rural conservatives, business interests, and religious communities.",
     },
     goals: [
       { id: 'fiscal_discipline',  title: 'Fiscal Discipline',  desc: 'Keep fiscal policy at level 2 or below',             check: (ps)     => ps.fiscal_policy <= 2 },

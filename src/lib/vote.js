@@ -3,7 +3,7 @@ import { PARTIES, BILLS, STARTING_POLICY } from './data.js';
 let seats            = [];
 let playerParty      = null;
 let partners         = [];
-let loyalty          = {};   // { partnerName: 0–100 }
+let loyalty          = {};
 let policyState      = {};
 let billsPassed      = 0;
 let leftBillsPassed  = 0;
@@ -30,8 +30,6 @@ export function initAgenda(flagships) {
 }
 
 export function proposeBill(bill) {
-
-  // Build per-party vote counts
   const breakdown = PARTIES.map(p => {
     if (p === playerParty) {
       return { party: p, ayes: p.seats, nays: 0, role: 'player' };
@@ -53,14 +51,12 @@ export function proposeBill(bill) {
   const majority  = Math.floor(total / 2) + 1;
   const passed    = totalAyes >= majority;
 
-  // Session stats (only on pass)
   if (passed) {
     billsPassed++;
     if (bill.score <= -2) leftBillsPassed++;
     if (bill.dimension)   domainsPassedSet.add(bill.dimension);
   }
 
-  // Loyalty update + policy state (only on pass)
   const loyaltyChanges = {};
   if (passed) {
     partners.forEach(p => {
@@ -92,10 +88,7 @@ export function getSessionStats() {
   return { billsPassed, leftBillsPassed, domainsPassedCount: domainsPassedSet.size };
 }
 
-// ── internal ────────────────────────────────────────────────────────────────
-
 function buildVoteArray(breakdown) {
-  // For each party, bucket their seat indices then randomly assign ayes
   const ayesLeft = {};
   breakdown.forEach(b => { ayesLeft[b.party.name] = b.ayes; });
 
