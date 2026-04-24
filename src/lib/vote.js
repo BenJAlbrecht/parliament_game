@@ -20,8 +20,14 @@ export function init(computedSeats, party, coalitionPartners) {
   domainsPassedSet = new Set();
 }
 
-export function initAgenda() {
-  return [...BILLS].sort(() => Math.random() - 0.5).slice(0, 10);
+export function initAgenda(party, partners, currentPolicyState) {
+  const eligible = BILLS.filter(bill => {
+    const cur = currentPolicyState[bill.dimension] ?? 3;
+    if (bill.delta > 0 && cur >= 5) return false;
+    if (bill.delta < 0 && cur <= 1) return false;
+    return true;
+  });
+  return [...eligible].sort(() => Math.random() - 0.5).slice(0, 10);
 }
 
 export function proposeBill(bill) {

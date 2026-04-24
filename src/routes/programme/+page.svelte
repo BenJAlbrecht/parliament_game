@@ -4,7 +4,7 @@
   import { fly, scale } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { PARTIES, logoSrc } from '$lib/data.js';
-  import { playerParty, coalitionPartners, committedGoals, playerMandate } from '$lib/stores.js';
+  import { playerParty, coalitionPartners, committedGoals, playerMandate, headerAccent, headerCrumb } from '$lib/stores.js';
 
   let party    = null;
   let partners = [];
@@ -15,6 +15,8 @@
     party    = $playerParty;
     partners = $coalitionPartners;
     if (!party || !partners.length) { goto('/select'); return; }
+    headerAccent.set(party.color);
+    headerCrumb.set(['Select Party', 'Coalition', 'Programme']);
   });
 
   $: allDone = mandate !== null &&

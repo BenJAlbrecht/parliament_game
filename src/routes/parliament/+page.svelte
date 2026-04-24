@@ -1,12 +1,12 @@
 <script>
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { fly, fade, scale } from 'svelte/transition';
+  import { fly, fade, scale, slide } from 'svelte/transition';
   import { backOut, cubicOut } from 'svelte/easing';
   import { PARTIES, POLICY_SCALES, STARTING_POLICY, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { calculateSeats } from '$lib/layout.js';
   import { init, initAgenda, proposeBill, getPolicyState, getSessionStats } from '$lib/vote.js';
-  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData, headerAccent, headerCrumb } from '$lib/stores.js';
 
   // ── Constants ────────────────────────────────────────────────────────────────
   const BILL_LIMIT = 10;
@@ -39,6 +39,11 @@
   let voteResult   = null;
   let abstained    = false;
   let collapsed    = false;
+  let openDomain   = null;
+
+  function toggleDomain(dim) {
+    openDomain = openDomain === dim ? null : dim;
+  }
 
   // ── Derived: government seat set ─────────────────────────────────────────────
   $: govIndices = (() => {
@@ -57,6 +62,8 @@
     };
   }
 
+  $: if (party) headerCrumb.set(['Select', 'Coalition', 'Programme', `Session · Turn ${turnCount} / ${BILL_LIMIT}`]);
+
   // ── Init ─────────────────────────────────────────────────────────────────────
   onMount(() => {
     party     = $playerParty;
@@ -66,10 +73,11 @@
     mandate   = $playerMandate;
     if (!party || !coalition) { goto('/select'); return; }
 
+    headerAccent.set(party.color);
     seats  = calculateSeats(PARTIES);
     votes  = new Array(seats.length).fill(null);
-    agenda = initAgenda();
     init(seats, party, partners);
+    agenda = initAgenda(party, partners, { ...STARTING_POLICY });
     loyalty     = Object.fromEntries(partners.map(p => [p.name, 100]));
     policyState = { ...STARTING_POLICY };
     nextTurn();
@@ -85,7 +93,7 @@
     selectedBill = null;
   }
 
-  function openAgenda() { phase = 'agenda'; }
+  function openAgenda() { phase = 'agenda'; openDomain = null; }
 
   function openBillDetail(bill) {
     selectedBill = bill;
@@ -290,65 +298,92 @@
       <button class="back-btn" on:click={backToPolicy}>&#8592; Back</button>
       <div class="phase-label">Legislative Agenda</div>
 
-      {#each agendaGroups as [dim, items]}
-        {@const dimScale = POLICY_SCALES[dim]}
-        {@const curVal   = policyState[dim] ?? 1}
-        <div class="agenda-group">
-          <div class="agenda-group-header">
-            <span class="agenda-group-label">{dimScale?.label ?? dim}</span>
-            <div class="agenda-group-pips">
-              {#each [1,2,3,4,5] as step}
-                <div class="agenda-pip" class:agenda-pip--filled={step <= curVal}></div>
-              {/each}
-              <span class="agenda-group-level">Lv.{curVal}</span>
-            </div>
-          </div>
-          {#each items as { bill, passable }}
-            {@const newVal     = Math.max(1, Math.min(5, curVal + (bill.delta ?? 0)))}
-            {@const targetPole = (bill.delta ?? 0) > 0 ? dimScale?.poles[1] : dimScale?.poles[0]}
-            {@const curStep    = dimScale?.steps[curVal - 1] ?? ''}
-            {@const newStep    = dimScale?.steps[newVal - 1] ?? ''}
-            <div
-              class="agenda-item"
-              class:agenda-item--passable={passable}
-              class:agenda-item--blocked={!passable}
-              on:click={() => openBillDetail(bill)}
-              role="button"
-              tabindex="0"
-              on:keydown={e => e.key === 'Enter' && openBillDetail(bill)}
-            >
-              <div class="agenda-item-top">
-                <div class="agenda-item-title">{bill.title}</div>
-                <span class="agenda-item-status" class:agenda-status--pass={passable} class:agenda-status--block={!passable}>
-                  {passable ? 'Passable ✓' : 'Blocked ✗'}
-                </span>
-              </div>
-              {#if dimScale && bill.delta}
-                <div class="agenda-item-effect">
-                  <span class="effect-delta" class:effect-delta--up={bill.delta > 0} class:effect-delta--down={bill.delta < 0}>
-                    {bill.delta > 0 ? '▲' : '▼'}
-                  </span>
-                  <span class="effect-pole">{targetPole}</span>
-                  <div class="effect-steps">
+      {#if allBlocked}
+        <div class="blocked-banner">All remaining bills are blocked — coalition support too low.</div>
+        <button class="primary" on:click={handleAbstain}>Abstain (skip turn) &#8594;</button>
+      {:else}
+        <div class="domain-accordion">
+          {#each agendaGroups as [dim, items]}
+            {@const dimScale      = POLICY_SCALES[dim]}
+            {@const curVal        = policyState[dim] ?? 1}
+            {@const passableCount = items.filter(d => d.passable).length}
+            {@const isOpen        = openDomain === dim}
+            {@const allDimBlocked = passableCount === 0}
+
+            <div class="domain-row" class:domain-row--open={isOpen}>
+              <button
+                class="domain-header"
+                class:domain-header--passable={!allDimBlocked}
+                class:domain-header--blocked={allDimBlocked}
+                on:click={() => toggleDomain(dim)}
+              >
+                <div class="domain-header-left">
+                  <div class="domain-pips">
                     {#each [1,2,3,4,5] as step}
-                      <div class="effect-pip"
-                        class:effect-pip--cur={step === curVal && step !== newVal}
-                        class:effect-pip--new={step === newVal}
-                        class:effect-pip--filled={step < Math.min(curVal, newVal)}
-                      ></div>
+                      <div class="domain-pip" class:domain-pip--filled={step <= curVal}></div>
                     {/each}
                   </div>
-                  <span class="effect-label">{newStep}</span>
+                  <span class="domain-name">{dimScale?.label ?? dim}</span>
+                  <span class="domain-lv">Lv.{curVal}</span>
+                </div>
+                <div class="domain-header-right">
+                  <span class="domain-count" class:domain-count--zero={allDimBlocked}>
+                    {passableCount}/{items.length}
+                  </span>
+                  <span class="domain-chevron" class:domain-chevron--open={isOpen}>&#8250;</span>
+                </div>
+              </button>
+
+              {#if isOpen}
+                <div class="domain-bills" transition:slide={{ duration: 180, easing: cubicOut }}>
+                  {#each items as { bill, passable }}
+                    {@const newVal     = Math.max(1, Math.min(5, curVal + (bill.delta ?? 0)))}
+                    {@const targetPole = (bill.delta ?? 0) > 0 ? dimScale?.poles[1] : dimScale?.poles[0]}
+                    {@const newStep    = dimScale?.steps[newVal - 1] ?? ''}
+                    <div
+                      class="agenda-item"
+                      class:agenda-item--passable={passable}
+                      class:agenda-item--blocked={!passable}
+                      on:click={() => openBillDetail(bill)}
+                      role="button"
+                      tabindex="0"
+                      on:keydown={e => e.key === 'Enter' && openBillDetail(bill)}
+                    >
+                      <div class="agenda-item-top">
+                        <div class="agenda-item-title">{bill.title}</div>
+                        <span class="agenda-item-status"
+                          class:agenda-status--pass={passable}
+                          class:agenda-status--block={!passable}>
+                          {passable ? '✓' : '✗'}
+                        </span>
+                      </div>
+                      {#if dimScale && bill.delta}
+                        <div class="agenda-item-effect">
+                          <span class="effect-delta"
+                            class:effect-delta--up={bill.delta > 0}
+                            class:effect-delta--down={bill.delta < 0}>
+                            {bill.delta > 0 ? '▲' : '▼'}
+                          </span>
+                          <span class="effect-pole">{targetPole}</span>
+                          <div class="effect-steps">
+                            {#each [1,2,3,4,5] as step}
+                              <div class="effect-pip"
+                                class:effect-pip--cur={step === curVal && step !== newVal}
+                                class:effect-pip--new={step === newVal}
+                                class:effect-pip--filled={step < Math.min(curVal, newVal)}
+                              ></div>
+                            {/each}
+                          </div>
+                          <span class="effect-label">{newStep}</span>
+                        </div>
+                      {/if}
+                    </div>
+                  {/each}
                 </div>
               {/if}
             </div>
           {/each}
         </div>
-      {/each}
-
-      {#if allBlocked}
-        <div class="blocked-banner">All remaining bills are blocked — coalition support too low.</div>
-        <button class="primary" on:click={handleAbstain}>Abstain (skip turn) &#8594;</button>
       {/if}
       </div>
     {/if}
@@ -356,11 +391,13 @@
     <!-- ── Phase: Bill Detail ── -->
     {#if phase === 'bill-detail' && selectedBill}
       {@const bill = selectedBill}
-      {@const accentColor = billPassable ? '#4ade80' : '#f87171'}
+      {@const accentColor = billPassable ? '#22c55e' : '#f87171'}
       {@const posLabel = bill.type === 'economic' ? econLabel(bill.score) : socialLabel(bill.score)}
 
       <div class="phase-bill-detail" in:fly={{ y: 14, duration: 240, delay: 100, easing: cubicOut }} out:fade={{ duration: 110 }}>
         <button class="back-btn" on:click={backToAgenda}>&#8592; Back to Agenda</button>
+
+        <div class="bill-doc-meta">Bill No. {billsProposed + 1} &nbsp;·&nbsp; First Reading</div>
 
         <!-- Bill header card -->
         <div class="bill-header-card" style="border-top-color:{accentColor};">
@@ -522,13 +559,14 @@
           </circle>
         {/each}
       </svg>
+      <div class="sidebar-caption">{total} seats &nbsp;·&nbsp; Majority: {majority}</div>
     </div>
 
     <!-- Government parties -->
     <div class="sidebar-card">
       <div class="sidebar-card-header">
-        <span>Government</span>
-        <span class="sidebar-card-stat">{govSeats} / {total} &nbsp;&middot;&nbsp; {pct(govSeats)}%</span>
+        Government
+        <span class="sidebar-card-stat">{govSeats} / {total} seats &nbsp;·&nbsp; {pct(govSeats)}%</span>
       </div>
       {#each govParties as p}
         {@const isPlayer = p === party}
@@ -555,8 +593,8 @@
     <!-- Opposition parties -->
     <div class="sidebar-card sidebar-card--dim">
       <div class="sidebar-card-header">
-        <span>Opposition</span>
-        <span class="sidebar-card-stat">{oppSeats} / {total} &nbsp;&middot;&nbsp; {pct(oppSeats)}%</span>
+        Opposition
+        <span class="sidebar-card-stat">{oppSeats} / {total} seats &nbsp;·&nbsp; {pct(oppSeats)}%</span>
       </div>
       {#each oppParties as p}
         <div class="sidebar-opp-row">
@@ -572,10 +610,10 @@
     <div class="sidebar-card sidebar-card--flush">
       <div class="sidebar-card-header">Political Ideology</div>
       <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-        <rect x={CP} y={CP} width={CS} height={CS} fill="#162032" />
-        <rect x={CP} y={CP} width={CS} height={CS} fill="none" stroke="#1e293b" stroke-width="1" />
-        <line x1={CP} y1={cy0} x2={CP+CS} y2={cy0} stroke="#1e293b" stroke-width="1" />
-        <line x1={cx0} y1={CP} x2={cx0} y2={CP+CS} stroke="#1e293b" stroke-width="1" />
+        <rect x={CP} y={CP} width={CS} height={CS} fill="#14121e" />
+        <rect x={CP} y={CP} width={CS} height={CS} fill="none" stroke="#1c1a2c" stroke-width="1" />
+        <line x1={CP} y1={cy0} x2={CP+CS} y2={cy0} stroke="#1c1a2c" stroke-width="1" />
+        <line x1={cx0} y1={CP} x2={cx0} y2={CP+CS} stroke="#1c1a2c" stroke-width="1" />
         <text x={cx0} y={CP - 6}   fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="middle">PROGRESSIVE</text>
         <text x={cx0} y={CP+CS+14} fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="middle">TRADITIONAL</text>
         <text x={CP - 4} y={cy0 + 4} fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="end">LEFT</text>

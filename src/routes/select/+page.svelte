@@ -5,9 +5,18 @@
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { PARTIES, COALITIONS, econLabel, socialLabel, logoSrc } from '$lib/data.js';
-  import { playerParty, headerFlag } from '$lib/stores.js';
+  import { playerParty, headerFlag, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { calculateSeats } from '$lib/layout.js';
 
-  onMount(() => { headerFlag.set('flag-base'); });
+  const arcSeats = calculateSeats(PARTIES);
+
+  onMount(() => {
+    headerFlag.set('flag-base');
+    headerAccent.set(null);
+    headerCrumb.set(['Select Party']);
+  });
+
+  $: headerAccent.set(selected?.color ?? null);
 
   const FLAG_MAP = {
     "People's Alliance": 'flag-pa',
@@ -57,10 +66,27 @@
   }
 </script>
 
-<p class="subtitle">Choose a party to lead into the session.</p>
+<div class="select-page">
 
-<div class="select-body">
-  <div class="select-left">
+  <aside class="select-lede">
+    <svg class="mini-arc" viewBox="55 25 570 292" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {#each arcSeats as seat}
+        {@const p = PARTIES[seat.partyIndex]}
+        <circle
+          cx={seat.x} cy={seat.y} r="5"
+          fill={p.color}
+          opacity={selected ? (p === selected ? 1 : 0.12) : 0.8}
+          style="transition: opacity 0.25s"
+        />
+      {/each}
+    </svg>
+    <div class="lede-text">
+      <p class="lede-standfirst">It is the 80th anniversary of the establishment of the Republic.</p>
+      <p class="lede-body">Modern capitalism and the welfare state promise a new social contract based on economic opportunity. The recent fall of the Menshevik regime has given birth to a unipolar world, spearheaded by the European Community and its global allies. The future of the Republic seems brighter than ever before.</p>
+    </div>
+  </aside>
+
+  <div class="select-right">
 
     {#if !selected}
       <!-- ── Party grid ── -->
@@ -81,6 +107,9 @@
             </div>
             <div class="party-card-tag">{party.ideology}</div>
             <div class="party-card-summary">{party.bio.summary}</div>
+            <div class="party-card-seat-bar">
+              <div class="party-card-seat-fill" style="width:{seatPct(party)}%; background:{party.color};"></div>
+            </div>
             <div class="party-card-footer">
               <span class="party-card-seats-badge" style="border-color:{party.color}; color:{party.color};">{party.seats} seats</span>
             </div>
@@ -184,16 +213,75 @@
     {/if}
 
   </div>
+
 </div>
 
 <style>
+  .select-page {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .select-lede {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .mini-arc {
+    display: block;
+    width: 100%;
+    background: transparent;
+    margin-bottom: 0.85rem;
+  }
+
+  .lede-text {
+    border-left: 2px solid #2d2b42;
+    padding-left: 0.75rem;
+  }
+
+  .lede-standfirst {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #cbd5e1;
+    line-height: 1.45;
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .lede-body {
+    font-size: 11.5px;
+    color: #64748b;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .select-right {
+    min-width: 0;
+  }
+
   .party-card {
     transition: transform 0.12s, background 0.12s, box-shadow 0.12s;
   }
 
   .party-card:hover {
-    background: #243044;
-    transform: translateX(3px);
-    box-shadow: -3px 0 16px color-mix(in srgb, var(--party-color) 35%, transparent);
+    background: #1a2840;
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 var(--party-color),
+                0 0 28px color-mix(in srgb, var(--party-color) 28%, transparent);
+  }
+
+  .party-card-seat-bar {
+    height: 3px;
+    background: #100f1c;
+    margin: 10px 0 0;
+  }
+
+  .party-card-seat-fill {
+    height: 100%;
+    transition: width 0.4s;
   }
 </style>

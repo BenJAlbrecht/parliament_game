@@ -175,7 +175,7 @@ export const PARTIES = [
   },
   {
     name: 'Socialist Party',
-    color: '#EC4899',
+    color: '#be185d',
     seats: 133,
     economic: -4,
     social: -4,
@@ -423,22 +423,60 @@ export const ENDINGS = {
 };
 
 export const BILLS = [
-  { title: 'Fund public transit expansion', type: 'economic', score:  -3, dimension: 'public_services',   delta: +1 },
-  { title: 'Raise the minimum wage',        type: 'economic', score:  -5, dimension: 'wages_unions',       delta: +1 },
-  { title: 'Cut corporate tax rate',        type: 'economic', score:  +6, dimension: 'fiscal_policy',      delta: -1 },
-  { title: 'Ratify climate accord',         type: 'social',   score:  -4, dimension: 'foreign_policy',     delta: -1 },
-  { title: 'Expand healthcare coverage',    type: 'economic', score:  -5, dimension: 'public_services',    delta: +1 },
-  { title: 'Tighten border controls',       type: 'social',   score:  +7, dimension: 'border_policy',      delta: +1 },
-  { title: 'Invest in renewable energy',    type: 'economic', score:  -3, dimension: 'public_services',    delta: +1 },
-  { title: 'Deregulate financial markets',  type: 'economic', score:  +7, dimension: 'market_regulation',  delta: -1 },
-  { title: 'Fund public education',         type: 'economic', score:  -4, dimension: 'public_services',    delta: +1 },
-  { title: 'Increase defense spending',     type: 'social',   score:  +4, dimension: 'foreign_policy',     delta: +1 },
-  { title: 'Legalize cannabis nationwide',  type: 'social',   score:  -6, dimension: 'social_policy',      delta: -1 },
-  { title: 'Reform the tax code',           type: 'economic', score:  +2, dimension: 'fiscal_policy',      delta: -1 },
-  { title: 'Ban single-use plastics',       type: 'social',   score:  -3, dimension: 'social_policy',      delta: -1 },
-  { title: 'Expand rural broadband',        type: 'economic', score:  -1, dimension: 'public_services',    delta: +1 },
-  { title: 'Privatize postal service',      type: 'economic', score:  +8, dimension: 'market_regulation',  delta: -1 },
-  { title: 'Anti-Corruption Commission Act',        type: 'social',   score:  -4, dimension: 'civic_integrity',    delta: +1 },
-  { title: 'Electoral Reform and Proportional Vote', type: 'social',  score:  -3, dimension: 'civic_integrity',    delta: +1 },
-  { title: 'Emergency Executive Powers Act',         type: 'social',   score:  +6, dimension: 'civic_integrity',    delta: -1 },
+  // wages_unions — both directions, full score range
+  { title: 'Raise the minimum wage',                      type: 'economic', score:  -5, dimension: 'wages_unions',      delta: +1 },
+  { title: 'Expand collective bargaining rights',         type: 'economic', score:  -4, dimension: 'wages_unions',      delta: +1 },
+  { title: 'Introduce productivity-linked pay floors',    type: 'economic', score:  +2, dimension: 'wages_unions',      delta: +1 },
+  { title: 'Restrict strike action in essential services',type: 'social',   score:  +6, dimension: 'wages_unions',      delta: -1 },
+  { title: 'Repeal union recognition law',                type: 'economic', score:  +8, dimension: 'wages_unions',      delta: -1 },
+
+  // market_regulation — both directions, full score range
+  { title: 'Nationalise the energy sector',               type: 'economic', score:  -7, dimension: 'market_regulation', delta: +1 },
+  { title: 'Expand antitrust enforcement',                type: 'economic', score:  -3, dimension: 'market_regulation', delta: +1 },
+  { title: 'Introduce consumer protection standards',     type: 'economic', score:  -1, dimension: 'market_regulation', delta: +1 },
+  { title: 'Deregulate financial markets',                type: 'economic', score:  +7, dimension: 'market_regulation', delta: -1 },
+  { title: 'Privatize postal service',                    type: 'economic', score:  +8, dimension: 'market_regulation', delta: -1 },
+
+  // public_services — both directions, full score range
+  { title: 'Expand healthcare coverage',                  type: 'economic', score:  -5, dimension: 'public_services',   delta: +1 },
+  { title: 'Fund public education',                       type: 'economic', score:  -4, dimension: 'public_services',   delta: +1 },
+  { title: 'Expand rural broadband',                      type: 'economic', score:  -1, dimension: 'public_services',   delta: +1 },
+  { title: 'Means-test welfare benefits',                 type: 'economic', score:  +4, dimension: 'public_services',   delta: -1 },
+  { title: 'Introduce school voucher programme',          type: 'economic', score:  +6, dimension: 'public_services',   delta: -1 },
+
+  // fiscal_policy — both directions, full score range
+  { title: 'Introduce a wealth tax',                      type: 'economic', score:  -7, dimension: 'fiscal_policy',     delta: +1 },
+  { title: 'Raise income tax on high earners',            type: 'economic', score:  -4, dimension: 'fiscal_policy',     delta: +1 },
+  { title: 'Expand working family tax credits',           type: 'economic', score:  -1, dimension: 'fiscal_policy',     delta: +1 },
+  { title: 'Cut corporate tax rate',                      type: 'economic', score:  +6, dimension: 'fiscal_policy',     delta: -1 },
+  { title: 'Abolish inheritance tax',                     type: 'economic', score:  +6, dimension: 'fiscal_policy',     delta: -1 },
+
+  // border_policy — both directions, full score range
+  { title: 'Expand legal migration pathways',             type: 'social',   score:  -5, dimension: 'border_policy',     delta: -1 },
+  { title: 'Abolish visa restrictions with treaty nations',type: 'social',  score:  -3, dimension: 'border_policy',     delta: -1 },
+  { title: 'Introduce points-based immigration system',   type: 'social',   score:  +2, dimension: 'border_policy',     delta: +1 },
+  { title: 'Tighten border controls',                     type: 'social',   score:  +7, dimension: 'border_policy',     delta: +1 },
+  { title: 'Establish a national deportation scheme',     type: 'social',   score:  +9, dimension: 'border_policy',     delta: +1 },
+
+  // social_policy — both directions (−1=Progressive, +1=Traditional), full range
+  { title: 'Legalize cannabis nationwide',                type: 'social',   score:  -6, dimension: 'social_policy',     delta: -1 },
+  { title: 'Decriminalise drug possession',               type: 'social',   score:  -4, dimension: 'social_policy',     delta: -1 },
+  { title: 'Strengthen civil liberties protections',      type: 'social',   score:  -2, dimension: 'social_policy',     delta: -1 },
+  { title: 'Restrict abortion access',                    type: 'social',   score:  +7, dimension: 'social_policy',     delta: +1 },
+  { title: 'Introduce religious exemptions in civil law', type: 'social',   score:  +6, dimension: 'social_policy',     delta: +1 },
+
+  // foreign_policy — both directions (−1=Multilateral, +1=Nationalist), full range
+  { title: 'Deepen European integration',                 type: 'social',   score:  -6, dimension: 'foreign_policy',    delta: -1 },
+  { title: 'Join international climate framework',        type: 'social',   score:  -4, dimension: 'foreign_policy',    delta: -1 },
+  { title: 'Ratify international human rights protocols', type: 'social',   score:  -2, dimension: 'foreign_policy',    delta: -1 },
+  { title: 'Increase defense spending',                   type: 'social',   score:  +5, dimension: 'foreign_policy',    delta: +1 },
+  { title: 'Impose import tariffs on foreign goods',      type: 'economic', score:  +3, dimension: 'foreign_policy',    delta: +1 },
+  { title: 'Withdraw from international court jurisdiction', type: 'social', score: +7, dimension: 'foreign_policy',    delta: +1 },
+
+  // civic_integrity — both directions, full score range
+  { title: 'Anti-Corruption Commission Act',              type: 'social',   score:  -4, dimension: 'civic_integrity',   delta: +1 },
+  { title: 'Electoral Reform and Proportional Vote',      type: 'social',   score:  -3, dimension: 'civic_integrity',   delta: +1 },
+  { title: 'Lobbying transparency register',              type: 'social',   score:  -2, dimension: 'civic_integrity',   delta: +1 },
+  { title: 'Emergency Executive Powers Act',              type: 'social',   score:  +6, dimension: 'civic_integrity',   delta: -1 },
+  { title: 'Repeal judicial review powers',               type: 'social',   score:  +7, dimension: 'civic_integrity',   delta: -1 },
 ];

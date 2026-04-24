@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { PARTIES, ENDINGS } from '$lib/data.js';
-  import { playerParty, selectedCoalition, committedGoals, playerMandate, endingData, resetGame } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, committedGoals, playerMandate, endingData, resetGame, headerAccent, headerCrumb } from '$lib/stores.js';
 
   let party     = null;
   let coalition = null;
@@ -27,6 +27,14 @@
     : mandateMet                  ? 'high'
     : (ending?.stats?.billsPassed ?? 0) >= 5 ? 'mid'
     : 'low';
+
+  $: verdictColor = tier === 'high' ? '#22c55e' : tier === 'mid' ? '#d97706' : '#f87171';
+  $: verdictLabel = tier === 'collapse' ? 'Coalition Collapsed'
+    : tier === 'high'     ? 'Mandate Achieved'
+    : tier === 'mid'      ? 'Partial Mandate'
+    : 'Mandate Failed';
+
+  $: if (tier) { headerAccent.set(verdictColor); headerCrumb.set(['Select', 'Coalition', 'Programme', 'Session', 'Results']); }
 
   $: endingText = coalition && party ? (ENDINGS[coalition.id]?.[party.name]?.[tier] ?? '') : '';
   $: titleText  = coalition && party ? (coalition.titles?.[party.name] ?? '') : '';
@@ -57,7 +65,10 @@
 </script>
 
 {#if party && coalition && ending}
-  <div class="ending-coalition-title">{titleText}</div>
+  <div class="ending-verdict-stamp" style="color:{verdictColor}; border-color:{verdictColor}40;">
+    {verdictLabel}
+  </div>
+  <h2 class="ending-headline">{titleText}</h2>
 
   <div class="ending-stats">
     {#if ending.collapsed}
