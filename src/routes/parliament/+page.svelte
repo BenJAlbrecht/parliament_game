@@ -6,7 +6,7 @@
   import { PARTIES, POLICY_SCALES, STARTING_POLICY, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { calculateSeats } from '$lib/layout.js';
   import { init, initAgenda, proposeBill, getPolicyState, getSessionStats } from '$lib/vote.js';
-  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData, headerAccent, headerTurn } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData, headerAccent } from '$lib/stores.js';
 
   // ── Constants ────────────────────────────────────────────────────────────────
   const BILL_LIMIT = 10;
@@ -62,7 +62,6 @@
     };
   }
 
-  $: if (party) headerTurn.set({ current: turnCount, max: BILL_LIMIT });
 
   // ── Init ─────────────────────────────────────────────────────────────────────
   onMount(() => {
@@ -222,13 +221,18 @@
 
     <!-- Party header -->
     <div class="party-header">
-      <img class="party-header-logo" src={logoSrc(party.name)} alt="">
-      <span class="party-header-name" style="color:{party.color}">{party.name}</span>
-      <span class="party-header-role">Leader of the {coalition.name}</span>
+      <div class="party-header-left">
+        <img class="party-header-logo" src={logoSrc(party.name)} alt="">
+        <div class="party-header-identity">
+          <span class="party-header-name" style="color:{party.color}">{party.name}</span>
+          <span class="party-header-role">Leader of the {coalition.name}</span>
+        </div>
+      </div>
+      <div class="party-header-counter">
+        <span class="counter-turn">Turn {turnCount}/{BILL_LIMIT}</span>
+        <span class="counter-year">Year {79 + turnCount}</span>
+      </div>
     </div>
-
-    <!-- Turn counter -->
-    <div class="turn-counter">Turn {turnCount} / {BILL_LIMIT}</div>
 
     <!-- ── Phase: Policy Home ── -->
     {#if phase === 'policy'}

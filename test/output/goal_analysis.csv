@@ -1,0 +1,65 @@
+Party,Coalition,Mandate,Strategy,Goal1_title,Goal1_%,Goal2_title,Goal2_%,Goal3_title,Goal3_%
+People's Alliance,left,seize_the_means,random,Workers First,48.1,Public Ownership,77.3,No Austerity,86.2
+People's Alliance,left,seize_the_means,pass-focused,Workers First,49.7,Public Ownership,77.9,No Austerity,84.3
+People's Alliance,left,seize_the_means,loyal,Workers First,55.1,Public Ownership,79.9,No Austerity,83.2
+People's Alliance,left,seize_the_means,mandate-focused,Workers First,56.6,Public Ownership,79.2,No Austerity,84.4
+People's Alliance,left,no_surrender,random,Workers First,47.0,Public Ownership,77.6,No Austerity,86.7
+People's Alliance,left,no_surrender,pass-focused,Workers First,48.3,Public Ownership,78.1,No Austerity,84.1
+People's Alliance,left,no_surrender,loyal,Workers First,54.6,Public Ownership,79.4,No Austerity,83.0
+People's Alliance,left,no_surrender,mandate-focused,Workers First,49.0,Public Ownership,78.0,No Austerity,83.5
+Socialist Party,left,build_welfare,random,Welfare State,39.2,Full Programme,51.3,Stable Coalition,67.2
+Socialist Party,left,build_welfare,pass-focused,Welfare State,40.5,Full Programme,52.9,Stable Coalition,77.3
+Socialist Party,left,build_welfare,loyal,Welfare State,38.9,Full Programme,47.9,Stable Coalition,78.8
+Socialist Party,left,build_welfare,mandate-focused,Welfare State,48.3,Full Programme,53.7,Stable Coalition,76.8
+Socialist Party,left,steady_hand,random,Welfare State,39.6,Full Programme,51.5,Stable Coalition,67.5
+Socialist Party,left,steady_hand,pass-focused,Welfare State,41.7,Full Programme,52.5,Stable Coalition,77.8
+Socialist Party,left,steady_hand,loyal,Welfare State,39.2,Full Programme,47.0,Stable Coalition,79.4
+Socialist Party,left,steady_hand,mandate-focused,Welfare State,40.6,Full Programme,47.3,Stable Coalition,79.3
+Renewal,left,reform_agenda,random,Fiscal Responsibility,88.5,Broad Mandate,43.0,Active Legislature,52.0
+Renewal,left,reform_agenda,pass-focused,Fiscal Responsibility,88.2,Broad Mandate,39.9,Active Legislature,44.9
+Renewal,left,reform_agenda,loyal,Fiscal Responsibility,86.5,Broad Mandate,33.7,Active Legislature,33.6
+Renewal,left,reform_agenda,mandate-focused,Fiscal Responsibility,87.5,Broad Mandate,59.6,Active Legislature,47.4
+Renewal,left,competent_govt,random,Fiscal Responsibility,88.7,Broad Mandate,42.3,Active Legislature,51.9
+Renewal,left,competent_govt,pass-focused,Fiscal Responsibility,88.1,Broad Mandate,39.2,Active Legislature,44.9
+Renewal,left,competent_govt,loyal,Fiscal Responsibility,86.6,Broad Mandate,34.2,Active Legislature,33.9
+Renewal,left,competent_govt,mandate-focused,Fiscal Responsibility,88.1,Broad Mandate,39.4,Active Legislature,44.1
+Socialist Party,grand,build_welfare,random,Welfare State,37.2,Full Programme,99.1,Stable Coalition,100.0
+Socialist Party,grand,build_welfare,pass-focused,Welfare State,37.8,Full Programme,98.6,Stable Coalition,100.0
+Socialist Party,grand,build_welfare,loyal,Welfare State,38.3,Full Programme,97.7,Stable Coalition,100.0
+Socialist Party,grand,build_welfare,mandate-focused,Welfare State,38.7,Full Programme,98.9,Stable Coalition,100.0
+Socialist Party,grand,steady_hand,random,Welfare State,37.6,Full Programme,99.0,Stable Coalition,100.0
+Socialist Party,grand,steady_hand,pass-focused,Welfare State,38.4,Full Programme,98.7,Stable Coalition,100.0
+Socialist Party,grand,steady_hand,loyal,Welfare State,38.7,Full Programme,97.6,Stable Coalition,100.0
+Socialist Party,grand,steady_hand,mandate-focused,Welfare State,38.6,Full Programme,97.7,Stable Coalition,100.0
+Christian Democrats,grand,sound_finances,random,Fiscal Discipline,59.4,Social Stability,59.3,Governing Majority,75.1
+Christian Democrats,grand,sound_finances,pass-focused,Fiscal Discipline,59.1,Social Stability,59.5,Governing Majority,73.2
+Christian Democrats,grand,sound_finances,loyal,Fiscal Discipline,61.1,Social Stability,59.5,Governing Majority,52.2
+Christian Democrats,grand,sound_finances,mandate-focused,Fiscal Discipline,61.5,Social Stability,61.0,Governing Majority,76.4
+Christian Democrats,grand,governing_party,random,Fiscal Discipline,59.0,Social Stability,60.0,Governing Majority,75.1
+Christian Democrats,grand,governing_party,pass-focused,Fiscal Discipline,59.8,Social Stability,59.4,Governing Majority,72.0
+Christian Democrats,grand,governing_party,loyal,Fiscal Discipline,61.7,Social Stability,59.7,Governing Majority,52.6
+Christian Democrats,grand,governing_party,mandate-focused,Fiscal Discipline,58.6,Social Stability,60.0,Governing Majority,73.7
+Renewal,right,reform_agenda,random,Fiscal Responsibility,91.6,Broad Mandate,75.8,Active Legislature,97.9
+Renewal,right,reform_agenda,pass-focused,Fiscal Responsibility,91.6,Broad Mandate,75.3,Active Legislature,97.8
+Renewal,right,reform_agenda,loyal,Fiscal Responsibility,91.1,Broad Mandate,71.8,Active Legislature,96.6
+Renewal,right,reform_agenda,mandate-focused,Fiscal Responsibility,92.5,Broad Mandate,81.9,Active Legislature,97.8
+Renewal,right,competent_govt,random,Fiscal Responsibility,91.6,Broad Mandate,75.3,Active Legislature,97.7
+Renewal,right,competent_govt,pass-focused,Fiscal Responsibility,91.9,Broad Mandate,74.4,Active Legislature,97.8
+Renewal,right,competent_govt,loyal,Fiscal Responsibility,91.5,Broad Mandate,71.5,Active Legislature,96.7
+Renewal,right,competent_govt,mandate-focused,Fiscal Responsibility,92.2,Broad Mandate,74.6,Active Legislature,97.7
+Christian Democrats,right,sound_finances,random,Fiscal Discipline,60.5,Social Stability,60.8,Governing Majority,99.5
+Christian Democrats,right,sound_finances,pass-focused,Fiscal Discipline,61.2,Social Stability,61.5,Governing Majority,99.0
+Christian Democrats,right,sound_finances,loyal,Fiscal Discipline,61.6,Social Stability,61.1,Governing Majority,99.2
+Christian Democrats,right,sound_finances,mandate-focused,Fiscal Discipline,60.4,Social Stability,60.5,Governing Majority,99.1
+Christian Democrats,right,governing_party,random,Fiscal Discipline,60.8,Social Stability,60.8,Governing Majority,99.7
+Christian Democrats,right,governing_party,pass-focused,Fiscal Discipline,60.9,Social Stability,61.5,Governing Majority,98.9
+Christian Democrats,right,governing_party,loyal,Fiscal Discipline,61.1,Social Stability,60.7,Governing Majority,99.3
+Christian Democrats,right,governing_party,mandate-focused,Fiscal Discipline,61.2,Social Stability,61.0,Governing Majority,99.0
+National Front,right,national_programme,random,Secure the Border,38.8,National Interest,32.3,Free Market,62.6
+National Front,right,national_programme,pass-focused,Secure the Border,38.2,National Interest,32.0,Free Market,64.9
+National Front,right,national_programme,loyal,Secure the Border,39.0,National Interest,32.0,Free Market,67.1
+National Front,right,national_programme,mandate-focused,Secure the Border,39.9,National Interest,31.5,Free Market,63.3
+National Front,right,prove_we_govern,random,Secure the Border,38.8,National Interest,31.9,Free Market,62.4
+National Front,right,prove_we_govern,pass-focused,Secure the Border,38.3,National Interest,31.9,Free Market,65.2
+National Front,right,prove_we_govern,loyal,Secure the Border,38.5,National Interest,31.9,Free Market,67.9
+National Front,right,prove_we_govern,mandate-focused,Secure the Border,37.6,National Interest,32.3,Free Market,64.8

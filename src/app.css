@@ -593,6 +593,68 @@ circle {
   transform: translateX(-50%);
 }
 
+.detail-coalition-card {
+  background: #14121e;
+  border: 1px solid #2d2b42;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.55rem;
+  cursor: default;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.detail-coalition-card:hover {
+  background: #1c1a2c;
+  border-color: #3d3b52;
+}
+
+.detail-coalition-card-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 0.45rem;
+}
+
+.detail-coalition-member {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.detail-coalition-member-name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.detail-coalition-member-seats {
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.detail-coalition-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #2d2b42;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-coalition-total--maj {
+  color: #22c55e;
+}
+
+/* legacy — kept for other usages */
 .detail-coalition-row {
   display: flex;
   align-items: center;
@@ -855,9 +917,16 @@ circle {
 .party-header {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  border-bottom: 1px solid #1c1a2c;
+}
+
+.party-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .party-header-logo {
@@ -866,31 +935,45 @@ circle {
   flex-shrink: 0;
 }
 
+.party-header-identity {
+  display: flex;
+  flex-direction: column;
+}
+
 .party-header-name {
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 22px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
 .party-header-role {
   font-family: 'Inconsolata', monospace;
-  font-size: 14px;
-  color: #cbd5e1;
-  line-height: 1.6;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
 }
 
-/* ── Turn counter ── */
-.turn-counter {
+.party-header-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: 'Inconsolata', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.counter-turn {
   font-size: 13px;
   color: #cbd5e1;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #1c1a2c;
+}
+
+.counter-year {
+  font-size: 11px;
+  color: #475569;
 }
 
 /* ── Phase label (extensible action slot header) ── */

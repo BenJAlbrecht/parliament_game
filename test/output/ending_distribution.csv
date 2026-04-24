@@ -1,0 +1,65 @@
+Party,Coalition,Mandate,Strategy,High_%,Mid_%,Low_%,Collapse_%
+People's Alliance,left,seize_the_means,random,19.9,79.0,1.0,0.0
+People's Alliance,left,seize_the_means,pass-focused,20.3,78.7,1.0,0.0
+People's Alliance,left,seize_the_means,loyal,26.8,72.0,1.2,0.0
+People's Alliance,left,seize_the_means,mandate-focused,29.1,69.9,1.0,0.0
+People's Alliance,left,no_surrender,random,14.6,84.3,1.1,0.0
+People's Alliance,left,no_surrender,pass-focused,10.6,88.3,1.1,0.0
+People's Alliance,left,no_surrender,loyal,2.7,96.0,1.3,0.0
+People's Alliance,left,no_surrender,mandate-focused,11.6,87.4,1.0,0.0
+Socialist Party,left,build_welfare,random,38.7,59.3,2.0,0.0
+Socialist Party,left,build_welfare,pass-focused,40.4,59.0,0.7,0.0
+Socialist Party,left,build_welfare,loyal,38.8,61.0,0.3,0.0
+Socialist Party,left,build_welfare,mandate-focused,48.1,51.3,0.6,0.0
+Socialist Party,left,steady_hand,random,50.3,47.9,1.8,0.0
+Socialist Party,left,steady_hand,pass-focused,61.4,38.0,0.7,0.0
+Socialist Party,left,steady_hand,loyal,62.6,37.1,0.3,0.0
+Socialist Party,left,steady_hand,mandate-focused,63.2,36.5,0.3,0.0
+Renewal,left,reform_agenda,random,78.2,19.8,2.0,0.0
+Renewal,left,reform_agenda,pass-focused,76.2,21.7,2.1,0.0
+Renewal,left,reform_agenda,loyal,71.4,25.8,2.8,0.0
+Renewal,left,reform_agenda,mandate-focused,90.4,7.8,1.8,0.0
+Renewal,left,competent_govt,random,51.9,46.2,1.9,0.0
+Renewal,left,competent_govt,pass-focused,44.9,52.8,2.3,0.0
+Renewal,left,competent_govt,loyal,33.9,63.6,2.5,0.0
+Renewal,left,competent_govt,mandate-focused,44.1,53.7,2.2,0.0
+Socialist Party,grand,build_welfare,random,37.2,62.7,0.0,0.0
+Socialist Party,grand,build_welfare,pass-focused,37.8,62.2,0.0,0.0
+Socialist Party,grand,build_welfare,loyal,38.3,61.7,0.0,0.0
+Socialist Party,grand,build_welfare,mandate-focused,38.7,61.3,0.0,0.0
+Socialist Party,grand,steady_hand,random,99.8,0.2,0.0,0.0
+Socialist Party,grand,steady_hand,pass-focused,99.9,0.1,0.0,0.0
+Socialist Party,grand,steady_hand,loyal,99.9,0.1,0.0,0.0
+Socialist Party,grand,steady_hand,mandate-focused,99.8,0.2,0.0,0.0
+Christian Democrats,grand,sound_finances,random,35.2,64.8,0.0,0.0
+Christian Democrats,grand,sound_finances,pass-focused,34.1,65.9,0.0,0.0
+Christian Democrats,grand,sound_finances,loyal,32.6,67.4,0.0,0.0
+Christian Democrats,grand,sound_finances,mandate-focused,37.3,62.7,0.0,0.0
+Christian Democrats,grand,governing_party,random,75.1,24.9,0.0,0.0
+Christian Democrats,grand,governing_party,pass-focused,72.0,28.0,0.0,0.0
+Christian Democrats,grand,governing_party,loyal,52.6,47.3,0.0,0.0
+Christian Democrats,grand,governing_party,mandate-focused,73.7,26.3,0.0,0.0
+Renewal,right,reform_agenda,random,96.6,3.4,0.0,0.0
+Renewal,right,reform_agenda,pass-focused,96.8,3.2,0.0,0.0
+Renewal,right,reform_agenda,loyal,95.6,4.4,0.0,0.0
+Renewal,right,reform_agenda,mandate-focused,98.4,1.6,0.0,0.0
+Renewal,right,competent_govt,random,97.7,2.3,0.0,0.0
+Renewal,right,competent_govt,pass-focused,97.8,2.2,0.0,0.0
+Renewal,right,competent_govt,loyal,96.7,3.3,0.0,0.0
+Renewal,right,competent_govt,mandate-focused,97.7,2.3,0.0,0.0
+Christian Democrats,right,sound_finances,random,36.9,62.9,0.0,0.1
+Christian Democrats,right,sound_finances,pass-focused,36.8,63.1,0.0,0.1
+Christian Democrats,right,sound_finances,loyal,37.5,62.3,0.0,0.2
+Christian Democrats,right,sound_finances,mandate-focused,36.9,63.0,0.0,0.1
+Christian Democrats,right,governing_party,random,99.6,0.3,0.0,0.1
+Christian Democrats,right,governing_party,pass-focused,98.8,1.1,0.0,0.1
+Christian Democrats,right,governing_party,loyal,99.1,0.7,0.0,0.1
+Christian Democrats,right,governing_party,mandate-focused,98.9,1.1,0.0,0.1
+National Front,right,national_programme,random,12.3,87.7,0.0,0.0
+National Front,right,national_programme,pass-focused,12.1,87.9,0.0,0.0
+National Front,right,national_programme,loyal,12.2,87.8,0.0,0.0
+National Front,right,national_programme,mandate-focused,12.4,87.6,0.0,0.0
+National Front,right,prove_we_govern,random,89.0,11.0,0.0,0.0
+National Front,right,prove_we_govern,pass-focused,78.7,21.3,0.0,0.0
+National Front,right,prove_we_govern,loyal,71.5,28.5,0.0,0.0
+National Front,right,prove_we_govern,mandate-focused,79.3,20.7,0.0,0.0

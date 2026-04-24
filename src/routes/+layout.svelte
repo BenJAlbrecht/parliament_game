@@ -1,6 +1,6 @@
 <script>
   import '../app.css';
-  import { headerFlag, headerAccent, headerTurn, playerParty } from '$lib/stores.js';
+  import { headerFlag, headerAccent } from '$lib/stores.js';
 </script>
 
 <div class="container">
@@ -12,19 +12,6 @@
       <img class="header-flag" src="/images/party_flags/{$headerFlag}.svg" alt="">
     </div>
     <div class="masthead-rule masthead-rule--thin"></div>
-    {#if $playerParty && $headerTurn}
-      <div class="masthead-session">
-        <div class="masthead-session-left">
-          <img class="session-flag" src="/images/party_flags/{$headerFlag}.svg" alt="">
-          <span class="session-party" style="color:{$playerParty.color}">{$playerParty.name}</span>
-        </div>
-        <div class="masthead-session-right">
-          <span class="session-turn">Turn {$headerTurn.current}/{$headerTurn.max}</span>
-          <span class="session-sep">·</span>
-          <span class="session-year">Year {79 + $headerTurn.current}</span>
-        </div>
-      </div>
-    {/if}
   </header>
   <slot />
 </div>

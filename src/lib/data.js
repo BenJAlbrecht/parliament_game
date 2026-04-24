@@ -160,11 +160,11 @@ export const PARTIES = [
     },
     goals: [
       { id: 'workers_first',    title: 'Workers First',    desc: 'Raise wages & unions to level 3 or above',      check: (ps)     => ps.wages_unions >= 3 },
-      { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 2 or more left-leaning bills this session', check: (ps, st) => st.leftBillsPassed >= 2 },
+      { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 4 or more left-leaning bills this session', check: (ps, st) => st.leftBillsPassed >= 4 },
       { id: 'no_austerity',     title: 'No Austerity',     desc: 'Keep fiscal policy at or above its starting level', check: (ps) => ps.fiscal_policy >= STARTING_POLICY.fiscal_policy },
     ],
     mandates: [
-      { id: 'seize_the_means',  title: 'Seize the Means',  desc: 'Raise market regulation AND wages & unions each to level 4 or above.', legislative: true,  check: (ps) => ps.market_regulation >= 4 && ps.wages_unions >= 4 },
+      { id: 'seize_the_means',  title: 'Seize the Means',  desc: 'Raise market regulation AND wages & unions each to level 3 or above.', legislative: true,  check: (ps) => ps.market_regulation >= 3 && ps.wages_unions >= 3 },
       { id: 'no_surrender',     title: 'No Surrender',     desc: 'Complete the session without abstaining on a single turn.',            legislative: false, check: (ps, st) => st.turnsAbstained === 0 },
     ],
     caucuses: [
@@ -187,12 +187,12 @@ export const PARTIES = [
     },
     goals: [
       { id: 'welfare_state',    title: 'Welfare State',    desc: 'Raise public services to level 4 or above',            check: (ps)     => ps.public_services >= 4 },
-      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass 6 or more bills this session',                   check: (ps, st) => st.billsPassed >= 6 },
+      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass 8 or more bills this session',                   check: (ps, st) => st.billsPassed >= 8 },
       { id: 'stable_coalition', title: 'Stable Coalition', desc: 'Keep all partner loyalties above 50% by session end', check: (ps, st) => st.allPartnersLoyalAbove50 },
     ],
     mandates: [
       { id: 'build_welfare',  title: 'Build the Welfare State', desc: 'Raise public services to level 4 or above AND pass 5 or more bills.', legislative: true,  check: (ps, st) => ps.public_services >= 4 && st.billsPassed >= 5 },
-      { id: 'steady_hand',    title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty.',       legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 },
+      { id: 'steady_hand',    title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty and pass 7 or more bills.', legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 && st.billsPassed >= 7 },
     ],
     caucuses: [
       { name: 'Old Guard',           share: 45, desc: 'The trade union bloc. Rooted in the postwar welfare settlement and deeply suspicious of markets, they resist any dilution of the party\'s redistributive commitments. Their loyalty is to organised labour first and electoral strategy second. The backbone of the membership; the drag on the modernisers.' },
@@ -214,12 +214,12 @@ export const PARTIES = [
     },
     goals: [
       { id: 'fiscal_responsibility', title: 'Fiscal Responsibility', desc: 'Keep fiscal policy within 1 step of where it started', check: (ps) => Math.abs(ps.fiscal_policy - STARTING_POLICY.fiscal_policy) <= 1 },
-      { id: 'broad_mandate',         title: 'Broad Mandate',         desc: 'Pass bills across 4 or more policy domains',           check: (ps, st) => st.domainsPassedCount >= 4 },
-      { id: 'active_legislature',    title: 'Active Legislature',    desc: 'Pass 6 or more bills this session',                    check: (ps, st) => st.billsPassed >= 6 },
+      { id: 'broad_mandate',         title: 'Broad Mandate',         desc: 'Pass bills across 6 or more policy domains',           check: (ps, st) => st.domainsPassedCount >= 6 },
+      { id: 'active_legislature',    title: 'Active Legislature',    desc: 'Pass 8 or more bills this session',                    check: (ps, st) => st.billsPassed >= 8 },
     ],
     mandates: [
       { id: 'reform_agenda',      title: 'The Reform Agenda',    desc: 'Pass bills across 5 or more distinct policy domains.', legislative: true,  check: (ps, st) => st.domainsPassedCount >= 5 },
-      { id: 'competent_govt',     title: 'Competent Government', desc: 'Pass 7 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 7 },
+      { id: 'competent_govt',     title: 'Competent Government', desc: 'Pass 8 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 8 },
     ],
     caucuses: [
       { name: 'The Mandarins',      share: 50, desc: 'The party\'s founding establishment. Evidence-based, institution-trusting, and firmly pro-European. Believe that competent management of public institutions is more transformative than ideology. The faction that makes Renewal feel like a think-tank that won an election.' },
@@ -242,11 +242,11 @@ export const PARTIES = [
     goals: [
       { id: 'fiscal_discipline',  title: 'Fiscal Discipline',  desc: 'Keep fiscal policy at level 2 or below',             check: (ps)     => ps.fiscal_policy <= 2 },
       { id: 'social_stability',   title: 'Social Stability',   desc: 'Keep social policy at or above its starting level',  check: (ps)     => ps.social_policy >= STARTING_POLICY.social_policy },
-      { id: 'governing_majority', title: 'Governing Majority', desc: 'Pass 5 or more bills without abstaining any turn',   check: (ps, st) => st.billsPassed >= 5 && st.turnsAbstained === 0 },
+      { id: 'governing_majority', title: 'Governing Majority', desc: 'Pass 8 or more bills without abstaining any turn',   check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
     ],
     mandates: [
       { id: 'sound_finances',   title: 'Sound Finances',    desc: 'Keep both fiscal policy and market regulation at level 2 or below.', legislative: true,  check: (ps) => ps.fiscal_policy <= 2 && ps.market_regulation <= 2 },
-      { id: 'governing_party',  title: 'Governing Party',   desc: 'Pass 5 or more bills without abstaining on any turn.',              legislative: false, check: (ps, st) => st.billsPassed >= 5 && st.turnsAbstained === 0 },
+      { id: 'governing_party',  title: 'Governing Party',   desc: 'Pass 8 or more bills without abstaining on any turn.',              legislative: false, check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
     ],
     caucuses: [
       { name: 'Social Catholics',     share: 40, desc: 'The party\'s original soul. Draw on Catholic social teaching to defend both traditional family values and a robust welfare state. Suspicious of pure market liberalism and committed to solidarity. The faction most uncomfortable with the coalition\'s nationalist partners, and the one European allies watch for reassurance.' },
@@ -268,12 +268,12 @@ export const PARTIES = [
     },
     goals: [
       { id: 'secure_border',     title: 'Secure the Border', desc: 'Raise border policy to level 4 or above',              check: (ps) => ps.border_policy >= 4 },
-      { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 4 or above',             check: (ps) => ps.foreign_policy >= 4 },
+      { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 3 or above',             check: (ps) => ps.foreign_policy >= 3 },
       { id: 'free_market',       title: 'Free Market',       desc: 'Keep market regulation at or below its starting level', check: (ps) => ps.market_regulation <= STARTING_POLICY.market_regulation },
     ],
     mandates: [
-      { id: 'national_programme', title: 'The National Programme', desc: 'Raise both border policy AND foreign policy to level 4 or above.', legislative: true,  check: (ps) => ps.border_policy >= 4 && ps.foreign_policy >= 4 },
-      { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass 4 or more bills this session.',                               legislative: false, check: (ps, st) => st.billsPassed >= 4 },
+      { id: 'national_programme', title: 'The National Programme', desc: 'Raise border policy to level 4 or above AND foreign policy to level 3 or above.', legislative: true,  check: (ps) => ps.border_policy >= 4 && ps.foreign_policy >= 3 },
+      { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass every bill — a perfect 10-turn session.',                     legislative: false, check: (ps, st) => st.billsPassed >= 10 },
     ],
     caucuses: [
       { name: 'Identitarians',       share: 45, desc: 'The cultural nationalist hardliners. Define the party\'s ideological core: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism. The faction that kept the NF in electoral purgatory for twenty years — and the one that finally cracked the cordon sanitaire.' },
