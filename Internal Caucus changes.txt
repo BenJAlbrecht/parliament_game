@@ -1,0 +1,67 @@
+Internal Caucus changes
+
+
+1) People's Alliance
+a) Revolutionary Caucus -> change name to "Democratic Road"
+--> New description: "The movement's majority alliance of Marxists and reformists, committed to the electoral path to socialism."
+
+b) Eco-Socialists (keep name)
+--> New description: "Environmentalists who see the climate crisis as inseparable from capitalism, fighting for a Green transition led by democratic workplaces."
+
+c) Democratic Assembly -> change name to "Commune Federation"
+--> New description: "Community organizers focusing on building local power through mutual aid and neighborhood assemblies, who believe revolutionary change is only possible from the ground up."
+
+
+2) Socialist Party
+a) Old Guard
+--> New description: "The trade union bloc. Rooted in the postwar welfare settlement and suspicious of markets, they resist any dilution of the party's redistributive agenda."
+
+b) The Reformists -> change name to "New Way"
+--> New description: "The modernising wing, shaped by years in opposition and spearheaded by the New Middle think-tank. Open to market reforms to outflank the right and ensure a left majority."
+
+c) Progressive Alliance -> change name to "Progressives"
+--> New description: "The social liberal insurgency, based in the professional-managerial class. Indifferent to redistribution, focused on rights — gender, race, LGBTQ+, disability, climate."
+
+
+3) Renewal
+a) The mandarins -> "Technocrats"
+--> New description: "The party's founding establishment. Evidence-based, institution-trusting, and firmly pro-European."
+
+b) Pirate Caucus (Keep name)
+--> put the pirate caucus LAST on the internal caucuses of Renewal, making it the smallest (so make classical liberals 2nd)
+--> New description: "Digital-age radicals inspired by the European Pirate Party movement. Focused on open government, algorithmic accountability, net neutrality, and direct democracy."
+
+c) Classical Liberals
+--> change places with pirate caucus
+--> New description: "The free-market conscience of the party. Pro-European but economically orthodox: lower taxes, deregulation, and individual liberty over state provision."
+
+
+4) Christian Democrats
+a) "Social Catholics"
+--> New description: "The soul of the party. Defenders of Catholic social teaching, traditional family values, and a robust welfare state."
+
+b) Economic Liberals -> "Business Wing"
+--> New description: "Voice of the haute bourgeoisie seeking lower taxes, lighter regulation, and a more flexible labor market. Increasingly dominant in party fundraising."
+
+c) "National Conservatives"
+--> New description: "The Eurosceptic Right. Culturally traditional and drawn to the immigration politics of the National Front."
+
+
+5) National Front
+a) "Identitarians"
+--> New description: "Nationalist hardliners who define the party's ideology: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism."
+
+b) "New Mensheviks"
+--> New description: "Traditional leftists disillusioned with the People's Alliance, seeking to fuse the legacy of the fallen Menshevik Soviet Republic with identitarian values."
+
+c) "Popular Voice"
+--> New description: "Hostile to elite consensus and the existing social order. A grassroots movement unified by shock jocks and fringe online communities."
+
+
+
+
+
+
+
+
+

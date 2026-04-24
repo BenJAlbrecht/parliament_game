@@ -168,9 +168,9 @@ export const PARTIES = [
       { id: 'no_surrender',     title: 'No Surrender',     desc: 'Complete the session without abstaining on a single turn.',            legislative: false, check: (ps, st) => st.turnsAbstained === 0 },
     ],
     caucuses: [
-      { name: 'Revolutionary Caucus', share: 55, desc: 'The founding hardliners. View parliamentary politics as a necessary evil rather than an end in itself. Push for maximum radicalism on every bill, treat compromise as capitulation, and regard coalition partners with open suspicion. The faction that gave the party its combative identity.' },
-      { name: 'Green Socialists',     share: 30, desc: 'Emerged from the environmental movement of the 1990s. Want to fuse economic radicalism with ecological transformation — public ownership of energy, a green industrial strategy, and zero-carbon commitments as the non-negotiable core of any left programme. Frequently in tension with the party\'s industrial base.' },
-      { name: 'Democratic Assembly',  share: 15, desc: 'The party\'s idealist fringe. Advocate for participatory budgeting, worker councils, and direct democracy as the architecture of a post-capitalist future. As sceptical of state power as of market power — they want power dispersed downward, not merely nationalised upward.' },
+      { name: 'Democratic Road',    share: 55, desc: 'The movement\'s majority alliance of Marxists and reformists, committed to the electoral path to socialism.' },
+      { name: 'Eco-Socialists',     share: 30, desc: 'Environmentalists who see the climate crisis as inseparable from capitalism, fighting for a Green transition led by democratic workplaces.' },
+      { name: 'Commune Federation', share: 15, desc: 'Community organizers focusing on building local power through mutual aid and neighborhood assemblies, who believe revolutionary change is only possible from the ground up.' },
     ],
   },
   {
@@ -195,9 +195,9 @@ export const PARTIES = [
       { id: 'steady_hand',    title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty and pass 7 or more bills.', legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 && st.billsPassed >= 7 },
     ],
     caucuses: [
-      { name: 'Old Guard',           share: 45, desc: 'The trade union bloc. Rooted in the postwar welfare settlement and deeply suspicious of markets, they resist any dilution of the party\'s redistributive commitments. Their loyalty is to organised labour first and electoral strategy second. The backbone of the membership; the drag on the modernisers.' },
-      { name: 'The Reformists',      share: 35, desc: 'The modernising wing, shaped by years in opposition. Believe electability requires a credible economic platform, pro-European positioning, and distance from the Old Guard\'s class politics. Viewed by the left as the party\'s ongoing identity crisis; view the left as the reason the party keeps losing.' },
-      { name: 'Progressive Alliance', share: 20, desc: 'The social liberal insurgency. Less interested in economic redistribution than in rights — gender, race, LGBTQ+, disability, climate. Push the party toward identity-conscious politics and away from its class-based roots, creating friction with both major factions while speaking to a younger urban base.' },
+      { name: 'Old Guard',     share: 45, desc: 'The trade union bloc. Rooted in the postwar welfare settlement and suspicious of markets, they resist any dilution of the party\'s redistributive agenda.' },
+      { name: 'New Way',       share: 35, desc: 'The modernising wing, shaped by years in opposition and spearheaded by the New Middle think-tank. Open to market reforms to outflank the right and ensure a left majority.' },
+      { name: 'Progressives',  share: 20, desc: 'The social liberal insurgency, based in the professional-managerial class. Indifferent to redistribution, focused on rights — gender, race, LGBTQ+, disability, climate.' },
     ],
   },
   {
@@ -222,9 +222,9 @@ export const PARTIES = [
       { id: 'competent_govt',     title: 'Competent Government', desc: 'Pass 8 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 8 },
     ],
     caucuses: [
-      { name: 'The Mandarins',      share: 50, desc: 'The party\'s founding establishment. Evidence-based, institution-trusting, and firmly pro-European. Believe that competent management of public institutions is more transformative than ideology. The faction that makes Renewal feel like a think-tank that won an election.' },
-      { name: 'Pirate Caucus',      share: 30, desc: 'Digital-age radicals inspired by the European Pirate Party movement. Champion open government, algorithmic accountability, net neutrality, and direct democratic participation via digital platforms. Uncomfortable with the party\'s economic centrism, but united with the Technocrats on civil liberties and European integration.' },
-      { name: 'Classical Liberals', share: 20, desc: 'The free-market conscience of the party. Pro-European but economically orthodox: lower taxes, deregulation, and individual liberty over state provision. Wary of the Technocrats\' appetite for intervention and quietly hostile to the Pirate Caucus\'s instincts on platform regulation.' },
+      { name: 'Technocrats',        share: 50, desc: 'The party\'s founding establishment. Evidence-based, institution-trusting, and firmly pro-European.' },
+      { name: 'Classical Liberals', share: 30, desc: 'The free-market conscience of the party. Pro-European but economically orthodox: lower taxes, deregulation, and individual liberty over state provision.' },
+      { name: 'Pirate Caucus',      share: 20, desc: 'Digital-age radicals inspired by the European Pirate Party movement. Focused on open government, algorithmic accountability, net neutrality, and direct democracy.' },
     ],
   },
   {
@@ -249,9 +249,9 @@ export const PARTIES = [
       { id: 'governing_party',  title: 'Governing Party',   desc: 'Pass 8 or more bills without abstaining on any turn.',              legislative: false, check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
     ],
     caucuses: [
-      { name: 'Social Catholics',     share: 40, desc: 'The party\'s original soul. Draw on Catholic social teaching to defend both traditional family values and a robust welfare state. Suspicious of pure market liberalism and committed to solidarity. The faction most uncomfortable with the coalition\'s nationalist partners, and the one European allies watch for reassurance.' },
-      { name: 'Economic Liberals',    share: 35, desc: 'The business wing. Want lower corporate taxes, a lighter regulatory touch, and a more flexible labour market. Increasingly dominant in the donor base and increasingly in tension with the Social Catholics over welfare spending. See the party\'s future in the boardroom, not the parish hall.' },
-      { name: 'National Conservatives', share: 25, desc: 'The Eurosceptic right. Culturally traditional, suspicious of Brussels, and drawn toward the immigration politics of the National Front without quite crossing the threshold. The faction most at risk of defection to nationalist parties — and the one the party\'s centrist partners watch most anxiously.' },
+      { name: 'Social Catholics',       share: 40, desc: 'The soul of the party. Defenders of Catholic social teaching, traditional family values, and a robust welfare state.' },
+      { name: 'Business Wing',          share: 35, desc: 'Voice of the haute bourgeoisie seeking lower taxes, lighter regulation, and a more flexible labor market. Increasingly dominant in party fundraising.' },
+      { name: 'National Conservatives', share: 25, desc: 'The Eurosceptic Right. Culturally traditional and drawn to the immigration politics of the National Front.' },
     ],
   },
   {
@@ -276,9 +276,9 @@ export const PARTIES = [
       { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass every bill — a perfect 10-turn session.',                     legislative: false, check: (ps, st) => st.billsPassed >= 10 },
     ],
     caucuses: [
-      { name: 'Identitarians',       share: 45, desc: 'The cultural nationalist hardliners. Define the party\'s ideological core: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism. The faction that kept the NF in electoral purgatory for twenty years — and the one that finally cracked the cordon sanitaire.' },
-      { name: 'Economic Nationalists', share: 35, desc: 'The left-populist surprise within the party. Want to protect domestic industry, tax multinationals, raise wages for native workers, and reject free trade as a globalist project. Inconsistent with the Identitarians on welfare but unified on every cultural question. Court the deindustrialised working class the Socialist Party abandoned.' },
-      { name: 'Law & Order',         share: 20, desc: 'The authoritarian security wing. Focused on crime, policing, and the expansion of state security powers. Demand tougher sentencing, more police, and a harder line on internal threats. The most comfortable with state power of any NF faction — which puts them in occasional tension with the Economic Nationalists\' anti-establishment instincts.' },
+      { name: 'Identitarians',   share: 45, desc: 'Nationalist hardliners who define the party\'s ideology: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism.' },
+      { name: 'New Mensheviks',  share: 35, desc: 'Traditional leftists disillusioned with the People\'s Alliance, seeking to fuse the legacy of the fallen Menshevik Soviet Republic with identitarian values.' },
+      { name: 'Popular Voice',   share: 20, desc: 'Hostile to elite consensus and the existing social order. A grassroots movement unified by shock jocks and fringe online communities.' },
     ],
   },
 ];
