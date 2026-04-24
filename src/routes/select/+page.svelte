@@ -2,8 +2,6 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { fly, fade } from 'svelte/transition';
-  import { tweened } from 'svelte/motion';
-  import { cubicOut } from 'svelte/easing';
   import { PARTIES, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { playerParty, headerFlag, headerAccent } from '$lib/stores.js';
   import { calculateSeats } from '$lib/layout.js';
@@ -29,21 +27,12 @@
 
   let selected = null;
 
-  const econPos   = tweened(50, { duration: 600, easing: cubicOut });
-  const socialPos = tweened(50, { duration: 600, easing: cubicOut });
-
-  $: if (selected) {
-    econPos.set(posBarPct(selected.economic));
-    socialPos.set(posBarPct(selected.social));
-  }
-
   function seatPct(party) {
     return Math.round(party.seats / totalSeats * 100);
   }
 
-  function posBarPct(value) {
-    return ((value + 10) / 20) * 100;
-  }
+  function compassX(economic) { return (economic + 10) / 20 * 200; }
+  function compassY(social)   { return (10 - social)  / 20 * 200; }
 
   function confirmParty() {
     playerParty.set(selected);
@@ -135,18 +124,37 @@
         </div>
 
         <div class="detail-stat-block">
-          <div class="detail-stat-label">Economic</div>
-          <div class="detail-pos-label">{econLabel(selected.economic)}</div>
-          <div class="detail-pos-track">
-            <div class="detail-pos-fill" style="left:{$econPos}%; background:{selected.color};"></div>
-          </div>
-        </div>
-
-        <div class="detail-stat-block">
-          <div class="detail-stat-label">Social</div>
-          <div class="detail-pos-label">{socialLabel(selected.social)}</div>
-          <div class="detail-pos-track">
-            <div class="detail-pos-fill" style="left:{$socialPos}%; background:{selected.color};"></div>
+          <div class="detail-stat-label">Political Position</div>
+          <svg class="compass-svg" viewBox="-14 -14 228 228" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- quadrant tints -->
+            <rect x="0" y="0" width="100" height="100" fill="rgba(139,92,246,0.06)"/>
+            <rect x="100" y="0" width="100" height="100" fill="rgba(37,99,168,0.06)"/>
+            <rect x="0" y="100" width="100" height="100" fill="rgba(190,24,93,0.05)"/>
+            <rect x="100" y="100" width="100" height="100" fill="rgba(245,158,11,0.05)"/>
+            <!-- border -->
+            <rect x="0" y="0" width="200" height="200" fill="none" stroke="#2d2b42" stroke-width="1"/>
+            <!-- axes -->
+            <line x1="0" y1="100" x2="200" y2="100" stroke="#2d2b42" stroke-width="1"/>
+            <line x1="100" y1="0" x2="100" y2="200" stroke="#2d2b42" stroke-width="1"/>
+            <!-- axis labels -->
+            <text text-anchor="middle" x="100" y="-4"  font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">AUTH.</text>
+            <text text-anchor="middle" x="100" y="214" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">LIB.</text>
+            <text text-anchor="end"    x="-4"  y="104" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">LEFT</text>
+            <text text-anchor="start"  x="204" y="104" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">RIGHT</text>
+            <!-- all parties -->
+            {#each PARTIES as p}
+              {@const cx = compassX(p.economic)}
+              {@const cy = compassY(p.social)}
+              {#if p !== selected}
+                <circle cx={cx} cy={cy} r="4" fill={p.color} opacity="0.22"/>
+              {/if}
+            {/each}
+            <!-- selected party: ring + dot -->
+            <circle cx={compassX(selected.economic)} cy={compassY(selected.social)} r="11" fill="none" stroke={selected.color} stroke-width="1" opacity="0.3"/>
+            <circle cx={compassX(selected.economic)} cy={compassY(selected.social)} r="6"  fill={selected.color}/>
+          </svg>
+          <div class="compass-caption">
+            {econLabel(selected.economic)} &nbsp;·&nbsp; {socialLabel(selected.social)}
           </div>
         </div>
 
@@ -259,6 +267,22 @@
     transform: translateX(4px);
     box-shadow: -4px 0 0 var(--party-color),
                 0 0 28px color-mix(in srgb, var(--party-color) 28%, transparent);
+  }
+
+  /* ── Political compass ── */
+  .compass-svg {
+    display: block;
+    width: 100%;
+    margin: 6px 0 0;
+  }
+
+  .compass-caption {
+    text-align: center;
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    color: #64748b;
+    margin: 4px 0 0.75rem;
+    letter-spacing: 0.04em;
   }
 
   .party-card-seat-bar {
