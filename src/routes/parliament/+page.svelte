@@ -6,7 +6,7 @@
   import { PARTIES, POLICY_SCALES, STARTING_POLICY, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { calculateSeats } from '$lib/layout.js';
   import { init, initAgenda, proposeBill, getPolicyState, getSessionStats } from '$lib/vote.js';
-  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData, headerAccent, headerTurn } from '$lib/stores.js';
 
   // ── Constants ────────────────────────────────────────────────────────────────
   const BILL_LIMIT = 10;
@@ -62,7 +62,7 @@
     };
   }
 
-  $: if (party) headerCrumb.set(['Select', 'Coalition', 'Programme', `Session · Turn ${turnCount} / ${BILL_LIMIT}`]);
+  $: if (party) headerTurn.set({ current: turnCount, max: BILL_LIMIT });
 
   // ── Init ─────────────────────────────────────────────────────────────────────
   onMount(() => {

@@ -1,6 +1,6 @@
 <script>
   import '../app.css';
-  import { headerFlag, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { headerFlag, headerAccent, headerTurn, playerParty } from '$lib/stores.js';
 </script>
 
 <div class="container">
@@ -11,15 +11,19 @@
       <h1>Parliament</h1>
       <img class="header-flag" src="/images/party_flags/{$headerFlag}.svg" alt="">
     </div>
-    <p class="masthead-tagline">Parliamentary Session Simulator</p>
     <div class="masthead-rule masthead-rule--thin"></div>
-    {#if $headerCrumb.length > 0}
-      <nav class="masthead-crumb">
-        {#each $headerCrumb as step, i}
-          {#if i > 0}<span class="crumb-sep">›</span>{/if}
-          <span class="crumb-step" class:crumb-step--active={i === $headerCrumb.length - 1}>{step}</span>
-        {/each}
-      </nav>
+    {#if $playerParty && $headerTurn}
+      <div class="masthead-session">
+        <div class="masthead-session-left">
+          <img class="session-flag" src="/images/party_flags/{$headerFlag}.svg" alt="">
+          <span class="session-party" style="color:{$playerParty.color}">{$playerParty.name}</span>
+        </div>
+        <div class="masthead-session-right">
+          <span class="session-turn">Turn {$headerTurn.current}/{$headerTurn.max}</span>
+          <span class="session-sep">·</span>
+          <span class="session-year">Year {79 + $headerTurn.current}</span>
+        </div>
+      </div>
     {/if}
   </header>
   <slot />

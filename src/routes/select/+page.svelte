@@ -5,7 +5,7 @@
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { PARTIES, COALITIONS, econLabel, socialLabel, logoSrc } from '$lib/data.js';
-  import { playerParty, headerFlag, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { playerParty, headerFlag, headerAccent } from '$lib/stores.js';
   import { calculateSeats } from '$lib/layout.js';
 
   const arcSeats = calculateSeats(PARTIES);
@@ -13,7 +13,6 @@
   onMount(() => {
     headerFlag.set('flag-base');
     headerAccent.set(null);
-    headerCrumb.set(['Select Party']);
   });
 
   $: headerAccent.set(selected?.color ?? null);

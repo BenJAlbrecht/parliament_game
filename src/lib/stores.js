@@ -6,8 +6,8 @@ export const coalitionPartners = writable([]);
 export const committedGoals    = writable({});
 export const playerMandate     = writable(null);
 export const headerFlag        = writable('flag-base');
-export const headerAccent      = writable(null);   // party color string or null
-export const headerCrumb       = writable([]);      // ['Select', 'Coalition', ...]
+export const headerAccent      = writable(null);
+export const headerTurn        = writable(null);    // { current, max } during session
 
 export const endingData = writable({
   finalLoyalty:  {},
@@ -24,6 +24,6 @@ export function resetGame() {
   playerMandate.set(null);
   headerFlag.set('flag-base');
   headerAccent.set(null);
-  headerCrumb.set([]);
+  headerTurn.set(null);
   endingData.set({ finalLoyalty: {}, billsProposed: 0, collapsed: false, stats: null });
 }

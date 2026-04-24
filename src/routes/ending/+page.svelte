@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { PARTIES, ENDINGS } from '$lib/data.js';
-  import { playerParty, selectedCoalition, committedGoals, playerMandate, endingData, resetGame, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, committedGoals, playerMandate, endingData, resetGame, headerAccent } from '$lib/stores.js';
 
   let party     = null;
   let coalition = null;
@@ -34,7 +34,7 @@
     : tier === 'mid'      ? 'Partial Mandate'
     : 'Mandate Failed';
 
-  $: if (tier) { headerAccent.set(verdictColor); headerCrumb.set(['Select', 'Coalition', 'Programme', 'Session', 'Results']); }
+  $: if (tier) { headerAccent.set(verdictColor); }
 
   $: endingText = coalition && party ? (ENDINGS[coalition.id]?.[party.name]?.[tier] ?? '') : '';
   $: titleText  = coalition && party ? (coalition.titles?.[party.name] ?? '') : '';

@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { PARTIES, COALITIONS, econLabel, socialLabel, logoSrc } from '$lib/data.js';
-  import { playerParty, selectedCoalition, coalitionPartners, headerAccent, headerCrumb } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, coalitionPartners, headerAccent } from '$lib/stores.js';
 
   let party = null;
   let options = [];
@@ -16,7 +16,6 @@
     if (!party) { goto('/select'); return; }
     options = party.coalitions.map(id => COALITIONS.find(c => c.id === id));
     headerAccent.set(party.color);
-    headerCrumb.set(['Select Party', 'Form Coalition']);
   });
 
   function coalitionSeats(coalition) {

@@ -79,26 +79,51 @@ h2 {
   margin: 5px 0 0;
 }
 
-.masthead-crumb {
+.masthead-session {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0 2px;
+}
+
+.masthead-session-left {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 0 0;
+}
+
+.session-flag {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.session-party {
   font-family: 'Oswald', sans-serif;
-  font-size: 11px;
-  letter-spacing: 1.5px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #334155;
 }
 
-.crumb-sep {
-  color: #1c1a2c;
-  font-size: 14px;
-  line-height: 1;
+.masthead-session-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.crumb-step--active {
-  color: #94a3b8;
+.session-sep {
+  margin: 0 0.5rem;
+  color: #2d2b42;
+}
+
+.session-year {
+  color: #64748b;
 }
 
 
