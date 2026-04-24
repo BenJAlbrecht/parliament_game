@@ -1,0 +1,39 @@
+CAUCUS_LEADERS
+Leader ideas: each caucus has a leader, and the party leader will be one of these caucus leaders.
+
+ALSO rename Eco-Socialists to Feminist-Greens!!!
+
+1) Peoples Alliance
+--> Change its desc from 1970s to the May Uprisings.
+	a) Democratic Road
+		Leader: Zohran Khalaf
+		Appearance: (Zohran Mamdani inspo)
+		Age: 34
+		Background: The Republic's first party leader from an immigrant background. Has a PhD in economics but fervent believer in 			Democratic Socialism.
+	b) Eco-Socialists
+		Leader: Lydia Brandt
+		Appearance: (Lydia inspo)
+		Age: 44
+		Background: Student leader during the campus uprisings of the May 68 movement. Has a doctorate in quantum chemistry and 
+	c) Commune Federation
+		Leader: Louis Blum
+		Appearance: (Louis inspo)
+		Age: 65
+		Background: Former mayor of the capital city and life-long activist. Once made a controversial visit to the Soviet Republic.
+2) Socialist Party 
+	a) Old Guard
+		Leader: Isabel Sánchez 
+		Appearance: (Izzy inspired, fem Pedro Sanchez)
+		Age: 54
+		Background: An experienced legislator and former private-consultant. A strong believer in the power of trade unionism and the 			Republic's refugee programs. 
+
+
+
+	b) 
+		Leader: Binyamin Atsil
+		Appearance: (ME!!!)
+		Age: 61
+		Background: 
+
+
+

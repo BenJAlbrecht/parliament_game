@@ -1,0 +1,167 @@
+MASSIVE_CHANGE
+
+Here comes one of our most ambitious overhauls yet. I think I want to completely trash the policy-state system and implement a basic economic model that will be one of the main gameplay features. We're basically moving from basic economic sliders to a modelled economy with a simple macro 101 model. I spoke with Claude on browser and we came up with this. Please evaluate it and give it feedback within the context of our game. I don't want players to be easily able to just set policy, they should still for example need coalition power to do something like increase spending or change tax policy. And we should have concrete proposals to do this: for ex, an infrastructure investment law to increase G. Again this will be a MASSIVE overhaul. So we will kinda have to erase a lot of the law content and coalition / mandate goals but we'll iterate and incorporate on those later
+
+================================================================
+       MINIMAL MACROECONOMIC MODEL SPEC
+       For Political Simulator v1
+================================================================
+ 
+ 
+----------------------------------------------------------------
+ 1. VARIABLE SET
+----------------------------------------------------------------
+ 
+PLAYER-CONTROLLED (policy levers):
+  G           Government spending
+  tax_rate    Average tax rate (so T = tax_rate x Y)
+  i           Interest rate
+              (if central bank is under government control;
+              otherwise AI-controlled)
+ 
+CALCULATED EACH TURN:
+  Y             GDP
+  Y*            Potential GDP (grows slowly, ~2%/year)
+  C             Consumption
+  I             Investment
+  T             Tax revenue
+  Deficit       = G - T
+  Debt          Accumulates deficits with interest
+  u             Unemployment rate
+  u*            Natural rate of unemployment (fixed, e.g. 5%)
+  pi            Inflation rate
+  pi_expected   Last turn's inflation
+                (simple adaptive expectations)
+ 
+ 
+----------------------------------------------------------------
+ 2. THE 4-EQUATION MODEL
+----------------------------------------------------------------
+ 
+---- EQUATION 1: KEYNESIAN CROSS --> GDP ----
+ 
+Base identity:
+  Y = C + I + G + NX
+  C = a + mpc x (Y - T)
+ 
+Solved for equilibrium Y:
+  Y = (a + I + G + NX - mpc x T) / (1 - mpc)
+ 
+NOTES:
+  - Drop NX for simplicity in v1.
+  - Typical values: a = 100, mpc = 0.6
+  - Multiplier = 1 / (1 - mpc) = 2.5
+  - A 1 unit increase in G raises Y by 2.5 units.
+ 
+Investment responds negatively to interest rate:
+  I = I_0 - d x i
+ 
+Where:
+  I_0   baseline investment
+  d     interest-rate sensitivity of investment
+ 
+ 
+---- EQUATION 2: OKUN'S LAW --> UNEMPLOYMENT ----
+ 
+  u - u* = a x (Y - Y*) / Y*
+ 
+With typical coefficient a ~ -0.5:
+ 
+  u = u* - 0.5 x ((Y - Y*) / Y*)
+ 
+INTUITION:
+  If Y is 4% below potential, unemployment is
+  2 points above the natural rate. Clean and simple.
+ 
+ 
+---- EQUATION 3: PHILLIPS CURVE --> INFLATION ----
+ 
+Standard form:
+  pi = pi_expected - alpha x (u - u*)
+ 
+Rearranged for player legibility:
+  pi = pi_expected + beta x (u* - u)
+ 
+INTUITION:
+  - Low unemployment --> inflation above expectations.
+  - High unemployment --> inflation below expectations.
+  - Typical beta ~ 0.5.
+ 
+Expectations rule (simplest, adaptive):
+  pi_expected(t) = pi(t - 1)
+ 
+This produces the classic stagflation dynamic where
+persistent stimulus causes accelerating inflation.
+ 
+ 
+---- EQUATION 4: GOVERNMENT BUDGET CONSTRAINT --> DEBT ----
+ 
+  Debt(t+1) = Debt(t) x (1 + i) + G - T
+ 
+NOTES:
+  - Interest rate compounds existing debt.
+  - New deficit adds on top.
+ 
+ 
+----------------------------------------------------------------
+ 3. HOW A TURN RESOLVES
+----------------------------------------------------------------
+ 
+  1. Player sets G, tax_rate, interest rate
+  2. Compute I from interest rate
+  3. Compute Y from Keynesian cross
+  4. Compute u from Okun's Law
+  5. Compute pi from Phillips Curve
+  6. Compute T, Deficit, new Debt
+  7. Update pi_expected for next turn
+  8. Feed Y growth, u, pi into political popularity
+ 
+ 
+----------------------------------------------------------------
+ 4. EMERGENT DYNAMICS
+----------------------------------------------------------------
+ 
+FISCAL STIMULUS WORKS BUT HAS LIMITS
+  Raising G boosts Y by the multiplier, lowers u,
+  but pushes pi up through Phillips.
+ 
+STAGFLATION
+  Running hot too long --> pi_expected rises -->
+  Phillips curve shifts upward --> inflation even at
+  normal unemployment.
+ 
+AUSTERITY TRAP
+  Cutting G to balance the budget lowers Y, raises u,
+  but cools inflation. Classic left-vs-right tradeoff.
+ 
+DEBT SPIRAL
+  High i + deficits --> debt compounds fast -->
+  forces spending cuts later.
+ 
+INTEREST RATE AS TOOL
+  Raising i cuts I, cools Y, raises u, cools pi.
+  The Volcker lever.
+ 
+ 
+----------------------------------------------------------------
+ 5. SKIPPED FOR V1
+----------------------------------------------------------------
+ 
+  - Net exports (NX)
+      Requires exchange rate modeling.
+ 
+  - LM curve / money supply
+      IS alone is enough for intro.
+ 
+  - Rational expectations
+      Adaptive expectations already captures the
+      relevant game feel without the complexity.
+ 
+  - Long-run vs short-run Phillips curves
+      Adaptive expectations produces the long-run
+      vertical Phillips curve emergently.
+ 
+ 
+================================================================
+                      END OF SPEC
+================================================================
