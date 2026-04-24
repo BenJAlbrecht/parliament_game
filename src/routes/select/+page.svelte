@@ -4,7 +4,7 @@
   import { fly, fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
-  import { PARTIES, COALITIONS, econLabel, socialLabel, logoSrc } from '$lib/data.js';
+  import { PARTIES, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { playerParty, headerFlag, headerAccent } from '$lib/stores.js';
   import { calculateSeats } from '$lib/layout.js';
 
@@ -28,7 +28,6 @@
   const totalSeats = PARTIES.reduce((s, p) => s + p.seats, 0);
 
   let selected = null;
-  let hoveredCoalition = null;
 
   const econPos   = tweened(50, { duration: 600, easing: cubicOut });
   const socialPos = tweened(50, { duration: 600, easing: cubicOut });
@@ -44,17 +43,6 @@
 
   function posBarPct(value) {
     return ((value + 10) / 20) * 100;
-  }
-
-  function coalitionOptions(party) {
-    return COALITIONS
-      .filter(c => c.parties.includes(party.name))
-      .map(c => ({
-        coalition: c,
-        partners: c.parties
-          .filter(n => n !== party.name)
-          .map(n => PARTIES.find(p => p.name === n)),
-      }));
   }
 
   function confirmParty() {
@@ -136,9 +124,7 @@
             <circle
               cx={seat.x} cy={seat.y} r="5"
               fill={p.color}
-              opacity={hoveredCoalition
-                ? (hoveredCoalition.parties.includes(p.name) ? 1 : 0.07)
-                : (p === selected ? 1 : 0.1)}
+              opacity={p === selected ? 1 : 0.1}
               style="transition: opacity 0.2s"
             />
           {/each}
@@ -162,38 +148,6 @@
           <div class="detail-pos-track">
             <div class="detail-pos-fill" style="left:{$socialPos}%; background:{selected.color};"></div>
           </div>
-        </div>
-
-        <div class="detail-stat-block">
-          <div class="detail-stat-label">Coalitions</div>
-          {#each coalitionOptions(selected) as { coalition, partners }}
-            {@const allParties = [selected, ...partners]}
-            {@const coalSeats = allParties.reduce((s, p) => s + p.seats, 0)}
-            {@const coalPct   = Math.round(coalSeats / totalSeats * 100)}
-            {@const majority  = Math.floor(totalSeats / 2) + 1}
-            {@const hasMaj    = coalSeats >= majority}
-            <div class="detail-coalition-card"
-              role="group"
-              on:mouseenter={() => hoveredCoalition = coalition}
-              on:mouseleave={() => hoveredCoalition = null}
-            >
-              <div class="detail-coalition-card-name">{coalition.name}</div>
-              {#each allParties as p}
-                <div class="detail-coalition-member">
-                  <span class="swatch" style="background:{p.color}"></span>
-                  <span class="detail-coalition-member-name" style="color:{p.color}">{p.name}</span>
-                  {#if p === selected}<span class="you-tag">YOU</span>{/if}
-                  <span class="detail-coalition-member-seats">{p.seats} · {seatPct(p)}%</span>
-                </div>
-              {/each}
-              <div class="detail-coalition-total" class:detail-coalition-total--maj={hasMaj}>
-                <span>Total</span>
-                <span>{coalSeats} seats · {coalPct}%{hasMaj ? ' ✓' : ''}</span>
-              </div>
-            </div>
-          {:else}
-            <div class="detail-no-coalition">None available</div>
-          {/each}
         </div>
 
         <button
