@@ -63,6 +63,7 @@
     </aside>
 
     <div class="select-right">
+      <div class="select-grid-label">Select your party:</div>
       <div id="party-grid" out:fade={{ duration: 140 }}>
         {#each PARTIES as party, i}
           <div
@@ -93,63 +94,66 @@
   </div>
 
 {:else}
-  <!-- ── Party detail: full width, arc in stats column ── -->
-  <div in:fly={{ y: 22, duration: 300, delay: 100 }}>
-    <button class="back-btn" on:click={() => selected = null}>&#8592; Back</button>
+  <!-- ── Party detail: same grid as homepage, back btn in right col ── -->
+  <div class="select-page" in:fly={{ y: 22, duration: 300, delay: 100 }}>
 
-    <div class="detail-layout">
-      <div class="detail-col-stats">
-        <div class="detail-top-row">
+    <!-- Left: arc flush with homepage position, identity below -->
+    <aside class="select-lede">
+      <svg class="mini-arc" viewBox="55 25 570 292" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        {#each arcSeats as seat}
+          {@const p = PARTIES[seat.partyIndex]}
+          <circle
+            cx={seat.x} cy={seat.y} r="5"
+            fill={p.color}
+            opacity={p === selected ? 1 : 0.1}
+            style="transition: opacity 0.2s"
+          />
+        {/each}
+      </svg>
+
+      <div class="detail-lede-panel">
+        <div class="detail-lede-top">
           <img class="detail-logo" src={logoSrc(selected.name)} alt="">
           <div>
             <div class="detail-party-heading" style="color:{selected.color};">{selected.name}</div>
             <div class="detail-ideology-tag">{selected.ideology}</div>
           </div>
         </div>
-
-        <svg class="detail-arc" viewBox="55 25 570 292" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          {#each arcSeats as seat}
-            {@const p = PARTIES[seat.partyIndex]}
-            <circle
-              cx={seat.x} cy={seat.y} r="5"
-              fill={p.color}
-              opacity={p === selected ? 1 : 0.1}
-              style="transition: opacity 0.2s"
-            />
-          {/each}
-        </svg>
-        <div class="detail-arc-caption">
+        <div class="detail-lede-seats">
           <span style="color:{selected.color}">{selected.seats} seats</span>
           &nbsp;·&nbsp; {seatPct(selected)}% of chamber
         </div>
+        <button
+          class="primary confirm-btn"
+          style="width:100%; margin-top:1rem; border-color:{selected.color}; color:{selected.color};"
+          on:click={confirmParty}
+        >
+          Lead this party &#8594;
+        </button>
+      </div>
+    </aside>
 
-        <div class="detail-stat-block">
-          <div class="detail-stat-label">Political Position</div>
-          <svg class="compass-svg" viewBox="-14 -14 228 228" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- quadrant tints -->
-            <rect x="0" y="0" width="100" height="100" fill="rgba(139,92,246,0.06)"/>
-            <rect x="100" y="0" width="100" height="100" fill="rgba(37,99,168,0.06)"/>
-            <rect x="0" y="100" width="100" height="100" fill="rgba(190,24,93,0.05)"/>
-            <rect x="100" y="100" width="100" height="100" fill="rgba(245,158,11,0.05)"/>
-            <!-- border -->
+    <!-- Right: back link, then compass + bio side-by-side, caucuses below -->
+    <div class="select-right">
+      <button class="back-btn" style="margin-bottom:1rem;" on:click={() => selected = null}>&#8592; Back</button>
+
+      <div class="detail-right-grid">
+        <!-- Compass column, fixed width matching left col -->
+        <div class="detail-compass-col">
+          <div class="compass-heading">Political Position</div>
+          <svg class="compass-svg" viewBox="-52 -22 304 244" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="0" y="0" width="200" height="200" fill="none" stroke="#2d2b42" stroke-width="1"/>
-            <!-- axes -->
             <line x1="0" y1="100" x2="200" y2="100" stroke="#2d2b42" stroke-width="1"/>
             <line x1="100" y1="0" x2="100" y2="200" stroke="#2d2b42" stroke-width="1"/>
-            <!-- axis labels -->
-            <text text-anchor="middle" x="100" y="-4"  font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">AUTH.</text>
-            <text text-anchor="middle" x="100" y="214" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">LIB.</text>
-            <text text-anchor="end"    x="-4"  y="104" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">LEFT</text>
-            <text text-anchor="start"  x="204" y="104" font-size="8" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.05em">RIGHT</text>
-            <!-- all parties -->
+            <text text-anchor="middle" x="100" y="-7"  font-size="9" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.04em">Authoritarian</text>
+            <text text-anchor="middle" x="100" y="218" font-size="9" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.04em">Libertarian</text>
+            <text text-anchor="end"    x="-6"  y="104" font-size="9" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.04em">Left</text>
+            <text text-anchor="start"  x="206" y="104" font-size="9" fill="#475569" font-family="Inconsolata,monospace" letter-spacing="0.04em">Right</text>
             {#each PARTIES as p}
-              {@const cx = compassX(p.economic)}
-              {@const cy = compassY(p.social)}
               {#if p !== selected}
-                <circle cx={cx} cy={cy} r="4" fill={p.color} opacity="0.22"/>
+                <circle cx={compassX(p.economic)} cy={compassY(p.social)} r="4" fill={p.color} opacity="0.22"/>
               {/if}
             {/each}
-            <!-- selected party: ring + dot -->
             <circle cx={compassX(selected.economic)} cy={compassY(selected.social)} r="11" fill="none" stroke={selected.color} stroke-width="1" opacity="0.3"/>
             <circle cx={compassX(selected.economic)} cy={compassY(selected.social)} r="6"  fill={selected.color}/>
           </svg>
@@ -158,37 +162,28 @@
           </div>
         </div>
 
-        <button
-          class="primary confirm-btn"
-          style="margin-top:1.25rem; border-color:{selected.color}; color:{selected.color};"
-          on:click={confirmParty}
-        >
-          Lead this party &#8594;
-        </button>
+        <!-- Bio column -->
+        <div class="detail-bio-col">
+          <p class="detail-summary-text">{selected.bio.summary}</p>
+          <p class="detail-history-text">{selected.bio.history}</p>
+        </div>
       </div>
 
-      <div class="detail-col-narrative">
-        <p class="detail-summary-text">{selected.bio.summary}</p>
-        <p class="detail-history-text">{selected.bio.history}</p>
-
-        {#if selected.caucuses?.length}
-          <div class="caucus-list">
-            <div class="caucus-list-label">Internal Caucuses</div>
+      {#if selected.caucuses?.length}
+        <div class="caucus-section">
+          <div class="caucus-section-label">Internal Caucuses</div>
+          <div class="caucus-grid">
             {#each selected.caucuses as caucus}
-              <div class="caucus-item">
-                <div class="caucus-item-header">
-                  <span class="caucus-name">{caucus.name}</span>
-                </div>
-                <div class="caucus-share-bar">
-                  <div class="caucus-share-fill" style="width:{caucus.share}%; background:{selected.color};"></div>
-                </div>
-                <p class="caucus-desc">{caucus.desc}</p>
+              <div class="caucus-panel" style="border-left-color:{selected.color};">
+                <div class="caucus-panel-name">{caucus.name}</div>
+                <p class="caucus-panel-desc">{caucus.desc}</p>
               </div>
             {/each}
           </div>
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
+
   </div>
 {/if}
 
@@ -240,21 +235,56 @@
     min-width: 0;
   }
 
-  /* ── Detail view arc ── */
-  .detail-arc {
-    display: block;
-    width: 100%;
-    background: transparent;
-    margin-bottom: 0.4rem;
+  .select-grid-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
   }
 
-  .detail-arc-caption {
-    text-align: center;
+  /* ── Detail view identity panel (below arc) ── */
+  .detail-lede-panel {
+    border-left: 2px solid #2d2b42;
+    padding-left: 0.75rem;
+  }
+
+  .detail-lede-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-lede-seats {
     font-family: 'Inconsolata', monospace;
     font-size: 11px;
     color: #64748b;
-    margin-bottom: 1rem;
     letter-spacing: 0.04em;
+  }
+
+  /* ── Detail right column inner layout ── */
+  .detail-right-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-bio-col {
+    min-width: 0;
+  }
+
+  /* ── Compass heading ── */
+  .compass-heading {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
   }
 
   /* ── Party cards ── */
@@ -283,6 +313,45 @@
     color: #64748b;
     margin: 4px 0 0.75rem;
     letter-spacing: 0.04em;
+  }
+
+  /* ── Internal caucuses (3-column flat grid) ── */
+  .caucus-section {
+    border-top: 1px solid #2d2b42;
+    padding-top: 1rem;
+  }
+
+  .caucus-section-label {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.75rem;
+  }
+
+  .caucus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .caucus-panel {
+    border-left: 2px solid;
+    padding-left: 0.75rem;
+  }
+
+  .caucus-panel-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 5px;
+  }
+
+  .caucus-panel-desc {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin: 0;
   }
 
   .party-card-seat-bar {

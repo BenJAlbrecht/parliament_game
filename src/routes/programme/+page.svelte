@@ -79,9 +79,6 @@
           tabindex="0"
           on:keydown={e => e.key === 'Enter' && (mandate = m)}
         >
-          {#if mandate === m}
-            <span class="goal-check" in:scale={{ duration: 200, easing: cubicOut }}>✓</span>
-          {/if}
           <div class="mandate-type-tag">{m.legislative ? 'Legislative' : 'Non-legislative'}</div>
           <div class="compact-goal-title">{m.title}</div>
           <div class="compact-goal-desc">{m.desc}</div>

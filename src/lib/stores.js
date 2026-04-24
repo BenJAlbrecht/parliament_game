@@ -8,6 +8,7 @@ export const playerMandate     = writable(null);
 export const headerFlag        = writable('flag-base');
 export const headerAccent      = writable(null);
 export const headerTurn        = writable(null);    // { current, max } during session
+export const sessionEconHistory = writable([]);     // annual economic snapshots during session
 
 export const endingData = writable({
   finalLoyalty:  {},
@@ -25,5 +26,6 @@ export function resetGame() {
   headerFlag.set('flag-base');
   headerAccent.set(null);
   headerTurn.set(null);
+  sessionEconHistory.set([]);
   endingData.set({ finalLoyalty: {}, billsProposed: 0, collapsed: false, stats: null });
 }
