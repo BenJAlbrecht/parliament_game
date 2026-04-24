@@ -1,10 +1,12 @@
 <script>
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { PARTIES, POLICY_SCALES, STARTING_POLICY, econLabel, socialLabel, leanLabel, leanCls, logoSrc } from '$lib/data.js';
+  import { fly, fade, scale } from 'svelte/transition';
+  import { backOut, cubicOut } from 'svelte/easing';
+  import { PARTIES, POLICY_SCALES, STARTING_POLICY, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { calculateSeats } from '$lib/layout.js';
   import { init, initAgenda, proposeBill, getPolicyState, getSessionStats } from '$lib/vote.js';
-  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, endingData } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, coalitionPartners, committedGoals, playerMandate, endingData } from '$lib/stores.js';
 
   // ── Constants ────────────────────────────────────────────────────────────────
   const BILL_LIMIT = 10;
@@ -17,6 +19,7 @@
   let partners   = [];
   let coalition  = null;
   let goals      = {};
+  let mandate    = null;
 
   // ── Session state ────────────────────────────────────────────────────────────
   let seats         = [];
@@ -24,11 +27,10 @@
   let loyalty       = {};
   let policyState   = { ...STARTING_POLICY };
 
-  let turnCount       = 0;
-  let billsProposed   = 0;
-  let flagshipsPassed = 0;
-  let turnsAbstained  = 0;
-  let agenda          = [];
+  let turnCount      = 0;
+  let billsProposed  = 0;
+  let turnsAbstained = 0;
+  let agenda         = [];
 
   // ── Phase management ─────────────────────────────────────────────────────────
   // 'policy' | 'agenda' | 'bill-detail' | 'result'
@@ -49,7 +51,6 @@
   function buildStats() {
     return {
       ...getSessionStats(),
-      flagshipsPassed,
       turnsAbstained,
       allPartnersLoyalAbove50: partners.every(p => (loyalty[p.name] ?? 0) > 50),
       policyState: { ...policyState },
@@ -62,12 +63,12 @@
     partners  = $coalitionPartners;
     coalition = $selectedCoalition;
     goals     = $committedGoals;
+    mandate   = $playerMandate;
     if (!party || !coalition) { goto('/select'); return; }
 
-    seats       = calculateSeats(PARTIES);
-    votes       = new Array(seats.length).fill(null);
-    const flagships = [...(coalition.flagships?.[party.name] ?? [])];
-    agenda      = initAgenda(flagships);
+    seats  = calculateSeats(PARTIES);
+    votes  = new Array(seats.length).fill(null);
+    agenda = initAgenda();
     init(seats, party, partners);
     loyalty     = Object.fromEntries(partners.map(p => [p.name, 100]));
     policyState = { ...STARTING_POLICY };
@@ -104,7 +105,6 @@
     billsProposed++;
     agenda = agenda.filter(b => b.title !== selectedBill.title);
     const result = proposeBill(selectedBill);
-    if (selectedBill.flagship && result.passed) flagshipsPassed++;
     votes      = result.votes;
     loyalty    = { ...result.newLoyalty };
     if (result.passed) policyState = getPolicyState();
@@ -116,11 +116,10 @@
   function handleNext() {
     if (collapsed || turnCount >= BILL_LIMIT) {
       endingData.set({
-        finalLoyalty:   { ...loyalty },
+        finalLoyalty:  { ...loyalty },
         billsProposed,
-        flagshipsPassed,
         collapsed,
-        stats:          buildStats(),
+        stats:         buildStats(),
       });
       goto('/ending');
     } else {
@@ -225,14 +224,15 @@
 
     <!-- ── Phase: Policy Home ── -->
     {#if phase === 'policy'}
+      <div in:fly={{ y: 14, duration: 240, delay: 100, easing: cubicOut }} out:fade={{ duration: 110 }}>
       <div class="panel-section-label">Policy State</div>
       <div class="policy-dim-list">
-        {#each Object.entries(POLICY_SCALES) as [key, scale]}
+        {#each Object.entries(POLICY_SCALES) as [key, dim]}
           {@const val  = policyState[key] ?? 1}
-          {@const desc = scale.steps[val - 1] ?? ''}
-          {@const [lp, rp] = scale.poles}
+          {@const desc = dim.steps[val - 1] ?? ''}
+          {@const [lp, rp] = dim.poles}
           <div class="policy-dimension">
-            <div class="policy-dim-name">{scale.label}</div>
+            <div class="policy-dim-name">{dim.label}</div>
             <div class="policy-spectrum">
               <span class="policy-pole policy-pole--left">{lp}</span>
               <div class="policy-track">
@@ -247,40 +247,67 @@
         {/each}
       </div>
 
-      <!-- Programme goals live tracker -->
-      {#if goals && Object.keys(goals).length > 0}
-        <div class="panel-section-label" style="margin-top:1.5rem;">Programme for Government</div>
-        <div class="programme-goal-list">
-          {#each Object.entries(goals) as [partnerName, goal]}
-            {@const partner = PARTIES.find(p => p.name === partnerName)}
-            {@const met = goalMet(goal)}
-            <div class="programme-goal-item" class:programme-goal--met={met} class:programme-goal--unmet={!met}>
-              <span class="programme-goal-icon">{met ? '✓' : '·'}</span>
-              <div class="programme-goal-body">
-                <div class="programme-goal-partner" style="color:{partner?.color ?? '#94a3b8'}">{partnerName}</div>
-                <div class="programme-goal-title">{goal.title}</div>
+      <!-- Programme live tracker -->
+      <div class="panel-section-label" style="margin-top:1.5rem;">Programme for Government</div>
+      <div class="programme-goal-list">
+        <!-- Mandate row -->
+        {#if mandate}
+          {@const met = goalMet(mandate)}
+          <div class="programme-goal-item programme-mandate-row" class:programme-goal--met={met} class:programme-goal--unmet={!met} data-tooltip={mandate.desc}>
+            <span class="programme-goal-icon">{met ? '✓' : '·'}</span>
+            <div class="programme-goal-body">
+              <div class="programme-goal-partner" style="color:{party.color}">
+                {party.name} <span class="mandate-inline-tag" style="background:{party.color};">Mandate</span>
               </div>
+              <div class="programme-goal-title">{mandate.title}</div>
             </div>
-          {/each}
-        </div>
-      {/if}
+          </div>
+        {/if}
+        <!-- Coalition goal rows -->
+        {#each Object.entries(goals) as [partnerName, goal]}
+          {@const partner = PARTIES.find(p => p.name === partnerName)}
+          {@const met = goalMet(goal)}
+          <div class="programme-goal-item" class:programme-goal--met={met} class:programme-goal--unmet={!met} data-tooltip={goal.desc}>
+            <span class="programme-goal-icon">{met ? '✓' : '·'}</span>
+            <div class="programme-goal-body">
+              <div class="programme-goal-partner" style="color:{partner?.color ?? '#94a3b8'}">{partnerName}</div>
+              <div class="programme-goal-title">{goal.title}</div>
+            </div>
+          </div>
+        {/each}
+      </div>
 
       <div class="panel-section-label" style="margin-top:1.5rem;">Actions</div>
       <button class="primary" style="margin-top:0.75rem;" on:click={openAgenda}>
         Legislative Agenda &#8594;
       </button>
+      </div>
     {/if}
 
     <!-- ── Phase: Legislative Agenda ── -->
     {#if phase === 'agenda'}
+      <div in:fly={{ y: 14, duration: 240, delay: 100, easing: cubicOut }} out:fade={{ duration: 110 }}>
       <button class="back-btn" on:click={backToPolicy}>&#8592; Back</button>
       <div class="phase-label">Legislative Agenda</div>
 
       {#each agendaGroups as [dim, items]}
-        {@const groupLabel = POLICY_SCALES[dim]?.label ?? 'Other'}
+        {@const dimScale = POLICY_SCALES[dim]}
+        {@const curVal   = policyState[dim] ?? 1}
         <div class="agenda-group">
-          <div class="agenda-group-label">{groupLabel}</div>
+          <div class="agenda-group-header">
+            <span class="agenda-group-label">{dimScale?.label ?? dim}</span>
+            <div class="agenda-group-pips">
+              {#each [1,2,3,4,5] as step}
+                <div class="agenda-pip" class:agenda-pip--filled={step <= curVal}></div>
+              {/each}
+              <span class="agenda-group-level">Lv.{curVal}</span>
+            </div>
+          </div>
           {#each items as { bill, passable }}
+            {@const newVal     = Math.max(1, Math.min(5, curVal + (bill.delta ?? 0)))}
+            {@const targetPole = (bill.delta ?? 0) > 0 ? dimScale?.poles[1] : dimScale?.poles[0]}
+            {@const curStep    = dimScale?.steps[curVal - 1] ?? ''}
+            {@const newStep    = dimScale?.steps[newVal - 1] ?? ''}
             <div
               class="agenda-item"
               class:agenda-item--passable={passable}
@@ -290,16 +317,30 @@
               tabindex="0"
               on:keydown={e => e.key === 'Enter' && openBillDetail(bill)}
             >
-              <div class="agenda-item-body">
+              <div class="agenda-item-top">
                 <div class="agenda-item-title">{bill.title}</div>
-                <div class="agenda-item-meta">
-                  <span class="bill-lean-tag {leanCls(bill.score)}">{leanLabel(bill.score)}</span>
-                  {#if bill.flagship}<span class="bill-mandate-tag">Mandate</span>{/if}
-                </div>
+                <span class="agenda-item-status" class:agenda-status--pass={passable} class:agenda-status--block={!passable}>
+                  {passable ? 'Passable ✓' : 'Blocked ✗'}
+                </span>
               </div>
-              <span class="bill-pass-status {passable ? 'pass' : 'block'}">
-                {passable ? 'Passable ✓' : 'Blocked ✗'}
-              </span>
+              {#if dimScale && bill.delta}
+                <div class="agenda-item-effect">
+                  <span class="effect-delta" class:effect-delta--up={bill.delta > 0} class:effect-delta--down={bill.delta < 0}>
+                    {bill.delta > 0 ? '▲' : '▼'}
+                  </span>
+                  <span class="effect-pole">{targetPole}</span>
+                  <div class="effect-steps">
+                    {#each [1,2,3,4,5] as step}
+                      <div class="effect-pip"
+                        class:effect-pip--cur={step === curVal && step !== newVal}
+                        class:effect-pip--new={step === newVal}
+                        class:effect-pip--filled={step < Math.min(curVal, newVal)}
+                      ></div>
+                    {/each}
+                  </div>
+                  <span class="effect-label">{newStep}</span>
+                </div>
+              {/if}
             </div>
           {/each}
         </div>
@@ -309,6 +350,7 @@
         <div class="blocked-banner">All remaining bills are blocked — coalition support too low.</div>
         <button class="primary" on:click={handleAbstain}>Abstain (skip turn) &#8594;</button>
       {/if}
+      </div>
     {/if}
 
     <!-- ── Phase: Bill Detail ── -->
@@ -317,7 +359,7 @@
       {@const accentColor = billPassable ? '#4ade80' : '#f87171'}
       {@const posLabel = bill.type === 'economic' ? econLabel(bill.score) : socialLabel(bill.score)}
 
-      <div class="phase-bill-detail">
+      <div class="phase-bill-detail" in:fly={{ y: 14, duration: 240, delay: 100, easing: cubicOut }} out:fade={{ duration: 110 }}>
         <button class="back-btn" on:click={backToAgenda}>&#8592; Back to Agenda</button>
 
         <!-- Bill header card -->
@@ -326,7 +368,6 @@
             <div class="bill-header-title">{bill.title}</div>
             <div class="bill-header-meta">
               <span class="bill-card-type">{bill.type}</span>
-              {#if bill.flagship}<span class="bill-mandate-tag">Mandate</span>{/if}
               <span class="bill-position-tag">{posLabel}</span>
             </div>
           </div>
@@ -431,14 +472,15 @@
 
     <!-- ── Phase: Vote Result ── -->
     {#if phase === 'result'}
-      <div class="phase-result">
+      <div class="phase-result" in:fly={{ y: 14, duration: 240, delay: 60, easing: cubicOut }} out:fade={{ duration: 110 }}>
         {#if abstained}
           <div class="vote-result-bill">Turn skipped</div>
-          <div class="vote-verdict-abstained">ABSTAINED</div>
+          <div class="vote-verdict-abstained" in:scale={{ duration: 380, start: 0.6, delay: 160, easing: backOut }}>ABSTAINED</div>
           <div class="vote-result-note">No bills could pass — coalition support too low.</div>
         {:else if voteResult}
           <div class="vote-result-bill">{selectedBill?.title}</div>
-          <div class="{voteResult.passed ? 'vote-verdict-passed' : 'vote-verdict-failed'}">
+          <div class="{voteResult.passed ? 'vote-verdict-passed' : 'vote-verdict-failed'}"
+               in:scale={{ duration: 380, start: 0.6, delay: 160, easing: backOut }}>
             {voteResult.passed ? 'PASSED' : 'FAILED'}
           </div>
         {/if}
@@ -460,8 +502,8 @@
   <div class="context-sidebar">
 
     <!-- Chamber SVG -->
-    <div class="chamber">
-      <div class="sidebar-box-title">Chamber</div>
+    <div class="sidebar-card sidebar-card--flush">
+      <div class="sidebar-card-header">Chamber</div>
       <svg viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
         {#each seats as seat, i}
           {@const p     = PARTIES[seat.partyIndex]}
@@ -482,22 +524,62 @@
       </svg>
     </div>
 
-    <!-- Political compass SVG -->
-    <div class="compass">
-      <div class="sidebar-box-title">Political Ideology</div>
+    <!-- Government parties -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">
+        <span>Government</span>
+        <span class="sidebar-card-stat">{govSeats} / {total} &nbsp;&middot;&nbsp; {pct(govSeats)}%</span>
+      </div>
+      {#each govParties as p}
+        {@const isPlayer = p === party}
+        {@const loy      = !isPlayer ? (loyalty[p.name] ?? 100) : null}
+        {@const loyCls   = loy !== null ? loyaltyCls(loy) : ''}
+        <div class="sidebar-party-row" class:sidebar-party-row--player={isPlayer}>
+          <div class="sidebar-party-row-top">
+            <span class="swatch" style="background:{p.color}"></span>
+            <span class="sidebar-party-name">{p.name}</span>
+            {#if isPlayer}<span class="you-tag">YOU</span>{/if}
+            <span class="sidebar-party-seats">{p.seats}</span>
+          </div>
+          {#if loy !== null}
+            <div class="sidebar-loyalty-track">
+              <div class="sidebar-loyalty-fill {loyCls}" style="width:{loy}%;"></div>
+            </div>
+            <div class="sidebar-loyalty-label {loyCls}">Loyalty: {loy.toFixed(1)}%</div>
+          {/if}
+          <div class="sidebar-party-ideology">{econLabel(p.economic)} &middot; {socialLabel(p.social)}</div>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Opposition parties -->
+    <div class="sidebar-card sidebar-card--dim">
+      <div class="sidebar-card-header">
+        <span>Opposition</span>
+        <span class="sidebar-card-stat">{oppSeats} / {total} &nbsp;&middot;&nbsp; {pct(oppSeats)}%</span>
+      </div>
+      {#each oppParties as p}
+        <div class="sidebar-opp-row">
+          <span class="swatch" style="background:{p.color}"></span>
+          <span class="sidebar-party-name">{p.name}</span>
+          <span class="sidebar-opp-ideology">{econLabel(p.economic)} &middot; {socialLabel(p.social)}</span>
+          <span class="sidebar-party-seats">{p.seats}</span>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Political compass -->
+    <div class="sidebar-card sidebar-card--flush">
+      <div class="sidebar-card-header">Political Ideology</div>
       <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-        <!-- Plot background -->
         <rect x={CP} y={CP} width={CS} height={CS} fill="#162032" />
         <rect x={CP} y={CP} width={CS} height={CS} fill="none" stroke="#1e293b" stroke-width="1" />
-        <!-- Crosshairs -->
         <line x1={CP} y1={cy0} x2={CP+CS} y2={cy0} stroke="#1e293b" stroke-width="1" />
         <line x1={cx0} y1={CP} x2={cx0} y2={CP+CS} stroke="#1e293b" stroke-width="1" />
-        <!-- Axis labels -->
         <text x={cx0} y={CP - 6}   fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="middle">PROGRESSIVE</text>
         <text x={cx0} y={CP+CS+14} fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="middle">TRADITIONAL</text>
         <text x={CP - 4} y={cy0 + 4} fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="end">LEFT</text>
         <text x={CP+CS+4} y={cy0 + 4} fill="#64748b" font-size="8" font-family="Inconsolata, monospace" text-anchor="start">RIGHT</text>
-        <!-- Party dots -->
         {#each PARTIES as p}
           {@const px     = mapX(p.economic)}
           {@const py     = mapY(p.social)}
@@ -517,77 +599,44 @@
       </svg>
     </div>
 
-    <!-- Legend -->
-    <div class="legend">
-      <div class="legend-group-label">
-        <span>Government</span>
-        <span class="legend-group-stats">{govSeats} / {total} seats &nbsp;&middot;&nbsp; {pct(govSeats)}%</span>
-      </div>
-      <div class="legend-group">
-        {#each govParties as p}
-          {@const isPlayer = p === party}
-          {@const loy      = !isPlayer ? (loyalty[p.name] ?? 100) : null}
-          {@const loyCls   = loy !== null ? loyaltyCls(loy) : ''}
-          <div class="legend-item">
-            <div class="legend-item-row1">
-              <div class="legend-item-namerow">
-                <span class="swatch" style="background:{p.color}"></span>
-                <span>{p.name}</span>
-                {#if isPlayer}<span class="you-tag">YOU</span>{/if}
-              </div>
-              <span class="legend-item-seats">Seats: {p.seats}</span>
-            </div>
-            <div class="legend-item-row2">
-              <span class="legend-item-ideology">{econLabel(p.economic)} &middot; {socialLabel(p.social)}</span>
-              {#if loy !== null}
-                <span class="legend-item-loyalty {loyCls}">Coalition Loyalty: {loy.toFixed(1)}%</span>
-              {/if}
+    <!-- Party caucuses -->
+    {#if party?.caucuses?.length}
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">{party.name} — Caucuses</div>
+        {#each party.caucuses as caucus, i}
+          <div class="sidebar-caucus-item" class:sidebar-caucus-item--last={i === party.caucuses.length - 1}>
+            <div class="sidebar-caucus-dot" style="background:{party.color}; opacity:{1 - i * 0.25};"></div>
+            <div class="sidebar-caucus-body">
+              <div class="sidebar-caucus-name">{caucus.name}</div>
+              <div class="sidebar-caucus-desc">{caucus.desc}</div>
             </div>
           </div>
         {/each}
       </div>
+    {/if}
 
-      <div class="legend-group-label">
-        <span>Opposition</span>
-        <span class="legend-group-stats">{oppSeats} / {total} seats &nbsp;&middot;&nbsp; {pct(oppSeats)}%</span>
-      </div>
-      <div class="legend-group legend-group--opp">
-        {#each oppParties as p}
-          <div class="legend-item legend-item--opp">
-            <div class="legend-item-row1">
-              <div class="legend-item-namerow">
-                <span class="swatch" style="background:{p.color}"></span>
-                <span>{p.name}</span>
-              </div>
-              <span class="legend-item-seats">Seats: {p.seats}</span>
-            </div>
-            <div class="legend-item-row2">
-              <span class="legend-item-ideology">{econLabel(p.economic)} &middot; {socialLabel(p.social)}</span>
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Vote tally sidebar (shown after a vote) -->
+    <!-- Vote tally (shown after a vote) -->
     {#if phase === 'result' && !abstained && voteResult}
-      <div class="vote-sidebar-section">
-        <div class="vote-sidebar-label">Vote tally</div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">Vote Tally</div>
         <div class="vote-sidebar-tally">
-          Ayes: {voteResult.ayes} &nbsp;&middot;&nbsp; Nays: {voteResult.nays} &nbsp;&middot;&nbsp; Majority: {majority}
+          Ayes: <strong>{voteResult.ayes}</strong> &nbsp;&middot;&nbsp;
+          Nays: <strong>{voteResult.nays}</strong> &nbsp;&middot;&nbsp;
+          Majority: {majority}
         </div>
+        {#if voteResult.passed && Object.keys(voteResult.loyaltyChanges).length}
+          <div class="vote-loyalty-changes">
+            {#each Object.entries(voteResult.loyaltyChanges) as [name, c]}
+              {@const sign = c.delta >= 0 ? '+' : ''}
+              {@const cls  = c.delta > 0 ? 'loyalty-up' : c.delta < 0 ? 'loyalty-down' : 'loyalty-neutral'}
+              <div class="vote-loyalty-change {cls}">
+                {name}: {c.prev.toFixed(1)}% &rarr; {c.next.toFixed(1)}%
+                <span class="vote-loyalty-delta">({sign}{c.delta.toFixed(1)}%)</span>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
-      {#if voteResult.passed && Object.keys(voteResult.loyaltyChanges).length}
-        <div>
-          {#each Object.entries(voteResult.loyaltyChanges) as [name, c]}
-            {@const sign = c.delta >= 0 ? '+' : ''}
-            {@const cls  = c.delta > 0 ? 'loyalty-up' : c.delta < 0 ? 'loyalty-down' : 'loyalty-neutral'}
-            <div class="vote-loyalty-change {cls}">
-              {name}: {c.prev.toFixed(1)}% &rarr; {c.next.toFixed(1)}% ({sign}{c.delta.toFixed(1)}%)
-            </div>
-          {/each}
-        </div>
-      {/if}
     {/if}
 
   </div><!-- /.context-sidebar -->

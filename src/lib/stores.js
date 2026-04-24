@@ -4,14 +4,14 @@ export const playerParty       = writable(null);
 export const selectedCoalition = writable(null);
 export const coalitionPartners = writable([]);
 export const committedGoals    = writable({});
+export const playerMandate     = writable(null);
 export const headerFlag        = writable('flag-base');
 
 export const endingData = writable({
-  finalLoyalty:   {},
-  billsProposed:  0,
-  flagshipsPassed: 0,
-  collapsed:      false,
-  stats:          null,
+  finalLoyalty:  {},
+  billsProposed: 0,
+  collapsed:     false,
+  stats:         null,
 });
 
 export function resetGame() {
@@ -19,6 +19,7 @@ export function resetGame() {
   selectedCoalition.set(null);
   coalitionPartners.set([]);
   committedGoals.set({});
+  playerMandate.set(null);
   headerFlag.set('flag-base');
-  endingData.set({ finalLoyalty: {}, billsProposed: 0, flagshipsPassed: 0, collapsed: false, stats: null });
+  endingData.set({ finalLoyalty: {}, billsProposed: 0, collapsed: false, stats: null });
 }

@@ -20,13 +20,8 @@ export function init(computedSeats, party, coalitionPartners) {
   domainsPassedSet = new Set();
 }
 
-export function initAgenda(flagships) {
-  const regularCount = 10 - flagships.length;
-  const shuffled     = [...BILLS].sort(() => Math.random() - 0.5);
-  return [
-    ...flagships.map(f => ({ ...f, flagship: true })),
-    ...shuffled.slice(0, regularCount),
-  ];
+export function initAgenda() {
+  return [...BILLS].sort(() => Math.random() - 0.5).slice(0, 10);
 }
 
 export function proposeBill(bill) {

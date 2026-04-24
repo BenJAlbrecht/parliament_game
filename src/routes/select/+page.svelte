@@ -1,7 +1,13 @@
 <script>
   import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import { fly, fade } from 'svelte/transition';
+  import { tweened } from 'svelte/motion';
+  import { cubicOut } from 'svelte/easing';
   import { PARTIES, COALITIONS, econLabel, socialLabel, logoSrc } from '$lib/data.js';
   import { playerParty, headerFlag } from '$lib/stores.js';
+
+  onMount(() => { headerFlag.set('flag-base'); });
 
   const FLAG_MAP = {
     "People's Alliance": 'flag-pa',
@@ -14,6 +20,16 @@
   const totalSeats = PARTIES.reduce((s, p) => s + p.seats, 0);
 
   let selected = null;
+
+  const seatWidth = tweened(0,  { duration: 500, easing: cubicOut });
+  const econPos   = tweened(50, { duration: 600, easing: cubicOut });
+  const socialPos = tweened(50, { duration: 600, easing: cubicOut });
+
+  $: if (selected) {
+    seatWidth.set(seatPct(selected));
+    econPos.set(posBarPct(selected.economic));
+    socialPos.set(posBarPct(selected.social));
+  }
 
   function seatPct(party) {
     return Math.round(party.seats / totalSeats * 100);
@@ -41,7 +57,6 @@
   }
 </script>
 
-<img class="homepage-decal" src="/images/parliament_homepage.svg" alt="">
 <p class="subtitle">Choose a party to lead into the session.</p>
 
 <div class="select-body">
@@ -49,11 +64,12 @@
 
     {#if !selected}
       <!-- ── Party grid ── -->
-      <div id="party-grid">
-        {#each PARTIES as party}
+      <div id="party-grid" out:fade={{ duration: 140 }}>
+        {#each PARTIES as party, i}
           <div
             class="party-card"
-            style="border-left-color:{party.color};"
+            style="--party-color:{party.color}; border-left-color:{party.color};"
+            in:fly={{ y: 28, duration: 320, delay: i * 75 }}
             on:click={() => selected = party}
             role="button"
             tabindex="0"
@@ -74,79 +90,110 @@
 
     {:else}
       <!-- ── Party detail ── -->
-      <button class="back-btn" on:click={() => selected = null}>&#8592; Back</button>
+      <div in:fly={{ y: 22, duration: 300, delay: 100 }}>
+        <button class="back-btn" on:click={() => selected = null}>&#8592; Back</button>
 
-      <div class="detail-layout">
-        <div class="detail-col-stats">
-          <div class="detail-top-row">
-            <img class="detail-logo" src={logoSrc(selected.name)} alt="">
-            <div>
-              <div class="detail-party-heading" style="color:{selected.color};">{selected.name}</div>
-              <div class="detail-ideology-tag">{selected.ideology}</div>
-            </div>
-          </div>
-
-          <div class="detail-stat-block">
-            <div class="detail-stat-label">Seats</div>
-            <div class="detail-seat-row">
-              <div class="detail-seat-track">
-                <div class="detail-seat-fill" style="width:{seatPct(selected)}%; background:{selected.color};"></div>
+        <div class="detail-layout">
+          <div class="detail-col-stats">
+            <div class="detail-top-row">
+              <img class="detail-logo" src={logoSrc(selected.name)} alt="">
+              <div>
+                <div class="detail-party-heading" style="color:{selected.color};">{selected.name}</div>
+                <div class="detail-ideology-tag">{selected.ideology}</div>
               </div>
-              <span class="detail-seat-count" style="color:{selected.color};">
-                {selected.seats} <span class="detail-seat-pct">({seatPct(selected)}%)</span>
-              </span>
             </div>
+
+            <div class="detail-stat-block">
+              <div class="detail-stat-label">Seats</div>
+              <div class="detail-seat-row">
+                <div class="detail-seat-track">
+                  <div class="detail-seat-fill" style="width:{$seatWidth}%; background:{selected.color};"></div>
+                </div>
+                <span class="detail-seat-count" style="color:{selected.color};">
+                  {selected.seats} <span class="detail-seat-pct">({seatPct(selected)}%)</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="detail-stat-block">
+              <div class="detail-stat-label">Economic</div>
+              <div class="detail-pos-label">{econLabel(selected.economic)}</div>
+              <div class="detail-pos-track">
+                <div class="detail-pos-fill" style="left:{$econPos}%; background:{selected.color};"></div>
+              </div>
+            </div>
+
+            <div class="detail-stat-block">
+              <div class="detail-stat-label">Social</div>
+              <div class="detail-pos-label">{socialLabel(selected.social)}</div>
+              <div class="detail-pos-track">
+                <div class="detail-pos-fill" style="left:{$socialPos}%; background:{selected.color};"></div>
+              </div>
+            </div>
+
+            <div class="detail-stat-block">
+              <div class="detail-stat-label">Coalitions</div>
+              {#each coalitionOptions(selected) as { coalition, partners }}
+                <div class="detail-coalition-row">
+                  <span class="detail-coalition-name">{coalition.name}</span>
+                  {#each partners as p}
+                    <span class="detail-partner-swatch" style="background:{p.color};" title="{p.name}"></span>
+                  {/each}
+                  {#each partners as p, i}
+                    {#if i > 0}<span class="detail-partner-sep">&middot;</span>{/if}
+                    <span class="detail-partner-name">{p.name}</span>
+                  {/each}
+                </div>
+              {:else}
+                <div class="detail-no-coalition">None available</div>
+              {/each}
+            </div>
+
+            <button
+              class="primary confirm-btn"
+              style="margin-top:1.25rem; border-color:{selected.color}; color:{selected.color};"
+              on:click={confirmParty}
+            >
+              Lead this party &#8594;
+            </button>
           </div>
 
-          <div class="detail-stat-block">
-            <div class="detail-stat-label">Economic</div>
-            <div class="detail-pos-label">{econLabel(selected.economic)}</div>
-            <div class="detail-pos-track">
-              <div class="detail-pos-fill" style="left:{posBarPct(selected.economic)}%; background:{selected.color};"></div>
-            </div>
-          </div>
+          <div class="detail-col-narrative">
+            <p class="detail-summary-text">{selected.bio.summary}</p>
+            <p class="detail-history-text">{selected.bio.history}</p>
 
-          <div class="detail-stat-block">
-            <div class="detail-stat-label">Social</div>
-            <div class="detail-pos-label">{socialLabel(selected.social)}</div>
-            <div class="detail-pos-track">
-              <div class="detail-pos-fill" style="left:{posBarPct(selected.social)}%; background:{selected.color};"></div>
-            </div>
-          </div>
-
-          <div class="detail-stat-block">
-            <div class="detail-stat-label">Coalitions</div>
-            {#each coalitionOptions(selected) as { coalition, partners }}
-              <div class="detail-coalition-row">
-                <span class="detail-coalition-name">{coalition.name}</span>
-                {#each partners as p}
-                  <span class="detail-partner-swatch" style="background:{p.color};" title="{p.name}"></span>
-                {/each}
-                {#each partners as p, i}
-                  {#if i > 0}<span class="detail-partner-sep">&middot;</span>{/if}
-                  <span class="detail-partner-name">{p.name}</span>
+            {#if selected.caucuses?.length}
+              <div class="caucus-list">
+                <div class="caucus-list-label">Internal Caucuses</div>
+                {#each selected.caucuses as caucus}
+                  <div class="caucus-item">
+                    <div class="caucus-item-header">
+                      <span class="caucus-name">{caucus.name}</span>
+                    </div>
+                    <div class="caucus-share-bar">
+                      <div class="caucus-share-fill" style="width:{caucus.share}%; background:{selected.color};"></div>
+                    </div>
+                    <p class="caucus-desc">{caucus.desc}</p>
+                  </div>
                 {/each}
               </div>
-            {:else}
-              <div class="detail-no-coalition">None available</div>
-            {/each}
+            {/if}
           </div>
-
-          <button
-            class="primary confirm-btn"
-            style="margin-top:1.25rem; border-color:{selected.color}; color:{selected.color};"
-            on:click={confirmParty}
-          >
-            Lead this party &#8594;
-          </button>
-        </div>
-
-        <div class="detail-col-narrative">
-          <p class="detail-summary-text">{selected.bio.summary}</p>
-          <p class="detail-history-text">{selected.bio.history}</p>
         </div>
       </div>
     {/if}
 
   </div>
 </div>
+
+<style>
+  .party-card {
+    transition: transform 0.12s, background 0.12s, box-shadow 0.12s;
+  }
+
+  .party-card:hover {
+    background: #243044;
+    transform: translateX(3px);
+    box-shadow: -3px 0 16px color-mix(in srgb, var(--party-color) 35%, transparent);
+  }
+</style>

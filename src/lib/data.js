@@ -121,6 +121,17 @@ export const POLICY_SCALES = {
       'Nationalist, withdrawn from international obligations',
     ],
   },
+  civic_integrity: {
+    label: 'Civic Integrity',
+    poles: ['Captured', 'Reformed'],
+    steps: [
+      'Widespread corruption; institutions captured by political interests',
+      'Weak accountability; formal oversight exists but is selectively enforced',
+      'Mixed: independent institutions emerging, partial transparency',
+      'Strong accountability; independent courts, press, and anti-corruption bodies',
+      'Full democratic reform; transparent government, proportional representation, citizen oversight',
+    ],
+  },
 };
 
 export const STARTING_POLICY = {
@@ -131,6 +142,7 @@ export const STARTING_POLICY = {
   border_policy:     3,
   social_policy:     3,
   foreign_policy:    2,
+  civic_integrity:   3,
 };
 
 export const PARTIES = [
@@ -151,6 +163,15 @@ export const PARTIES = [
       { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 2 or more left-leaning bills this session', check: (ps, st) => st.leftBillsPassed >= 2 },
       { id: 'no_austerity',     title: 'No Austerity',     desc: 'Keep fiscal policy at or above its starting level', check: (ps) => ps.fiscal_policy >= STARTING_POLICY.fiscal_policy },
     ],
+    mandates: [
+      { id: 'seize_the_means',  title: 'Seize the Means',  desc: 'Raise market regulation AND wages & unions each to level 4 or above.', legislative: true,  check: (ps) => ps.market_regulation >= 4 && ps.wages_unions >= 4 },
+      { id: 'no_surrender',     title: 'No Surrender',     desc: 'Complete the session without abstaining on a single turn.',            legislative: false, check: (ps, st) => st.turnsAbstained === 0 },
+    ],
+    caucuses: [
+      { name: 'Revolutionary Caucus', share: 55, desc: 'The founding hardliners. View parliamentary politics as a necessary evil rather than an end in itself. Push for maximum radicalism on every bill, treat compromise as capitulation, and regard coalition partners with open suspicion. The faction that gave the party its combative identity.' },
+      { name: 'Green Socialists',     share: 30, desc: 'Emerged from the environmental movement of the 1990s. Want to fuse economic radicalism with ecological transformation — public ownership of energy, a green industrial strategy, and zero-carbon commitments as the non-negotiable core of any left programme. Frequently in tension with the party\'s industrial base.' },
+      { name: 'Democratic Assembly',  share: 15, desc: 'The party\'s idealist fringe. Advocate for participatory budgeting, worker councils, and direct democracy as the architecture of a post-capitalist future. As sceptical of state power as of market power — they want power dispersed downward, not merely nationalised upward.' },
+    ],
   },
   {
     name: 'Socialist Party',
@@ -165,9 +186,18 @@ export const PARTIES = [
       history: 'Founded by trade union leaders at the turn of the twentieth century, the Socialist Party governed for most of the postwar decades and built the modern welfare state. A bruising stint in opposition during the 1990s forced a painful modernisation: the party shed its nationalisation commitments, embraced regulated markets, and repositioned itself as the party of public services and European integration. It remains the largest left-of-centre force, drawing support from public-sector workers, urban professionals, and minority communities.',
     },
     goals: [
-      { id: 'welfare_state',    title: 'Welfare State',    desc: 'Raise public services to level 4 or above',         check: (ps)     => ps.public_services >= 4 },
-      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass all 3 mandate bills this session',             check: (ps, st) => st.flagshipsPassed >= 3 },
+      { id: 'welfare_state',    title: 'Welfare State',    desc: 'Raise public services to level 4 or above',            check: (ps)     => ps.public_services >= 4 },
+      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass 6 or more bills this session',                   check: (ps, st) => st.billsPassed >= 6 },
       { id: 'stable_coalition', title: 'Stable Coalition', desc: 'Keep all partner loyalties above 50% by session end', check: (ps, st) => st.allPartnersLoyalAbove50 },
+    ],
+    mandates: [
+      { id: 'build_welfare',  title: 'Build the Welfare State', desc: 'Raise public services to level 4 or above AND pass 5 or more bills.', legislative: true,  check: (ps, st) => ps.public_services >= 4 && st.billsPassed >= 5 },
+      { id: 'steady_hand',    title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty.',       legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 },
+    ],
+    caucuses: [
+      { name: 'Old Guard',           share: 45, desc: 'The trade union bloc. Rooted in the postwar welfare settlement and deeply suspicious of markets, they resist any dilution of the party\'s redistributive commitments. Their loyalty is to organised labour first and electoral strategy second. The backbone of the membership; the drag on the modernisers.' },
+      { name: 'The Reformists',      share: 35, desc: 'The modernising wing, shaped by years in opposition. Believe electability requires a credible economic platform, pro-European positioning, and distance from the Old Guard\'s class politics. Viewed by the left as the party\'s ongoing identity crisis; view the left as the reason the party keeps losing.' },
+      { name: 'Progressive Alliance', share: 20, desc: 'The social liberal insurgency. Less interested in economic redistribution than in rights — gender, race, LGBTQ+, disability, climate. Push the party toward identity-conscious politics and away from its class-based roots, creating friction with both major factions while speaking to a younger urban base.' },
     ],
   },
   {
@@ -187,6 +217,15 @@ export const PARTIES = [
       { id: 'broad_mandate',         title: 'Broad Mandate',         desc: 'Pass bills across 4 or more policy domains',           check: (ps, st) => st.domainsPassedCount >= 4 },
       { id: 'active_legislature',    title: 'Active Legislature',    desc: 'Pass 6 or more bills this session',                    check: (ps, st) => st.billsPassed >= 6 },
     ],
+    mandates: [
+      { id: 'reform_agenda',      title: 'The Reform Agenda',    desc: 'Pass bills across 5 or more distinct policy domains.', legislative: true,  check: (ps, st) => st.domainsPassedCount >= 5 },
+      { id: 'competent_govt',     title: 'Competent Government', desc: 'Pass 7 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 7 },
+    ],
+    caucuses: [
+      { name: 'The Mandarins',      share: 50, desc: 'The party\'s founding establishment. Evidence-based, institution-trusting, and firmly pro-European. Believe that competent management of public institutions is more transformative than ideology. The faction that makes Renewal feel like a think-tank that won an election.' },
+      { name: 'Pirate Caucus',      share: 30, desc: 'Digital-age radicals inspired by the European Pirate Party movement. Champion open government, algorithmic accountability, net neutrality, and direct democratic participation via digital platforms. Uncomfortable with the party\'s economic centrism, but united with the Technocrats on civil liberties and European integration.' },
+      { name: 'Classical Liberals', share: 20, desc: 'The free-market conscience of the party. Pro-European but economically orthodox: lower taxes, deregulation, and individual liberty over state provision. Wary of the Technocrats\' appetite for intervention and quietly hostile to the Pirate Caucus\'s instincts on platform regulation.' },
+    ],
   },
   {
     name: 'Christian Democrats',
@@ -205,6 +244,15 @@ export const PARTIES = [
       { id: 'social_stability',   title: 'Social Stability',   desc: 'Keep social policy at or above its starting level',  check: (ps)     => ps.social_policy >= STARTING_POLICY.social_policy },
       { id: 'governing_majority', title: 'Governing Majority', desc: 'Pass 5 or more bills without abstaining any turn',   check: (ps, st) => st.billsPassed >= 5 && st.turnsAbstained === 0 },
     ],
+    mandates: [
+      { id: 'sound_finances',   title: 'Sound Finances',    desc: 'Keep both fiscal policy and market regulation at level 2 or below.', legislative: true,  check: (ps) => ps.fiscal_policy <= 2 && ps.market_regulation <= 2 },
+      { id: 'governing_party',  title: 'Governing Party',   desc: 'Pass 5 or more bills without abstaining on any turn.',              legislative: false, check: (ps, st) => st.billsPassed >= 5 && st.turnsAbstained === 0 },
+    ],
+    caucuses: [
+      { name: 'Social Catholics',     share: 40, desc: 'The party\'s original soul. Draw on Catholic social teaching to defend both traditional family values and a robust welfare state. Suspicious of pure market liberalism and committed to solidarity. The faction most uncomfortable with the coalition\'s nationalist partners, and the one European allies watch for reassurance.' },
+      { name: 'Economic Liberals',    share: 35, desc: 'The business wing. Want lower corporate taxes, a lighter regulatory touch, and a more flexible labour market. Increasingly dominant in the donor base and increasingly in tension with the Social Catholics over welfare spending. See the party\'s future in the boardroom, not the parish hall.' },
+      { name: 'National Conservatives', share: 25, desc: 'The Eurosceptic right. Culturally traditional, suspicious of Brussels, and drawn toward the immigration politics of the National Front without quite crossing the threshold. The faction most at risk of defection to nationalist parties — and the one the party\'s centrist partners watch most anxiously.' },
+    ],
   },
   {
     name: 'National Front',
@@ -222,6 +270,15 @@ export const PARTIES = [
       { id: 'secure_border',     title: 'Secure the Border', desc: 'Raise border policy to level 4 or above',              check: (ps) => ps.border_policy >= 4 },
       { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 4 or above',             check: (ps) => ps.foreign_policy >= 4 },
       { id: 'free_market',       title: 'Free Market',       desc: 'Keep market regulation at or below its starting level', check: (ps) => ps.market_regulation <= STARTING_POLICY.market_regulation },
+    ],
+    mandates: [
+      { id: 'national_programme', title: 'The National Programme', desc: 'Raise both border policy AND foreign policy to level 4 or above.', legislative: true,  check: (ps) => ps.border_policy >= 4 && ps.foreign_policy >= 4 },
+      { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass 4 or more bills this session.',                               legislative: false, check: (ps, st) => st.billsPassed >= 4 },
+    ],
+    caucuses: [
+      { name: 'Identitarians',       share: 45, desc: 'The cultural nationalist hardliners. Define the party\'s ideological core: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism. The faction that kept the NF in electoral purgatory for twenty years — and the one that finally cracked the cordon sanitaire.' },
+      { name: 'Economic Nationalists', share: 35, desc: 'The left-populist surprise within the party. Want to protect domestic industry, tax multinationals, raise wages for native workers, and reject free trade as a globalist project. Inconsistent with the Identitarians on welfare but unified on every cultural question. Court the deindustrialised working class the Socialist Party abandoned.' },
+      { name: 'Law & Order',         share: 20, desc: 'The authoritarian security wing. Focused on crime, policing, and the expansion of state security powers. Demand tougher sentencing, more police, and a harder line on internal threats. The most comfortable with state power of any NF faction — which puts them in occasional tension with the Economic Nationalists\' anti-establishment instincts.' },
     ],
   },
 ];
@@ -255,23 +312,6 @@ export const COALITIONS = [
         'Socialist Party': "The largest partner, 133 seats, with a long tradition of governing. They believe this coalition is theirs to lead — your job is to prove otherwise.",
       },
     },
-    flagships: {
-      "People's Alliance": [
-        { title: 'Nationalise the energy sector',                  type: 'economic', score: -8, dimension: 'market_regulation', delta: +2 },
-        { title: 'Cap executive pay at ten times the median wage', type: 'economic', score: -9, dimension: 'wages_unions',       delta: +2 },
-        { title: 'Universal rent control act',                     type: 'economic', score: -7, dimension: 'market_regulation', delta: +2 },
-      ],
-      'Socialist Party': [
-        { title: 'National housing construction programme',        type: 'economic', score: -6, dimension: 'public_services',   delta: +2 },
-        { title: 'Nationalise the national rail network',          type: 'economic', score: -7, dimension: 'market_regulation', delta: +2 },
-        { title: 'Universal free university tuition',              type: 'economic', score: -5, dimension: 'public_services',   delta: +2 },
-      ],
-      'Renewal': [
-        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4, dimension: 'social_policy',     delta: -1 },
-        { title: 'Digital public services modernisation act',        type: 'economic', score: -1, dimension: 'public_services',   delta: +1 },
-        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3, dimension: 'social_policy',     delta: -1 },
-      ],
-    },
   },
   {
     id: 'grand',
@@ -292,18 +332,6 @@ export const COALITIONS = [
       'Christian Democrats': {
         'Socialist Party': "The centre-left with 133 seats and a clear price for their cooperation. Coalition discipline will be tested from day one.",
       },
-    },
-    flagships: {
-      'Socialist Party': [
-        { title: 'Expand mental health services nationwide',       type: 'economic', score: -5, dimension: 'public_services',   delta: +1 },
-        { title: 'Public housing fund for low earners',            type: 'economic', score: -4, dimension: 'public_services',   delta: +1 },
-        { title: 'Raise the minimum wage to a living wage',        type: 'economic', score: -5, dimension: 'wages_unions',      delta: +1 },
-      ],
-      'Christian Democrats': [
-        { title: 'Balanced budget consolidation act',              type: 'economic', score: +3, dimension: 'fiscal_policy',     delta: -2 },
-        { title: 'Pension system modernisation',                   type: 'economic', score: +4, dimension: 'fiscal_policy',     delta: -1 },
-        { title: 'Renew European defence commitments',             type: 'social',   score: +5, dimension: 'foreign_policy',    delta: -1 },
-      ],
     },
   },
   {
@@ -333,23 +361,6 @@ export const COALITIONS = [
         'Christian Democrats': "The Christian Democrats bring institutional legitimacy and 145 seats — but they will try to moderate everything you want to do.",
         'Renewal': "Renewal's 83 seats give the coalition a veneer of centrism. They are uneasy. Keep them in line.",
       },
-    },
-    flagships: {
-      'Renewal': [
-        { title: 'Electoral reform and proportional representation', type: 'social',   score: -4, dimension: 'social_policy',     delta: -1 },
-        { title: 'Open markets free trade agreement',                type: 'economic', score: +3, dimension: 'market_regulation', delta: -2 },
-        { title: 'Independent anti-corruption commission',           type: 'social',   score: -3, dimension: 'social_policy',     delta: -1 },
-      ],
-      'Christian Democrats': [
-        { title: 'Business tax reform and investment package',       type: 'economic', score: +5, dimension: 'fiscal_policy',     delta: -2 },
-        { title: 'Pension system modernisation',                     type: 'economic', score: +4, dimension: 'fiscal_policy',     delta: -1 },
-        { title: 'Border security enhancement act',                  type: 'social',   score: +6, dimension: 'border_policy',     delta: +2 },
-      ],
-      'National Front': [
-        { title: 'Strict immigration and border controls act',       type: 'social',   score: +8, dimension: 'border_policy',     delta: +2 },
-        { title: 'Withdrawal from European treaty obligations',      type: 'social',   score: +7, dimension: 'foreign_policy',    delta: +2 },
-        { title: 'National industry and jobs protection act',        type: 'economic', score: +2, dimension: 'market_regulation', delta: +1 },
-      ],
     },
   },
 ];
@@ -427,4 +438,7 @@ export const BILLS = [
   { title: 'Ban single-use plastics',       type: 'social',   score:  -3, dimension: 'social_policy',      delta: -1 },
   { title: 'Expand rural broadband',        type: 'economic', score:  -1, dimension: 'public_services',    delta: +1 },
   { title: 'Privatize postal service',      type: 'economic', score:  +8, dimension: 'market_regulation',  delta: -1 },
+  { title: 'Anti-Corruption Commission Act',        type: 'social',   score:  -4, dimension: 'civic_integrity',    delta: +1 },
+  { title: 'Electoral Reform and Proportional Vote', type: 'social',  score:  -3, dimension: 'civic_integrity',    delta: +1 },
+  { title: 'Emergency Executive Powers Act',         type: 'social',   score:  +6, dimension: 'civic_integrity',    delta: -1 },
 ];

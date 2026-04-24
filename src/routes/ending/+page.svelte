@@ -2,39 +2,40 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { PARTIES, ENDINGS } from '$lib/data.js';
-  import { playerParty, selectedCoalition, committedGoals, endingData, resetGame } from '$lib/stores.js';
+  import { playerParty, selectedCoalition, committedGoals, playerMandate, endingData, resetGame } from '$lib/stores.js';
 
-  let party      = null;
-  let coalition  = null;
-  let goals      = {};
-  let ending     = null;
+  let party     = null;
+  let coalition = null;
+  let goals     = {};
+  let mandate   = null;
+  let ending    = null;
 
   onMount(() => {
     party     = $playerParty;
     coalition = $selectedCoalition;
     goals     = $committedGoals;
+    mandate   = $playerMandate;
     ending    = $endingData;
     if (!party || !coalition || !ending?.stats) { goto('/select'); return; }
   });
 
-  $: tier = ending?.collapsed
-    ? 'collapse'
-    : (ending?.flagshipsPassed ?? 0) >= 3 ? 'high'
-    : (ending?.flagshipsPassed ?? 0) >= 1 ? 'mid'
+  $: mandateMet = mandate && ending?.stats
+    ? mandate.check(ending.stats.policyState ?? {}, ending.stats)
+    : false;
+
+  $: tier = ending?.collapsed     ? 'collapse'
+    : mandateMet                  ? 'high'
+    : (ending?.stats?.billsPassed ?? 0) >= 5 ? 'mid'
     : 'low';
 
-  $: endingText  = coalition && party ? (ENDINGS[coalition.id]?.[party.name]?.[tier] ?? '') : '';
-  $: titleText   = coalition && party ? (coalition.titles?.[party.name] ?? '') : '';
+  $: endingText = coalition && party ? (ENDINGS[coalition.id]?.[party.name]?.[tier] ?? '') : '';
+  $: titleText  = coalition && party ? (coalition.titles?.[party.name] ?? '') : '';
 
   $: partners = coalition && party
     ? coalition.parties
         .filter(n => n !== party.name)
         .map(n => PARTIES.find(p => p.name === n))
     : [];
-
-  $: mandateCls = (ending?.flagshipsPassed ?? 0) >= 3
-    ? 'loyalty-up'
-    : (ending?.flagshipsPassed ?? 0) >= 1 ? 'loyalty-neutral' : 'loyalty-down';
 
   $: goalEntries = (goals && ending?.stats)
     ? Object.entries(goals).map(([partnerName, goal]) => ({
@@ -63,9 +64,16 @@
       <div class="ending-stat-row ending-stat-collapse">Coalition collapsed mid-session</div>
     {/if}
 
-    <div class="ending-stat-row">
-      Mandate bills passed: <strong class={mandateCls}>{ending.flagshipsPassed} / 3</strong>
-    </div>
+    <!-- Mandate result -->
+    {#if mandate}
+      <div class="ending-stat-row ending-mandate-row">
+        <span class="swatch" style="background:{party.color}"></span>
+        <span style="color:{party.color}">{party.name}</span>
+        mandate — {mandate.title}:
+        <strong class="{mandateMet ? 'loyalty-up' : 'loyalty-down'}">{mandateMet ? '✓ Achieved' : '✗ Failed'}</strong>
+      </div>
+    {/if}
+
     <div class="ending-stat-row">
       Bills proposed: <strong>{ending.billsProposed}</strong>
     </div>
