@@ -57,15 +57,13 @@
       <img class="compact-partner-logo" src={logoSrc(party.name)} alt="">
       <div class="partner-header-text">
         <div class="compact-partner-name" style="color:{party.color}">{party.name}</div>
-        <div class="compact-partner-prompt">
-          {#if mandate}
+        {#if mandate}
+          <div class="compact-partner-prompt">
             <span class="partner-committed" style="color:{party.color}" in:fly={{ x: -8, duration: 200 }}>
               ✓ {mandate.title}
             </span>
-          {:else}
-            Choose your party mandate — this is your primary objective
-          {/if}
-        </div>
+          </div>
+        {/if}
       </div>
       <span class="mandate-badge">Mandate</span>
     </div>
@@ -125,7 +123,7 @@
       {#each partner.goals as goal}
         <div
           class="compact-goal-card"
-          class:compact-goal-card--selected={isSelected(partner, goal)}
+          class:compact-goal-card--selected={selected[partner.name] === goal}
           on:click={() => pickGoal(partner, goal)}
           role="button"
           tabindex="0"

@@ -1,0 +1,172 @@
+ECONOMIC MODEL
+==============
+
+The game uses a 4-equation macroeconomic model that resolves once per in-game
+year (every 3 turns). Players do not set levers directly — all changes to
+spending, taxes, and investment flow through legislation (bills with econEffect).
+
+
+----------------------------------------------------------------
+ 1. VARIABLES
+----------------------------------------------------------------
+
+POLICY LEVERS (mutated by passed bills via econEffect):
+  G           Government spending              (starts 270)
+  tax_rate    Average tax rate  T = tax_rate × Y   (starts 0.25)
+  I_0         Baseline investment              (starts 170, in currentEconParams)
+
+STRUCTURAL PARAMETERS (in ECON_PARAMS, modified by bills via Y_star_g):
+  mpc = 0.60          Marginal propensity to consume
+  a   = 150           Autonomous consumption
+  d   = 500           Investment sensitivity to interest rate
+  u_star = 0.05       Natural rate of unemployment
+  okun   = 0.50       Okun coefficient
+  beta   = 0.50       Phillips curve slope
+  potential_growth    Potential GDP growth rate  (starts 0.020, can be raised by bills)
+
+FIXED:
+  i = 0.04            Interest rate (independent central bank — not player-controlled)
+
+CALCULATED EACH YEAR:
+  Y             Real GDP
+  Y_star        Potential GDP (grows each year at potential_growth)
+  I             Private investment
+  u             Unemployment rate
+  pi            Inflation rate
+  pi_expected   Adaptive expectations (set to last year's pi)
+  T             Tax revenue
+  deficit       = G − T
+  debt          Accumulates: Debt(t+1) = Debt(t) × (1 + i) + deficit
+
+
+----------------------------------------------------------------
+ 2. THE 4 EQUATIONS (as coded in computeEconYear)
+----------------------------------------------------------------
+
+Domain modifiers are applied before the core equations:
+  eff_u_star = u_star  +  (border − 3) × 0.003    // open borders → lower NAIRU
+  eff_ys_g   = potential_growth  +  (3 − border) × 0.001  // open → higher growth
+  eff_I0     = I_0  +  (3 − foreign) × 4          // multilateral → higher investment
+
+EQUATION 1 — Keynesian Cross (GDP):
+  I      = eff_I0 − d × i
+  Y      = (a + I + G) / (1 − mpc × (1 − tax_rate))
+
+  Note: T is endogenous (T = tax_rate × Y), so the tax rate enters the multiplier
+  denominator rather than being subtracted from the numerator. This means a tax
+  rise lowers the multiplier as well as reducing disposable income.
+
+EQUATION 2 — Okun's Law (unemployment):
+  Y_star_new = Y_star × (1 + eff_ys_g)
+  u          = max(0,  eff_u_star − okun × (Y − Y_star_new) / Y_star_new)
+
+EQUATION 3 — Phillips Curve (inflation):
+  pi = pi_expected + beta × (eff_u_star − u)
+
+  Adaptive expectations: pi_expected for next year = pi of this year.
+  Persistent stimulus → pi_expected rises → inflation accelerates.
+
+EQUATION 4 — Debt constraint:
+  T       = tax_rate × Y
+  deficit = G − T
+  debt    = debt × (1 + i) + deficit
+
+
+----------------------------------------------------------------
+ 3. HOW A YEAR RESOLVES (every 3 turns)
+----------------------------------------------------------------
+
+  1. Apply domain structural modifiers to get eff_u_star, eff_ys_g, eff_I0
+  2. Compute I from interest rate
+  3. Compute Y via Keynesian Cross
+  4. Grow Y_star by eff_ys_g
+  5. Compute u via Okun's Law
+  6. Compute pi via Phillips Curve
+  7. Compute T, deficit, debt
+  8. Save snapshot → yearHistory; update pi_expected = pi
+  9. Generate a one-line economic headline for the Annual Report screen
+
+Between years, passed bills accumulate changes to G, tax_rate, I_0, and
+potential_growth. The model sees these as the new baseline when the year resolves.
+
+
+----------------------------------------------------------------
+ 4. BILL econEffect FIELDS
+----------------------------------------------------------------
+
+Each fiscal bill can carry an econEffect object with any of:
+  G         — permanent change to government spending
+  tax_rate  — permanent change to average tax rate (clamped 0.05–0.60)
+  I_0       — permanent change to baseline investment (floor 50)
+  Y_star_g  — permanent change to potential_growth rate (clamped 0–0.06)
+
+Non-fiscal bills (border, social, foreign, civic) can also carry econEffect.
+Examples: Expand Legal Migration (+Y_star_g), Tighten Border Controls (+G),
+Deepen European Integration (+I_0), Increase Defence Spending (+G).
+
+
+----------------------------------------------------------------
+ 5. STARTING STATE
+----------------------------------------------------------------
+
+  G = 270, tax_rate = 0.25, i = 0.04
+  Y = 1036, Y_star = 1000  (economy running ~3.6% above potential)
+  u = 3.2%  (below natural rate of 5% — running hot)
+  pi = 2.9%, pi_expected = 2.0%
+  T = 259, deficit = 11, debt = 840 (~81% of Y*)
+
+20 years of pre-game history are stored in ECONOMIC_HISTORY and displayed
+on the Finance Ministry chart alongside in-game snapshots.
+
+
+================================================================
+ COMPARISON TO MASSIVE_CHANGE.TXT SPEC
+================================================================
+
+The MASSIVE_CHANGE.txt described the intended 4-equation model. The
+implementation closely follows the spec with the following differences:
+
+IMPLEMENTED AS SPEC:
+  ✓ Keynesian Cross for Y (NX omitted as specified)
+  ✓ Okun's Law for u
+  ✓ Phillips Curve with adaptive expectations
+  ✓ Debt accumulates with interest
+  ✓ Stagflation / austerity trap / debt spiral dynamics all emerge
+  ✓ 20-year pre-game economic history
+
+DIVERGES FROM SPEC:
+
+  1. Legislative gate, not direct lever-setting
+     Spec said "player sets G, tax_rate, i each turn."
+     Implementation: players never set these directly — they pass bills
+     that carry econEffect deltas. This preserves the coalition negotiation
+     mechanic described in the MASSIVE_CHANGE preamble.
+
+  2. Interest rate is fixed (independent central bank)
+     Spec included i as a player-controlled lever "if central bank under
+     government control." In the current game, i = 0.04 always (independent
+     CB). There is no bill that changes i, and no central bank independence
+     legislation yet.
+
+  3. Domain structural modifiers (not in spec)
+     Border policy shifts u_star and potential_growth.
+     Foreign policy shifts effective I_0.
+     These create cross-domain economic consequences not described in the spec.
+
+  4. Y_star growth is modifiable by bills (Y_star_g)
+     Spec treated potential GDP growth as fixed. Bills like Infrastructure
+     Investment Act and Research and Innovation Fund can permanently raise
+     potential_growth, creating a supply-side channel.
+
+  5. Annual resolution, not per-turn
+     The model resolves once every 3 turns (one in-game year), not once per
+     turn as implied by the spec. This smooths out single-bill shocks and
+     gives the session a 3-year parliamentary-term feel.
+
+  6. Old goal/mandate checks are stale (known issue)
+     Several party goals still reference fields from the retired slider system
+     (fiscal_policy, wages_unions, public_services, market_regulation,
+     social_policy) that no longer exist in policyState. STARTING_POLICY is
+     also referenced but never defined. These goals will silently evaluate to
+     false. They need to be rewritten against econState, domainState, or
+     session stats.
