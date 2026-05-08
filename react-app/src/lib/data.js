@@ -43,8 +43,6 @@ export const LAYOUT = {
   rows: 8,
 };
 
-// Four non-economic policy domains tracked as 1–5 scales.
-// Fiscal policy is handled directly via econState (G, tax_rate) — no domain scale.
 export const DOMAIN_SCALES = {
   border: {
     label: 'Border Policy',
@@ -92,7 +90,6 @@ export const DOMAIN_SCALES = {
   },
 };
 
-// Agenda accordion order: fiscal first, then the four domain scales
 export const DOMAIN_ORDER = ['fiscal', 'border', 'social', 'foreign', 'civic'];
 
 export const STARTING_DOMAINS = {
@@ -102,61 +99,23 @@ export const STARTING_DOMAINS = {
   civic:   3,
 };
 
-// ── Macroeconomic model ───────────────────────────────────────────────────────
-// 4-equation model: Keynesian cross, Okun's Law, Phillips Curve, debt constraint
-
 export const ECON_PARAMS = {
-  mpc:              0.60,   // marginal propensity to consume
-  a:                150,    // autonomous consumption
-  I_0:              170,    // baseline investment
-  d:                500,    // investment sensitivity to interest rate
-  u_star:           0.050,  // natural rate of unemployment
-  okun:             0.50,   // Okun coefficient (Y gap → unemployment gap)
-  beta:             0.50,   // Phillips curve slope (unemployment gap → inflation)
-  potential_growth: 0.020,  // annual potential GDP growth
+  mpc:          0.75,
+  g:            0.02,
+  tau:          1.5,
+  tax_baseline: 0.25,
 };
 
-// Starting macroeconomic state (Year 0, game start)
-// Y = (a + I_0 - d*i + G) / (1 - mpc*(1 - tax_rate)) = 570 / 0.55 ≈ 1036
 export const STARTING_ECONOMY = {
-  G:           270,    // government spending
-  tax_rate:    0.25,   // average tax rate
-  i:           0.04,   // interest rate (central bank, independent)
-  Y:           1036,   // real GDP
-  Y_star:      1000,   // potential GDP
-  u:           0.032,  // unemployment rate (below natural: economy running hot)
-  pi:          0.029,  // inflation rate
-  pi_expected: 0.020,  // adaptive expectations (prior year's inflation)
-  T:           259,    // tax revenue
-  deficit:     11,     // fiscal deficit (G − T)
-  debt:        840,    // public debt stock (~81% of Y*)
-  Y_growth:    0,      // placeholder for first year
+  I_base:   150,
+  G:        270,
+  tax_rate: 0.25,
+  Y:        960,
+  C:        540,
+  I:        150,
+  T:        240,
+  growth:   0,
 };
-
-// 20 years of pre-game economic history (for Finance Ministry time-series)
-// Narrative: reconstruction boom → reform era → financial shock → recovery
-export const ECONOMIC_HISTORY = [
-  { year: -20, Y:  718, Y_star: 673, u_pct: 10.2, pi_pct: 6.1, deficit: 28, debt: 340 },
-  { year: -19, Y:  734, Y_star: 686, u_pct:  9.8, pi_pct: 5.8, deficit: 26, debt: 370 },
-  { year: -18, Y:  751, Y_star: 700, u_pct:  9.3, pi_pct: 5.4, deficit: 24, debt: 397 },
-  { year: -17, Y:  769, Y_star: 714, u_pct:  8.9, pi_pct: 4.9, deficit: 22, debt: 422 },
-  { year: -16, Y:  790, Y_star: 728, u_pct:  8.4, pi_pct: 4.5, deficit: 20, debt: 445 },
-  { year: -15, Y:  818, Y_star: 743, u_pct:  7.8, pi_pct: 3.8, deficit: 18, debt: 464 },
-  { year: -14, Y:  851, Y_star: 758, u_pct:  7.1, pi_pct: 3.3, deficit: 16, debt: 481 },
-  { year: -13, Y:  884, Y_star: 773, u_pct:  6.4, pi_pct: 3.0, deficit: 14, debt: 497 },
-  { year: -12, Y:  915, Y_star: 788, u_pct:  5.8, pi_pct: 2.8, deficit: 12, debt: 510 },
-  { year: -11, Y:  940, Y_star: 804, u_pct:  5.3, pi_pct: 2.6, deficit: 10, debt: 521 },
-  { year: -10, Y:  920, Y_star: 820, u_pct:  6.4, pi_pct: 2.1, deficit: 38, debt: 560 },
-  { year:  -9, Y:  891, Y_star: 837, u_pct:  8.2, pi_pct: 1.6, deficit: 54, debt: 616 },
-  { year:  -8, Y:  885, Y_star: 853, u_pct:  9.4, pi_pct: 1.4, deficit: 58, debt: 676 },
-  { year:  -7, Y:  903, Y_star: 870, u_pct:  8.8, pi_pct: 1.7, deficit: 42, debt: 720 },
-  { year:  -6, Y:  930, Y_star: 888, u_pct:  7.6, pi_pct: 2.0, deficit: 30, debt: 753 },
-  { year:  -5, Y:  956, Y_star: 906, u_pct:  6.5, pi_pct: 2.2, deficit: 22, debt: 777 },
-  { year:  -4, Y:  978, Y_star: 924, u_pct:  5.7, pi_pct: 2.3, deficit: 16, debt: 795 },
-  { year:  -3, Y:  996, Y_star: 942, u_pct:  5.1, pi_pct: 2.5, deficit: 14, debt: 811 },
-  { year:  -2, Y: 1012, Y_star: 961, u_pct:  4.6, pi_pct: 2.7, deficit: 12, debt: 825 },
-  { year:  -1, Y: 1022, Y_star: 981, u_pct:  4.1, pi_pct: 2.8, deficit: 12, debt: 839 },
-];
 
 export const PARTIES = [
   {
@@ -172,13 +131,13 @@ export const PARTIES = [
       history: "Born from the labour strikes and campus uprisings of the early 1970s, the People's Alliance has spent decades on the fringes of parliament — principled, combative, and perpetually outgunned. It champions full public ownership of utilities, a maximum wage, and unilateral disarmament. Coalition partners have always found it difficult; the party itself considers compromise a form of surrender. Its small caucus punches above its weight through protest, obstruction, and the occasional surprise defection that tips a vote.",
     },
     goals: [
-      { id: 'workers_first',    title: 'Workers First',    desc: 'Raise wages & unions to level 3 or above',      check: (ps)     => ps.wages_unions >= 3 },
-      { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 4 or more left-leaning bills this session', check: (ps, st) => st.leftBillsPassed >= 4 },
-      { id: 'no_austerity',     title: 'No Austerity',     desc: 'Keep fiscal policy at or above its starting level', check: (ps) => ps.fiscal_policy >= STARTING_POLICY.fiscal_policy },
+      { id: 'workers_first',    title: 'Workers First',    desc: 'Achieve Civic Integrity level 4 or above',          check: (ps)     => ps.civic >= 4 },
+      { id: 'public_ownership', title: 'Public Ownership', desc: 'Pass 4 or more left-leaning bills this session',    check: (ps, st) => st.leftBillsPassed >= 4 },
+      { id: 'progressive_state', title: 'Progressive State', desc: 'Keep social policy at level 2 or below',          check: (ps)     => ps.social <= 2 },
     ],
     mandates: [
-      { id: 'seize_the_means',  title: 'Seize the Means',  desc: 'Raise market regulation AND wages & unions each to level 3 or above.', legislative: true,  check: (ps) => ps.market_regulation >= 3 && ps.wages_unions >= 3 },
-      { id: 'no_surrender',     title: 'No Surrender',     desc: 'Complete the session without abstaining on a single turn.',            legislative: false, check: (ps, st) => st.turnsAbstained === 0 },
+      { id: 'seize_the_means', title: 'Seize the Means', desc: 'Achieve Civic Integrity level 4 or above AND keep social policy at level 2 or below.', legislative: true,  check: (ps) => ps.civic >= 4 && ps.social <= 2 },
+      { id: 'no_surrender',    title: 'No Surrender',    desc: 'Complete the session without abstaining on a single turn.',                            legislative: false, check: (ps, st) => st.turnsAbstained === 0 },
     ],
     caucuses: [
       { name: 'Democratic Road',    share: 55, desc: 'The movement\'s majority alliance of Marxists and reformists, committed to the electoral path to socialism.' },
@@ -199,13 +158,13 @@ export const PARTIES = [
       history: 'Founded by trade union leaders at the turn of the twentieth century, the Socialist Party governed for most of the postwar decades and built the modern welfare state. A bruising stint in opposition during the 1990s forced a painful modernisation: the party shed its nationalisation commitments, embraced regulated markets, and repositioned itself as the party of public services and European integration. It remains the largest left-of-centre force, drawing support from public-sector workers, urban professionals, and minority communities.',
     },
     goals: [
-      { id: 'welfare_state',    title: 'Welfare State',    desc: 'Raise public services to level 4 or above',            check: (ps)     => ps.public_services >= 4 },
-      { id: 'full_programme',   title: 'Full Programme',   desc: 'Pass 8 or more bills this session',                   check: (ps, st) => st.billsPassed >= 8 },
-      { id: 'stable_coalition', title: 'Stable Coalition', desc: 'Keep all partner loyalties above 50% by session end', check: (ps, st) => st.allPartnersLoyalAbove50 },
+      { id: 'civic_institutions', title: 'Civic Institutions', desc: 'Achieve Civic Integrity level 4 or above',            check: (ps)     => ps.civic >= 4 },
+      { id: 'full_programme',     title: 'Full Programme',     desc: 'Pass 8 or more bills this session',                   check: (ps, st) => st.billsPassed >= 8 },
+      { id: 'stable_coalition',   title: 'Stable Coalition',   desc: 'Keep all partner loyalties above 50% by session end', check: (ps, st) => st.allPartnersLoyalAbove50 },
     ],
     mandates: [
-      { id: 'build_welfare',  title: 'Build the Welfare State', desc: 'Raise public services to level 4 or above AND pass 5 or more bills.', legislative: true,  check: (ps, st) => ps.public_services >= 4 && st.billsPassed >= 5 },
-      { id: 'steady_hand',    title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty and pass 7 or more bills.', legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 && st.billsPassed >= 7 },
+      { id: 'build_welfare', title: 'Build the Welfare State', desc: 'Achieve Civic Integrity level 4 or above AND pass 5 or more bills.',                                        legislative: true,  check: (ps, st) => ps.civic >= 4 && st.billsPassed >= 5 },
+      { id: 'steady_hand',   title: 'Steady Hand',             desc: 'End the session with all coalition partners above 50% loyalty and pass 7 or more bills.', legislative: false, check: (ps, st) => st.allPartnersLoyalAbove50 && st.billsPassed >= 7 },
     ],
     caucuses: [
       { name: 'Old Guard',     share: 45, desc: 'The trade union bloc. Rooted in the postwar welfare settlement and suspicious of markets, they resist any dilution of the party\'s redistributive agenda.' },
@@ -226,13 +185,13 @@ export const PARTIES = [
       history: 'Renewal was founded just twelve years ago by defectors from both the Socialist Party and the Christian Democrats who believed that partisan trench warfare was destroying public trust in government. It surged to prominence on a platform of electoral reform, digital public services, and pro-European centrism. Critics call it a party without a soul; supporters call it the only party without an axe to grind. Its electoral coalition is volatile — urban, educated, and quick to punish perceived betrayal.',
     },
     goals: [
-      { id: 'fiscal_responsibility', title: 'Fiscal Responsibility', desc: 'Keep fiscal policy within 1 step of where it started', check: (ps) => Math.abs(ps.fiscal_policy - STARTING_POLICY.fiscal_policy) <= 1 },
-      { id: 'broad_mandate',         title: 'Broad Mandate',         desc: 'Pass bills across 6 or more policy domains',           check: (ps, st) => st.domainsPassedCount >= 6 },
-      { id: 'active_legislature',    title: 'Active Legislature',    desc: 'Pass 8 or more bills this session',                    check: (ps, st) => st.billsPassed >= 8 },
+      { id: 'broad_mandate',      title: 'Broad Mandate',      desc: 'Pass bills across 3 or more policy domains', check: (ps, st) => st.domainsPassedCount >= 3 },
+      { id: 'civic_reform',       title: 'Civic Reform',       desc: 'Pass bills across all 4 policy domains',     check: (ps, st) => st.domainsPassedCount >= 4 },
+      { id: 'active_legislature', title: 'Active Legislature', desc: 'Pass 8 or more bills this session',          check: (ps, st) => st.billsPassed >= 8 },
     ],
     mandates: [
-      { id: 'reform_agenda',      title: 'The Reform Agenda',    desc: 'Pass bills across 5 or more distinct policy domains.', legislative: true,  check: (ps, st) => st.domainsPassedCount >= 5 },
-      { id: 'competent_govt',     title: 'Competent Government', desc: 'Pass 8 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 8 },
+      { id: 'reform_agenda',  title: 'The Reform Agenda',    desc: 'Pass bills across 3 or more distinct policy domains.', legislative: true,  check: (ps, st) => st.domainsPassedCount >= 3 },
+      { id: 'competent_govt', title: 'Competent Government', desc: 'Pass 8 or more bills this session.',                   legislative: false, check: (ps, st) => st.billsPassed >= 8 },
     ],
     caucuses: [
       { name: 'Technocrats',        share: 50, desc: 'The party\'s founding establishment. Evidence-based, institution-trusting, and firmly pro-European.' },
@@ -253,13 +212,13 @@ export const PARTIES = [
       history: "The Christian Democrats emerged from the rubble of the Second World War as the guarantors of stability, democracy, and Western alliance. Anchored in Catholic social teaching, the party has always balanced free-market economics with a robust social safety net — suspicious of both socialism and libertarianism. It has led or participated in government for most of the republic's history, making it the natural party of cautious, incremental reform. Its broad church includes rural conservatives, business interests, and religious communities.",
     },
     goals: [
-      { id: 'fiscal_discipline',  title: 'Fiscal Discipline',  desc: 'Keep fiscal policy at level 2 or below',             check: (ps)     => ps.fiscal_policy <= 2 },
-      { id: 'social_stability',   title: 'Social Stability',   desc: 'Keep social policy at or above its starting level',  check: (ps)     => ps.social_policy >= STARTING_POLICY.social_policy },
+      { id: 'social_stability',   title: 'Social Stability',   desc: 'Keep social policy at level 3 or above',            check: (ps)     => ps.social >= 3 },
+      { id: 'civic_integrity',    title: 'Civic Integrity',    desc: 'Achieve Civic Integrity level 3 or above',           check: (ps)     => ps.civic >= 3 },
       { id: 'governing_majority', title: 'Governing Majority', desc: 'Pass 8 or more bills without abstaining any turn',   check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
     ],
     mandates: [
-      { id: 'sound_finances',   title: 'Sound Finances',    desc: 'Keep both fiscal policy and market regulation at level 2 or below.', legislative: true,  check: (ps) => ps.fiscal_policy <= 2 && ps.market_regulation <= 2 },
-      { id: 'governing_party',  title: 'Governing Party',   desc: 'Pass 8 or more bills without abstaining on any turn.',              legislative: false, check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
+      { id: 'sound_governance', title: 'Sound Governance', desc: 'Keep social policy at level 3 or above AND achieve Civic Integrity level 3 or above.', legislative: true,  check: (ps) => ps.social >= 3 && ps.civic >= 3 },
+      { id: 'governing_party',  title: 'Governing Party',  desc: 'Pass 8 or more bills without abstaining on any turn.',                                  legislative: false, check: (ps, st) => st.billsPassed >= 8 && st.turnsAbstained === 0 },
     ],
     caucuses: [
       { name: 'Social Catholics',       share: 40, desc: 'The soul of the party. Defenders of Catholic social teaching, traditional family values, and a robust welfare state.' },
@@ -280,13 +239,13 @@ export const PARTIES = [
       history: 'The National Front spent its first two decades as a pariah — tolerated on the ballot but excluded from every coalition negotiation. That changed when economic stagnation and a series of high-profile immigration controversies pushed it into double digits. The party is ruthlessly disciplined, ideologically rigid, and deeply suspicious of international institutions. It draws support from deindustrialised towns, small-business owners, and younger voters who feel abandoned by the mainstream. Mainstream parties still refuse to govern with it — for now.',
     },
     goals: [
-      { id: 'secure_border',     title: 'Secure the Border', desc: 'Raise border policy to level 4 or above',              check: (ps) => ps.border_policy >= 4 },
-      { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 3 or above',             check: (ps) => ps.foreign_policy >= 3 },
-      { id: 'free_market',       title: 'Free Market',       desc: 'Keep market regulation at or below its starting level', check: (ps) => ps.market_regulation <= STARTING_POLICY.market_regulation },
+      { id: 'secure_border',     title: 'Secure the Border', desc: 'Raise border policy to level 4 or above',  check: (ps) => ps.border >= 4 },
+      { id: 'national_interest', title: 'National Interest', desc: 'Raise foreign policy to level 3 or above', check: (ps) => ps.foreign >= 3 },
+      { id: 'sovereign_state',   title: 'Sovereign State',   desc: 'Keep civic integrity at level 2 or below', check: (ps) => ps.civic <= 2 },
     ],
     mandates: [
-      { id: 'national_programme', title: 'The National Programme', desc: 'Raise border policy to level 4 or above AND foreign policy to level 3 or above.', legislative: true,  check: (ps) => ps.border_policy >= 4 && ps.foreign_policy >= 3 },
-      { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass every bill — a perfect 10-turn session.',                     legislative: false, check: (ps, st) => st.billsPassed >= 10 },
+      { id: 'national_programme', title: 'The National Programme', desc: 'Raise border policy to level 4 or above AND foreign policy to level 3 or above.', legislative: true,  check: (ps) => ps.border >= 4 && ps.foreign >= 3 },
+      { id: 'prove_we_govern',    title: 'Prove We Can Govern',    desc: 'Pass every bill — a perfect 10-turn session.',                                     legislative: false, check: (ps, st) => st.billsPassed >= 10 },
     ],
     caucuses: [
       { name: 'Identitarians',   share: 45, desc: 'Nationalist hardliners who define the party\'s ideology: heritage, demographic politics, and uncompromising opposition to immigration and multiculturalism.' },
@@ -439,32 +398,23 @@ export const ENDINGS = {
 //   domain      — 'fiscal' | 'border' | 'social' | 'foreign' | 'civic'
 //   type        — 'economic' | 'social'  (determines which party axis is used in vote formula)
 //   score       — −10 to +10  (party ideological compatibility)
-//   domainDelta — +1 | −1  (moves the domain's 1–5 scale; omitted for fiscal bills)
-//   econEffect  — { G, tax_rate, I_0, Y_star_g }  (permanent model changes; omitted if none)
+//   domainDelta — +1 | −1  (moves the domain's 1–5 scale; absent for fiscal)
+//   econEffect  — { deltaG } or { deltaTax } for fiscal bills only
 
 export const BILLS = [
-  // ── Fiscal Policy (no domain scale — directly modifies econ model) ────────────
-  { title: 'Infrastructure Investment Act',          domain: 'fiscal', type: 'economic', score: -2, econEffect: { G: +15, Y_star_g: +0.001 } },
-  { title: 'Universal Healthcare Expansion',         domain: 'fiscal', type: 'economic', score: -5, econEffect: { G: +20 } },
-  { title: 'Public Education Investment',            domain: 'fiscal', type: 'economic', score: -4, econEffect: { G: +12, Y_star_g: +0.001 } },
-  { title: 'Research and Innovation Fund',           domain: 'fiscal', type: 'economic', score: -1, econEffect: { G: +10, Y_star_g: +0.002 } },
-  { title: 'Austerity Budget',                       domain: 'fiscal', type: 'economic', score: +5, econEffect: { G: -20 } },
-  { title: 'Spending Review Act',                    domain: 'fiscal', type: 'economic', score: +3, econEffect: { G: -10 } },
-  { title: 'Wealth Tax Act',                         domain: 'fiscal', type: 'economic', score: -7, econEffect: { tax_rate: +0.02 } },
-  { title: 'High Earner Income Tax Rise',            domain: 'fiscal', type: 'economic', score: -4, econEffect: { tax_rate: +0.01 } },
-  { title: 'Working Family Tax Credits',             domain: 'fiscal', type: 'economic', score: -1, econEffect: { G: +8, tax_rate: -0.01 } },
-  { title: 'Corporate Tax Cut',                      domain: 'fiscal', type: 'economic', score: +6, econEffect: { tax_rate: -0.02, I_0: +10 } },
-  { title: 'Abolish Inheritance Tax',                domain: 'fiscal', type: 'economic', score: +6, econEffect: { tax_rate: -0.01 } },
-  { title: 'Financial Market Deregulation',          domain: 'fiscal', type: 'economic', score: +7, econEffect: { I_0: +15 } },
-  { title: 'Nationalise Energy Sector',              domain: 'fiscal', type: 'economic', score: -7, econEffect: { G: +25, I_0: -12 } },
-  { title: 'Privatisation Programme',                domain: 'fiscal', type: 'economic', score: +7, econEffect: { G: -12, I_0: +12 } },
-  { title: 'Business Deregulation Package',          domain: 'fiscal', type: 'economic', score: +4, econEffect: { I_0: +8 } },
+  // ── Fiscal Policy ─────────────────────────────────────────────────────────────
+  { title: 'Public Investment Programme',    domain: 'fiscal', type: 'economic', score: -6, econEffect: { deltaG:   +25 } },
+  { title: 'Welfare Expansion Act',          domain: 'fiscal', type: 'economic', score: -3, econEffect: { deltaG:   +15 } },
+  { title: 'Infrastructure Investment Fund', domain: 'fiscal', type: 'economic', score:  0, econEffect: { deltaG:   +10 } },
+  { title: 'Austerity Package',              domain: 'fiscal', type: 'economic', score: +4, econEffect: { deltaG:   -20 } },
+  { title: 'Raise Income Tax',               domain: 'fiscal', type: 'economic', score: -5, econEffect: { deltaTax: +0.03 } },
+  { title: 'Corporate Tax Cut',              domain: 'fiscal', type: 'economic', score: +5, econEffect: { deltaTax: -0.03 } },
 
   // ── Border Policy (1=Open … 5=Closed) ────────────────────────────────────────
-  { title: 'Expand Legal Migration Pathways',               domain: 'border', type: 'social', score: -5, domainDelta: -1, econEffect: { Y_star_g: +0.001 } },
+  { title: 'Expand Legal Migration Pathways',               domain: 'border', type: 'social', score: -5, domainDelta: -1 },
   { title: 'Abolish Visa Restrictions with Treaty Nations', domain: 'border', type: 'social', score: -3, domainDelta: -1 },
   { title: 'Points-based Immigration System',               domain: 'border', type: 'social', score: +2, domainDelta: +1 },
-  { title: 'Tighten Border Controls',                       domain: 'border', type: 'social', score: +7, domainDelta: +1, econEffect: { G: +5 } },
+  { title: 'Tighten Border Controls',                       domain: 'border', type: 'social', score: +7, domainDelta: +1 },
   { title: 'National Deportation Scheme',                   domain: 'border', type: 'social', score: +9, domainDelta: +1 },
 
   // ── Social Policy (1=Progressive … 5=Traditional) ────────────────────────────
@@ -475,11 +425,11 @@ export const BILLS = [
   { title: 'Religious Exemptions in Civil Law',      domain: 'social', type: 'social', score: +6, domainDelta: +1 },
 
   // ── Foreign Policy (1=Multilateral … 5=Nationalist) ──────────────────────────
-  { title: 'Deepen European Integration',                    domain: 'foreign', type: 'social',   score: -6, domainDelta: -1, econEffect: { I_0: +6 } },
-  { title: 'Join International Climate Framework',           domain: 'foreign', type: 'social',   score: -4, domainDelta: -1, econEffect: { G: +8 } },
+  { title: 'Deepen European Integration',                    domain: 'foreign', type: 'social',   score: -6, domainDelta: -1 },
+  { title: 'Join International Climate Framework',           domain: 'foreign', type: 'social',   score: -4, domainDelta: -1 },
   { title: 'Ratify International Human Rights Protocols',    domain: 'foreign', type: 'social',   score: -2, domainDelta: -1 },
-  { title: 'Increase Defence Spending',                      domain: 'foreign', type: 'social',   score: +5, domainDelta: +1, econEffect: { G: +12 } },
-  { title: 'Impose Import Tariffs on Foreign Goods',         domain: 'foreign', type: 'economic', score: +3, domainDelta: +1, econEffect: { I_0: -6 } },
+  { title: 'Increase Defence Spending',                      domain: 'foreign', type: 'social',   score: +5, domainDelta: +1 },
+  { title: 'Impose Import Tariffs on Foreign Goods',         domain: 'foreign', type: 'economic', score: +3, domainDelta: +1 },
   { title: 'Withdraw from International Court Jurisdiction', domain: 'foreign', type: 'social',   score: +7, domainDelta: +1 },
 
   // ── Civic Integrity (1=Captured … 5=Reformed) ────────────────────────────────

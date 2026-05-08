@@ -9,7 +9,6 @@ const useGameStore = create((set) => ({
   headerFlag:         'flag-base',
   headerAccent:       null,
   headerTurn:         null,
-  sessionEconHistory: [],
   endingData: {
     finalLoyalty:  {},
     billsProposed: 0,
@@ -25,7 +24,6 @@ const useGameStore = create((set) => ({
   setHeaderFlag:         (v) => set({ headerFlag: v }),
   setHeaderAccent:       (v) => set({ headerAccent: v }),
   setHeaderTurn:         (v) => set({ headerTurn: v }),
-  setSessionEconHistory: (v) => set({ sessionEconHistory: v }),
   setEndingData:         (v) => set({ endingData: v }),
 
   resetGame: () => set({
@@ -37,7 +35,6 @@ const useGameStore = create((set) => ({
     headerFlag:         'flag-base',
     headerAccent:       null,
     headerTurn:         null,
-    sessionEconHistory: [],
     endingData: { finalLoyalty: {}, billsProposed: 0, collapsed: false, stats: null },
   }),
 }));

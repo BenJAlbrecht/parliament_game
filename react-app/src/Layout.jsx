@@ -10,12 +10,12 @@ export default function Layout() {
   return (
     <div className="container">
       <header className="masthead">
-        <div className="masthead-rule" style={{ background: ruleColor }}></div>
         <div className="masthead-inner">
           <img className="header-flag" src={`/images/party_flags/${headerFlag}.svg`} alt="" />
           <h1>Parliament</h1>
           <img className="header-flag" src={`/images/party_flags/${headerFlag}.svg`} alt="" />
         </div>
+        <div className="masthead-rule" style={{ background: ruleColor }}></div>
         <div className="masthead-rule masthead-rule--thin"></div>
       </header>
       <Outlet />

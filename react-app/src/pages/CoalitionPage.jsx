@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PARTIES, COALITIONS } from '$lib/data.js';
+import { PARTIES, COALITIONS, logoSrc } from '$lib/data.js';
 import { calculateSeats } from '$lib/layout.js';
 import useGameStore from '$lib/store.js';
 
@@ -66,16 +66,22 @@ export default function CoalitionPage() {
             const p = PARTIES[seat.partyIndex];
             const opacity = arcCoalition
               ? (arcCoalition.parties.includes(p.name) ? 1 : 0.07)
-              : (p.name === party.name ? 1 : 0.15);
+              : (p.name === party.name ? 1 : 0.1);
             return <circle key={i} cx={seat.x} cy={seat.y} r="5" fill={p.color} opacity={opacity} />;
           })}
         </svg>
 
-        <div className="coalition-arc-caption">
-          <span style={{ color: party.color }}>{party.seats} seats</span>
-          {' · '}{seatPct(party)}% of chamber
+        <div className="detail-party-sidebar">
+          <img className="detail-party-sidebar-logo" src={logoSrc(party.name)} alt="" />
+          <div className="detail-party-sidebar-name" style={{ color: party.color }}>
+            {party.name}
+          </div>
+          <div className="detail-party-sidebar-tag">{party.ideology}</div>
+          <div className="detail-party-sidebar-seats">
+            <span style={{ color: party.color }}>{party.seats} seats</span>
+            {' · '}{seatPct(party)}% of chamber
+          </div>
         </div>
-        <div className="coalition-you-label" style={{ color: party.color }}>{party.name}</div>
 
         {sideMembers && (
           <div className="coalition-sidebar-breakdown">
