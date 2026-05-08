@@ -4,17 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Running the Game
 
-Because the JS uses ES modules (`import`/`export`), the game must be served over HTTP — opening `index.html` directly as a `file://` URL will not work. Use any local server:
-
 ```bash
-# Python (if installed)
-python -m http.server 8000
-
-# Node (if installed)
-npx serve .
+cd react-app
+npm install
+npm run dev
 ```
 
-Then open `http://localhost:8000` in a browser. There is no build step, no compilation, and no package manager.
+Open **http://localhost:5174**
+
+```bash
+npm run build    # production build → react-app/dist/
+npm run preview  # serve the production build on port 4174
+```
 
 ## Project Goal
 
@@ -22,26 +23,16 @@ A browser-based, single-player parliament simulator. The player leads a coalitio
 
 ## Architecture
 
-The game is pure HTML/CSS/JS — no frameworks, no bundler. The original `java/Parliament.java` was a code generator that produced the HTML file; it has been retired and is kept only as a reference.
+Vite + React + React Router + Zustand. All game code lives in `react-app/`.
 
-### Module dependency order
+### React module overview
 
-```
-data.js  ←  layout.js
-data.js  ←  render.js
-data.js + render.js  ←  vote.js
-data.js  ←  compact.js
-all of the above  ←  parliament.js  (entry point)
-```
-
-### What each JS module owns
-
-- **`js/data.js`** — All static content: `PARTIES` (with `goals` per party), `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel`/`leanLabel`/`leanCls`/`logoSrc` helpers.
-- **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
-- **`js/render.js`** — All SVG and DOM manipulation. Key exports: `renderAgenda`, `renderBillDetail`, `renderVoteResult`, `renderLegend`, `renderProgramme`, `renderEnding`. No internal game state.
-- **`js/vote.js`** — Session state and game logic. `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool. `proposeBill(bill)` runs the vote and updates loyalty + tracks session stats. Exports `getSessionStats()` returning `{ billsPassed, leftBillsPassed, domainsPassedCount }`.
-- **`js/compact.js`** — Programme for Government screen. `showCompact(party, partners, onBack, onConfirm)` renders goal-selection cards (one per partner, 3 goals each). `onConfirm` receives `{ [partnerName]: goalObj }`.
-- **`js/parliament.js`** — Entry point. Manages session flow, tracks `flagshipsPassed` and `turnsAbstained`, builds end-of-turn stats, and passes `committedGoals` through to `renderProgramme` and `renderEnding`.
+- **`src/lib/data.js`** — All static content: `PARTIES` (with `goals` and `mandates` per party), `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel`/`leanLabel`/`leanCls`/`logoSrc` helpers.
+- **`src/lib/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
+- **`src/lib/vote.js`** — Session state and game logic (singleton). `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool. `proposeBill(bill)` runs the vote and updates loyalty + tracks session stats. Exports `getSessionStats()`.
+- **`src/lib/store.js`** — Zustand global state. Fields: `playerParty`, `selectedCoalition`, `coalitionPartners`, `committedGoals`, `playerMandate`, `headerFlag`, `headerAccent`, `headerTurn`, `sessionEconHistory`, `endingData`. Each has a `setFieldName(v)` setter plus `resetGame()`.
+- **`src/Layout.jsx`** — Masthead wrapper, renders on every route via `<Outlet />`.
+- **`src/App.jsx`** — React Router route definitions. Root redirects to `/select`.
 
 ### Game flow (full session)
 
@@ -78,11 +69,11 @@ Edit `PARTIES` in `js/data.js`. The seat layout recalculates automatically on lo
 
 ### Adding flagship bills
 
-Add entries to `COALITIONS[id].flagships[partyName]` in `js/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
+Add entries to `COALITIONS[id].flagships[partyName]` in `src/lib/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
 
 ### Adding or editing party goals
 
-Edit the `goals` array in each party object in `js/data.js`. Each goal is `{ id, title, desc, check(policyState, stats) }`. `STARTING_POLICY` is accessible by closure (defined above `PARTIES` in the same module). Three goals per party is the current standard.
+Edit the `goals` array in each party object in `src/lib/data.js`. Each goal is `{ id, title, desc, check(policyState, stats) }`. `STARTING_POLICY` is accessible by closure (defined above `PARTIES` in the same module). Three goals per party is the current standard.
 
 ## Balance Analysis
 
@@ -92,4 +83,4 @@ Edit the `goals` array in each party object in `js/data.js`. Each goal is `{ id,
 python test/analyze.py
 ```
 
-Writes CSVs to `test/output/`. The data mirrors `js/data.js` — if parties, bills, or formulas change there, update `analyze.py` to match.
+Writes CSVs to `test/output/`. The data mirrors `src/lib/data.js` — if parties, bills, or formulas change there, update `analyze.py` to match.

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(git clone *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\balbrecht\\\\Documents\\\\parliament_game\\\\src\" -Recurse -Force | Select-Object FullName, PSIsContainer | ForEach-Object { $_.FullName })",
+      "PowerShell(Copy-Item *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(cd \"C:\\\\Users\\\\balbrecht\\\\Documents\\\\parliament_game\\\\react-app\"; $proc = Start-Process -FilePath \"npm\" -ArgumentList \"run\",\"dev\" -PassThru -NoNewWindow; Start-Sleep -Seconds 5; $proc.Kill\\(\\); Write-Output \"dev server started and killed cleanly\")",
+      "Bash(timeout 8 npm run dev)",
+      "PowerShell(dir \"C:\\\\Users\\\\balbrecht\\\\Documents\\\\parliament_game\\\\react-app\\\\src\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(npm run *)",
+      "Bash(Remove-Item -Recurse -Force src, static, node_modules, package.json, package-lock.json, svelte.config.js, vite.config.js, vercel.json, \"Internal Caucus changes.txt\", MASSIVE_CHANGE.txt)",
+      "PowerShell(cmd /c \"rmdir /s /q \"\"C:\\\\Users\\\\balbrecht\\\\Documents\\\\parliament_game\\\\.svelte-kit\"\"\")"
+    ]
+  }
+}
