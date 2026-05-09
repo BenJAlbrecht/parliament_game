@@ -37,6 +37,9 @@ RATES_COLORS <- c(
   i  = "#60a5fa"    # blue   — interest rate
 )
 
+SCAR_COLOR   <- "#f97316"   # orange — scar factor
+STRUCT_COLOR <- "#4ade80"   # green  — trend growth rate
+
 # ── plot_levels ───────────────────────────────────────────────────────────────
 # Monetary aggregates: Y, C, I, G, T, Y* (dashed)
 
@@ -89,4 +92,48 @@ plot_rates <- function(results) {
     theme_econ() +
     labs(title    = "RATES",
          subtitle = "unemployment · inflation · interest rate")
+}
+
+# ── plot_scar ─────────────────────────────────────────────────────────────────
+# Cumulative hysteresis scar factor (1.0 = no damage; lower = permanent Y* loss)
+
+plot_scar <- function(results) {
+  ggplot(results, aes(x = year, y = scar_factor)) +
+    geom_hline(yintercept = 1, color = "#2d2b42", linewidth = 0.5,
+               linetype = "dashed") +
+    geom_line(color = SCAR_COLOR, linewidth = 1.2) +
+    geom_text(
+      data = results %>% slice_max(year, n = 1),
+      aes(label = "scar"), hjust = -0.2, size = 3.2, family = "mono",
+      color = SCAR_COLOR
+    ) +
+    scale_x_continuous(breaks = scales::breaks_pretty(),
+                       expand = expansion(mult = c(0.02, 0.12))) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    theme_econ() +
+    labs(title    = "HYSTERESIS SCAR FACTOR",
+         subtitle = "cumulative permanent damage to potential output (1.0 = no scarring)")
+}
+
+# ── plot_structural ───────────────────────────────────────────────────────────
+# Running trend growth rate (g_current) — baseline plus accumulated structural boosts
+
+plot_structural <- function(results) {
+  g_baseline <- results$g_current[1]   # year-1 value before any boosts compound
+
+  ggplot(results, aes(x = year, y = g_current)) +
+    geom_hline(yintercept = g_baseline, color = "#2d2b42", linewidth = 0.5,
+               linetype = "dashed") +
+    geom_line(color = STRUCT_COLOR, linewidth = 1.2) +
+    geom_text(
+      data = results %>% slice_max(year, n = 1),
+      aes(label = "g"), hjust = -0.2, size = 3.2, family = "mono",
+      color = STRUCT_COLOR
+    ) +
+    scale_x_continuous(breaks = scales::breaks_pretty(),
+                       expand = expansion(mult = c(0.02, 0.12))) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    theme_econ() +
+    labs(title    = "TREND GROWTH RATE",
+         subtitle = "g_current — baseline plus accumulated structural reforms (dashed = baseline)")
 }

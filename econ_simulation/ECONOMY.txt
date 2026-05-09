@@ -15,8 +15,10 @@ The model is built from four classical macro relationships:
 - The Phillips curve (output gap → inflation)
 - The Taylor Rule (inflation and unemployment → central bank rate)
 
-Plus a stochastic shock to private investment, representing the year-to-year
-variability of business sentiment.
+Plus a stochastic shock to private investment (business-sentiment variability),
+three exogenous shock vectors that can represent crises, supply disruptions, or
+cost pressures, and two structural policy levers that raise trend growth or heal
+accumulated scarring over time.
 
 ## Identity and equations
 
@@ -26,26 +28,34 @@ GDP is the sum of consumption, investment, and government spending:
 
 Each component:
 
-    C = mpc · (Y − T)
-    I = I_base · (1 + g)^(t−1) · (1 − τ · (tax_rate − tax_baseline)) ·
-                                  (1 − d · (i − i_neutral)) · (1 + ε_t)
-    G = G_path[t] · (1 + g)^(t−1)
+    C = a + mpc · (Y − T)
+    I = I_base · trend_t · (1 − τ · (tax_rate − tax_baseline)) ·
+                           (1 − d · (i − i_neutral)) · (1 + ε_t) · (1 + δ_t)
+    G = G_path[t] · trend_t
     T = tax_rate · Y
 
-Where ε_t ~ N(0, σ²) is the investment shock for year t, and i is the
-central bank interest rate set by the Taylor Rule (see below). G_path[t]
-is the player's real (year-1-equivalent) spending choice for year t.
+Where:
+- a = a_0 · trend_t · (1 + δ_t) is trend-scaled autonomous consumption,
+  also affected by demand shocks
+- trend_t is a cumulative trend factor that starts at 1 in year 1 and compounds
+  each year at the current growth rate: trend_{t+1} = trend_t · (1 + g_current_t).
+  With no structural boosts, trend_t = (1 + g)^(t−1). Structural growth reforms
+  raise g_current permanently, so trend accelerates from the year after each reform.
+- ε_t ~ N(0, σ²) is the investment shock for year t
+- δ_t = demand_shock_path[t] is a demand shock applied to both a and I
+- i is the central bank interest rate set by the Taylor Rule (see below)
+- G_path[t] is the player's real (year-1-equivalent) spending choice for year t
 
 Y is solved analytically from these (since C depends on Y):
 
-    Y = (I + G) / (1 − mpc · (1 − tax_rate))
+    Y = (a + I + G) / (1 − mpc · (1 − tax_rate))
 
 ## Mandatory vs. discretionary spending
 
 G_path[t] represents the government's real spending level for year t, expressed
 in year-1-equivalent terms. The model automatically scales it up by trend growth:
 
-    G_t = G_path[t] · (1 + g)^(t−1)
+    G_t = G_path[t] · trend_t
 
 This reflects how most government spending is mandatory or entitlement-driven —
 pensions, healthcare, statutory benefits — and grows automatically with
@@ -58,8 +68,8 @@ the trend-adjusted baseline. A bill raising G_path from 270 to 285 commits the
 government to 5.6% more real spending every year from that point forward, not
 a one-time nominal boost.
 
-When the player does nothing (G_path constant), G grows in line with I and Y*,
-and the economy stays near potential output. The player's legislative choices
+When the player does nothing (G_path constant), G grows in line with I, a, and
+Y*, and the economy stays near potential output. The player's legislative choices
 determine whether the economy runs above or below potential — not whether it
 survives at all.
 
@@ -69,11 +79,14 @@ a planned refinement. For now, all spending is treated as real and trend-scaled.
 
 ## Output gap, unemployment, inflation
 
-Potential output grows at the trend rate:
+Potential output grows at the trend rate, modified by any supply shock and
+accumulated hysteresis scarring:
 
-    Y*_t = Y*_0 · (1 + g)^(t−1)
+    Y*_t = Y*_0 · trend_t · (1 + σ_t) · scar_t
 
-The output gap measures the economy relative to potential:
+where σ_t = supply_shock_path[t] and scar_t is the cumulative scar factor
+(see Hysteresis / scarring below). The output gap measures the economy relative
+to potential:
 
     gap = (Y − Y*) / Y*
 
@@ -87,12 +100,14 @@ Okun's law translates the output gap into unemployment:
 A hot economy → unemployment below natural rate. A slack economy → unemployment
 above natural rate.
 
-The Phillips curve translates the output gap into inflation:
+The Phillips curve translates the output gap into inflation, with an optional
+cost-push term:
 
-    π = π_target + β · gap
+    π = π_target + β · gap + ζ_t
 
-A hot economy generates above-target inflation. A slack economy produces
-below-target inflation (or deflation).
+where ζ_t = inflation_shock_path[t]. A hot economy generates above-target
+inflation; a slack economy produces below-target inflation or deflation.
+Cost-push shocks add to π regardless of the output gap.
 
 ## Central bank
 
@@ -126,40 +141,232 @@ investment. When i < i_neutral (easing), it is above 1 and boosts investment.
 i_{0} = i_neutral, so i_1 = i_neutral. The CB starts at neutral and only
 deviates once the economy generates an output gap.
 
+## Shocks
+
+Three exogenous shock vectors run alongside G_path and tax_path, all defaulting
+to zero. They are passed as arguments to simulate_economy() and have the same
+length as G_path.
+
+### Demand shock (demand_shock_path)
+
+A demand shock represents a simultaneous collapse of private spending intentions
+across both households and businesses — a financial crisis, a consumer-confidence
+crash, or a broad credit crunch. It applies multiplicatively to both autonomous
+consumption and investment:
+
+    a_t = a_0 · (1 + g)^(t−1) · (1 + δ_t)
+    I_t = I_base · ... · (1 + ε_t) · (1 + δ_t)
+
+Routing the shock through both a and I is economically honest: a real demand
+collapse suppresses both household spending intentions and business investment
+plans simultaneously. Hitting only investment would miss the consumer-confidence
+channel; hitting only consumption would miss the business-sentiment channel.
+
+**Recession signature:** deflationary slump — Y falls, unemployment rises,
+inflation drops below target. The CB responds with rate cuts, but the one-year
+lag and smoothing (ρ = 0.8) mean relief arrives slowly.
+
+Example — two-year financial crisis (years 4–5):
+    demand_shock_path[4:5] <- -0.15
+
+### Supply shock (supply_shock_path)
+
+A supply shock compresses the economy's productive capacity without directly
+cutting private demand — an oil embargo, a pandemic, a natural disaster. It
+shifts potential output downward while actual Y may remain elevated, pushing
+the output gap positive despite a weakening real economy:
+
+    Y*_t = Y*_0 · trend_t · (1 + σ_t)
+
+**Recession signature:** stagflation — actual Y holds up while Y* falls, so
+the output gap stays positive or turns positive. Unemployment may fall even as
+the real economy weakens in absolute terms. Inflation rises above target. The CB
+faces a dilemma: raising rates to fight inflation tightens an already-strained
+economy.
+
+Example — 1970s-style supply compression (years 3–7):
+    supply_shock_path[3:7] <- -0.08
+
+### Cost-push shock (inflation_shock_path)
+
+A cost-push shock adds directly to observed inflation without moving the output
+gap — an import price spike, a commodity surge, a supply-chain disruption that
+raises prices without reducing real output:
+
+    π_t = π_target + β · gap + ζ_t
+
+**Recession signature:** CB dilemma — inflation is above target but the real
+economy may be at or below potential. Raising rates to fight cost-push inflation
+induces unnecessary unemployment; ignoring it risks unanchored expectations.
+
+Example — three-year commodity price surge (years 2–4):
+    inflation_shock_path[2:4] <- 0.03
+
+### Multi-year recessions
+
+A single-year shock recovers quickly: the CB responds in t+1, investment
+rebounds in t+2, and the output gap closes within two to three years. To model
+a sustained recession, apply the shock across multiple consecutive years:
+
+- 2008-style financial crisis:  demand_shock_path[4:6] <- -0.12
+- COVID shock:                  demand_shock_path[1:2] <- -0.20
+- 1970s stagflation combo:      supply_shock_path[3:8] <- -0.08
+                                inflation_shock_path[3:8] <- 0.05
+
+## Hysteresis / scarring
+
+Prolonged negative output gaps permanently damage potential output — a mechanism
+known as hysteresis. Skills atrophy when workers are unemployed for extended
+periods. Capital depreciates without reinvestment. Discouraged workers exit the
+labour force permanently. The result is a lower structural ceiling for the
+economy even after the original shock has passed.
+
+The model tracks this via a stateful scar factor that multiplicatively erodes Y*:
+
+    scar_{t+1} = scar_t · (1 + min(0, gap_t) · hysteresis_rate)
+
+Negative gaps shrink the scar factor; positive gaps (overheating) leave it
+unchanged. The ratchet is strictly one-way: Y* can never recover lost ground
+through the scar factor alone. Once potential output is permanently reduced,
+only structural policy (modelled separately) could reverse it.
+
+**Scarring is gap-based, not shock-based.** The mechanism fires whenever the
+output gap is negative, regardless of what caused it. A demand shock scars
+directly: Y falls while Y* holds, gap turns negative, scarring accumulates.
+A supply shock scars indirectly: Y* falls, inflation rises, the CB tightens,
+investment drops, Y eventually falls below the new (lower) Y*, and the negative
+gap then scars further. A cost-push shock scars in the same indirect way:
+CB tightening to fight above-gap inflation can create a negative gap that scars.
+
+**The 2008 textbook case.** The 2008 financial crisis was a demand-side shock.
+GDP recovered within a few years in most economies, but productivity growth
+slowed permanently. Economists attribute this to capital underinvestment,
+R&D cuts, and long-term unemployment that destroyed human capital. The scar
+factor models exactly this channel: the recession itself, not the initial
+shock, is what left economies permanently smaller.
+
+**Gameplay implication.** Aggressive recession response — spending to close
+negative gaps quickly — has a long-run payoff beyond the immediate stabilisation.
+Every year a gap remains negative, scar_factor ticks down and Y* is permanently
+reduced, compounding the damage over future turns. Conversely, a player who lets
+a recession run its course faces a permanently smaller economy in the back half
+of the session. The hysteresis mechanism gives players a reason to care about
+speed of recovery, not just eventual recovery.
+
+## Structural policies
+
+Structural policies are long-run supply-side levers — distinct from short-run
+demand management via G and tax_rate. They do not shift Y directly; they raise
+the economy's ceiling (potential output) over time, so the same level of demand
+produces less inflationary pressure and more sustainable growth.
+
+Two mechanisms are available, passed as per-year vectors alongside the shock paths:
+
+### Trend growth boost (g_boost_path)
+
+Each year's value is permanently added to the running trend growth rate g_current:
+
+    g_current_t = g_baseline + sum(g_boost_path[1:t])
+
+From the year after the boost, trend_t compounds at the higher g_current, so all
+trend-scaled quantities (Y*, G, a, I) grow faster. The effect is permanent and
+cumulative: a reform in year 5 raises the growth rate for all subsequent years.
+
+    trend_{t+1} = trend_t · (1 + g_current_t)
+
+Example bills and magnitudes:
+
+| Reform                          | g_boost  |
+|---------------------------------|----------|
+| Public Education Investment     | +0.001   |
+| Research and Innovation Fund    | +0.002   |
+| Infrastructure Investment Act   | +0.001   |
+| Immigration Expansion           | +0.0015  |
+
+**Compounding over decades.** Small g_boost values produce large effects over
+long horizons. A +0.001 boost held for 30 years raises trend_t by roughly 3%
+above the no-reform baseline — equivalent to three extra years of 1% growth.
+A +0.002 boost for 30 years adds ~6%. Because the boost is multiplicative and
+permanent, early reforms compound longer and are worth more than late reforms.
+
+### Scar healing (heal_path)
+
+Each year's value is added directly to scar_factor, capped at 1.0:
+
+    scar_factor_after_healing = min(1.0, scar_factor + heal_path[t])
+
+Healing is applied at the start of each turn, before Y_star is computed. It
+immediately raises Y*, reducing the negative output gap that would otherwise
+compound further scarring. At scar_factor = 1.0 (no damage), heal is a no-op.
+
+Example bills and magnitudes:
+
+| Reform                          | heal     |
+|---------------------------------|----------|
+| Workforce Retraining Initiative | +0.005   |
+| Industrial Renewal Program      | +0.010   |
+| Capital Investment Tax Credit   | +0.003   |
+
+### Short-run vs. long-run policy
+
+Demand-side tools (G, tax_rate) shift Y immediately but face CB crowding-out
+over time. Structural tools shift Y* gradually, raising the ceiling without
+triggering the CB. The optimal player strategy combines both: stabilise Y in
+the short run with demand policy, invest in structural reforms to raise the
+long-run ceiling, and use scar healing to recover from any recession damage
+before hysteresis compounds it.
+
 ## Parameters
 
-| Parameter      | Value | Meaning                                                  |
-|----------------|-------|----------------------------------------------------------|
-| mpc            | 0.75  | Marginal propensity to consume                           |
-| τ              | 1.5   | Investment sensitivity to tax rate                       |
-| tax_baseline   | 0.25  | Reference tax rate (no investment effect at this level)  |
-| g              | 0.02  | Trend growth rate (productivity + capital + labor)       |
-| σ (shock_sd)   | 0.03  | Std dev of investment shock                              |
-| u_natural      | 0.05  | Natural rate of unemployment                             |
-| okun           | 0.5   | Okun coefficient (output gap → unemployment)             |
-| π_target       | 0.02  | Target / expected inflation                              |
-| β              | 0.5   | Phillips slope (output gap → inflation)                  |
-| I_base_0       | 150   | Baseline investment in year 1                            |
-| Y*_0           | 960   | Potential output in year 1                               |
-| i_neutral      | 0.02  | CB neutral interest rate                                 |
-| φ_π            | 1.5   | CB response to inflation gap (Taylor Rule)               |
-| φ_u            | 0.5   | CB response to unemployment gap (Taylor Rule)            |
-| d              | 5     | Investment sensitivity to interest rate deviation        |
-| ρ              | 0.8   | Interest rate smoothing (CB moves 20% toward target/yr) |
+| Parameter      | Value   | Meaning                                                  |
+|----------------|---------|----------------------------------------------------------|
+| mpc            | 0.75    | Marginal propensity to consume                           |
+| a_0            | 80      | Autonomous consumption in year 1 (trend-scaled after)   |
+| τ              | 1.5     | Investment sensitivity to tax rate                       |
+| tax_baseline   | 0.25    | Reference tax rate (no investment effect at this level)  |
+| g              | 0.02    | Baseline trend growth rate; raised permanently by g_boost_path |
+| σ (shock_sd)   | 0.03    | Std dev of investment shock                              |
+| u_natural      | 0.05    | Natural rate of unemployment                             |
+| okun           | 0.5     | Okun coefficient (output gap → unemployment)             |
+| π_target       | 0.02    | Target / expected inflation                              |
+| β              | 0.5     | Phillips slope (output gap → inflation)                  |
+| I_base_0       | 150     | Baseline investment in year 1                            |
+| Y*_0           | ≈1142.86| Potential output in year 1 (auto-computed; see below)    |
+| i_neutral      | 0.02    | CB neutral interest rate                                 |
+| φ_π            | 1.5     | CB response to inflation gap (Taylor Rule)               |
+| φ_u            | 0.5     | CB response to unemployment gap (Taylor Rule)            |
+| d              | 5       | Investment sensitivity to interest rate deviation        |
+| ρ              | 0.8     | Interest rate smoothing (CB moves 20% toward target/yr) |
+| hysteresis_rate| 0.10    | Fraction of negative gap that permanently scars Y*       |
+
+**Y*_0 is auto-computed.** It is set equal to the year-1 equilibrium Y
+(with no shocks and CB at neutral) so that the initial output gap is exactly
+zero. With the defaults above and G_path[1] = 270, tax_path[1] = 0.25:
+
+    Y*_0 = (a_0 + I_base_0 + G_0) / (1 − mpc · (1 − tax_baseline))
+         = (80 + 150 + 270) / (1 − 0.75 · 0.75)
+         = 500 / 0.4375
+         ≈ 1142.86
+
+Override by passing Y_star_0 in the params list if you need a specific value.
 
 ## Initial state (year 1)
 
-At baseline tax rate, no shock, no policy change, CB at neutral:
+At baseline tax rate, no shocks, CB at neutral:
 
-- Y = 960 (equals Y*)
-- C = 540 (56% of GDP)
-- I = 150 (16% of GDP)
-- G = 270 (28% of GDP)
-- T = 240
+- Y ≈ 1142.86 (equals Y*)
+- a = 80
+- C ≈ 722.86 (63% of GDP)
+- I = 150 (13% of GDP)
+- G = 270 (24% of GDP)
+- T ≈ 285.71
 - Output gap = 0
 - u = 5%
 - π = 2%
 - i = 2% (neutral; i_prev = i_neutral)
+- scar_factor = 1.0 (no accumulated damage)
+- g_current = 2% (baseline; no structural boosts applied yet)
+- trend_state = 1.0
 
 ## Player levers
 
@@ -170,33 +377,55 @@ The player changes the economy by passing bills, which modify:
 - **tax_rate**. Affects both consumption (via disposable income) and
   investment (via the τ sensitivity term). Cuts boost short-run growth but
   reduce tax revenue.
+- **g_boost_path** (structural growth reform). Permanently raises g_current,
+  accelerating growth of Y*, G, a, and I from the following year onward. Small
+  per-year values (+0.001 to +0.002) compound into large long-run effects.
+- **heal_path** (scar healing). Directly restores scar_factor toward 1.0,
+  immediately raising Y* and reducing the negative gap that would compound
+  further hysteresis. Most effective when applied soon after a recession.
 
 ## Per-turn update loop
 
 For each year t:
 
-1.  Apply this turn's bill effects to G_path[t] and/or tax_rate
-    Scale G_path[t] to actual spending: G_t = G_path[t] · (1 + g)^(t−1)
-2.  Compute i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
+1.  Apply structural policies for this year:
+    g_current_t = g_current_{t-1} + g_boost_path[t]
+    scar_factor = min(1.0, scar_factor + heal_path[t])
+2.  Apply this turn's bill effects to G_path[t] and/or tax_rate
+    Scale G_path[t] to actual spending: G_t = G_path[t] · trend_t
+3.  Compute i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
     Compute i_t = ρ · i_{t-1} + (1 − ρ) · i_target
-3.  Generate shock: ε_t ~ N(0, σ²)
-4.  Compute Y* = Y*_0 · (1 + g)^(t−1)
-5.  Compute I = I_base_0 · (1 + g)^(t−1) · (1 − τ · (tax_rate − tax_baseline)) · (1 − d · (i − i_neutral)) · (1 + ε_t)
-6.  Compute Y = (I + G) / (1 − mpc · (1 − tax_rate))
-7.  Compute T = tax_rate · Y, then C = mpc · (Y − T)
-8.  Compute gap = (Y − Y*) / Y*
-9.  Compute u = u_natural − okun · gap
-10. Compute π = π_target + β · gap
-11. Record state; set π_{t}, u_{t}, and i_{t} as inputs for next year's Taylor Rule
+4.  Generate investment shock: ε_t ~ N(0, σ²)
+5.  Read demand_shock_path[t] = δ_t, supply_shock_path[t] = σ_t, inflation_shock_path[t] = ζ_t
+6.  Compute Y* = Y*_0 · trend_t · (1 + σ_t) · scar_t
+7.  Compute a = a_0 · trend_t · (1 + δ_t)
+8.  Compute I = I_base_0 · trend_t · (1 − τ · (tax_rate − tax_baseline)) · (1 − d · (i − i_neutral)) · (1 + ε_t) · (1 + δ_t)
+9.  Compute Y = (a + I + G) / (1 − mpc · (1 − tax_rate))
+10. Compute T = tax_rate · Y, then C = a + mpc · (Y − T)
+11. Compute gap = (Y − Y*) / Y*
+12. Compute u = u_natural − okun · gap
+13. Compute π = π_target + β · gap + ζ_t
+14. Update scar_t+1 = scar_t · (1 + min(0, gap) · hysteresis_rate)
+15. Update trend_{t+1} = trend_t · (1 + g_current_t)
+16. Record state (including scar_t+1, g_current_t); set π_{t}, u_{t}, i_{t} for next year's Taylor Rule
 
 ## Design notes
 
-**What happens when the player does nothing.** Both I and G grow at trend g
-automatically (I via the investment trend term, G via the spending scale factor).
-Y therefore grows in line with Y*, the output gap stays near zero, and the
-economy idles at roughly natural unemployment and target inflation. The player's
-legislative choices determine whether the economy runs above or below potential;
-inaction is a stable baseline, not structural decay.
+**What happens when the player does nothing.** Both a, I, and G grow at trend g
+automatically. Y therefore grows in line with Y*, the output gap stays near zero,
+and the economy idles at roughly natural unemployment and target inflation. The
+player's legislative choices determine whether the economy runs above or below
+potential; inaction is a stable baseline, not structural decay.
+
+**Structural reforms compound silently.** A g_boost of +0.001 in year 5 barely
+shows up in the rates plot — but over 25 remaining years it lifts trend_t by
+roughly 2.5% above the no-reform path. Two reforms (+0.002 total) applied early
+lift it by ~5%. The compounding is multiplicative: each subsequent year, trend
+grows at the new higher rate. A player who invests in structural reforms in
+the first half of the session will outperform a pure demand-side player in the
+second half, even if both have the same G and tax_rate. The reverse is also true:
+structural reforms provide no short-run demand stimulus — they do not close gaps
+or prevent recessions, they only raise the long-run ceiling.
 
 **Why the economy is volatile.** The shock term ε_t means each year's
 investment lands above or below trend. Most years are near-trend, but
@@ -210,11 +439,17 @@ investment and partially offsets the fiscal stimulus. The player cannot simply
 spend their way to permanent prosperity — sustained stimulus will draw a CB
 response that crowds out private investment, though it arrives gradually.
 
-**Recessions trigger easing.** When a shock or fiscal tightening drives the
-output gap negative, unemployment rises and inflation falls. The CB responds
+**Recessions trigger easing.** When a demand shock or fiscal tightening drives
+the output gap negative, unemployment rises and inflation falls. The CB responds
 with rate cuts in subsequent years, which boosts investment and provides
 automatic stabilisation. Bad luck is self-correcting to a degree, but the
 one-year lag plus smoothing means the medicine arrives slowly after the pain.
+
+**Single-year shocks recover quickly.** A one-year demand or supply shock
+typically closes within two to three years as the CB adjusts and investment
+rebounds. To produce a multi-year recession — a 2008-style crisis or a pandemic
+— apply the shock across several consecutive years. The sustained gap between
+actual and potential output then compounds the CB response and prolongs recovery.
 
 **Stimulus that overheats triggers tightening.** A large spending bill in year t
 may push Y well above Y*. Inflation rises. The CB begins raising rates in
@@ -222,6 +457,15 @@ year t+1, but only 20% of the way toward the Taylor target. The tightening
 accumulates over several years. The net multi-year effect of fiscal stimulus is
 therefore smaller than the single-year Keynesian multiplier implies — and the
 drag arrives on a delay.
+
+**Hysteresis compounds slow recoveries.** Each year the output gap stays
+negative, scar_factor ticks down and Y* is permanently reduced. A two-year
+recession with hysteresis_rate = 0.10 and average gap of −0.05 leaves
+scar_factor at roughly 0.99 — a 1% permanent loss in potential. That sounds
+small, but it compounds: a five-year slump with the same gap drops scar_factor
+to ~0.975. The CB's slow-moving response (ρ = 0.8) means the economy can stay
+below potential for many years after an initial shock, accumulating scar damage
+long after the original cause is resolved.
 
 **The CB moves slowly.** With ρ = 0.8, the CB is a slow-moving force rather
 than an instant corrective. A single inflationary year will barely shift rates;
@@ -237,4 +481,3 @@ meaningful rate pressure.
 - International trade (closed economy assumption)
 - Adaptive inflation expectations (π_target is currently fixed)
 - Threshold crises (debt panic, currency crisis, banking crisis)
-- Endogenous Y* growth driven by productivity-boosting bills
