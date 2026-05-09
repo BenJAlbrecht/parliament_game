@@ -8,12 +8,6 @@ import useGameStore from '$lib/store.js';
 const arcSeats   = calculateSeats(PARTIES);
 const totalSeats = PARTIES.reduce((s, p) => s + p.seats, 0);
 
-const arcSeatRanks = (() => {
-  const order = arcSeats.map((_, i) => i).sort((a, b) => arcSeats[a].x - arcSeats[b].x);
-  const ranks = new Array(arcSeats.length);
-  order.forEach((origIdx, rank) => { ranks[origIdx] = rank; });
-  return ranks;
-})();
 
 const FLAG_MAP = {
   "People's Alliance":   'flag-pa',
@@ -47,7 +41,6 @@ export default function SelectPage() {
 
   const [selected,    setSelected]    = useState(playerParty ?? null);
   const [highlighted, setHighlighted] = useState(null);
-  const [animReady,   setAnimReady]   = useState(false);
   const [popup,       setPopup]       = useState(null); // { party, x, y, dir }
 
   const clearHoverTimer = useRef(null);
@@ -62,14 +55,6 @@ export default function SelectPage() {
     setHeaderFlag(selected ? FLAG_MAP[selected.name] : 'flag-base');
   }, [selected]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setAnimReady(true);
-      return;
-    }
-    const id = setTimeout(() => setAnimReady(true), 20);
-    return () => clearTimeout(id);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function hoverOn(party, x, y, dir) {
     clearTimeout(clearHoverTimer.current);
@@ -143,9 +128,7 @@ export default function SelectPage() {
                 cx={seat.x} cy={seat.y} r="5"
                 fill={p.color}
                 opacity={opacity}
-                style={animReady
-                  ? { animation: `seat-pop 300ms ease-out ${arcSeatRanks[i] * 2}ms both`, cursor: 'pointer' }
-                  : { transform: 'scale(0)', transformBox: 'fill-box', transformOrigin: 'center' }}
+                style={{ cursor: 'pointer' }}
                 onMouseEnter={e => hoverOn(p, e.clientX, e.clientY - 8, 'above')}
                 onMouseLeave={hoverOff}
                 onClick={() => withTransition(() => setSelected(p))}
@@ -202,9 +185,6 @@ export default function SelectPage() {
                 cx={seat.x} cy={seat.y} r="5"
                 fill={p.color}
                 opacity={opacity}
-                style={animReady
-                  ? { animation: `seat-pop 300ms ease-out ${arcSeatRanks[i] * 2}ms both` }
-                  : { transform: 'scale(0)', transformBox: 'fill-box', transformOrigin: 'center' }}
               />
             );
           })}
@@ -226,13 +206,6 @@ export default function SelectPage() {
         <div className="detail-action-row">
           <button className="back-btn" onClick={() => withTransition(() => { setPlayerParty(null); setSelected(null); })}>
             ← Back
-          </button>
-          <button
-            className="primary confirm-btn"
-            style={{ borderColor: selected.color, color: selected.color }}
-            onClick={confirmParty}
-          >
-            Lead this party →
           </button>
         </div>
 
@@ -277,6 +250,16 @@ export default function SelectPage() {
             </div>
           </div>
         )}
+
+        <div className="detail-confirm-footer">
+          <button
+            className="primary confirm-btn"
+            style={{ borderColor: selected.color, color: selected.color }}
+            onClick={confirmParty}
+          >
+            Lead this party →
+          </button>
+        </div>
       </div>
 
     </div>

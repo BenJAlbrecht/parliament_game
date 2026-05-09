@@ -2,11 +2,11 @@
 
 ## Overview
 
-The economy simulates a closed national economy each turn (1 turn = 1 year).
+The economy simulates a closed national economy each turn (1 turn = 1 quarter).
 It tracks GDP and its three components, plus unemployment, inflation, and the
 central bank interest rate. Player actions (passing bills) change government
-spending and tax rates, which propagate through the model to produce yearly
-economic outcomes. The central bank responds to those outcomes with a one-year
+spending and tax rates, which propagate through the model to produce quarterly
+economic outcomes. The central bank responds to those outcomes with a one-quarter
 lag, adjusting the interest rate according to a Taylor Rule.
 
 The model is built from four classical macro relationships:
@@ -19,6 +19,10 @@ Plus a stochastic shock to private investment (business-sentiment variability),
 three exogenous shock vectors that can represent crises, supply disruptions, or
 cost pressures, and two structural policy levers that raise trend growth or heal
 accumulated scarring over time.
+
+All rates (g, π_target, i_neutral) are expressed in per-quarter terms internally.
+Player-facing text always presents these in annualized terms — the central bank
+"targets 2% annual inflation," not "0.496% quarterly inflation."
 
 ## Identity and equations
 
@@ -37,14 +41,14 @@ Each component:
 Where:
 - a = a_0 · trend_t · (1 + δ_t) is trend-scaled autonomous consumption,
   also affected by demand shocks
-- trend_t is a cumulative trend factor that starts at 1 in year 1 and compounds
-  each year at the current growth rate: trend_{t+1} = trend_t · (1 + g_current_t).
+- trend_t is a cumulative trend factor that starts at 1 in quarter 1 and compounds
+  each quarter at the current growth rate: trend_{t+1} = trend_t · (1 + g_current_t).
   With no structural boosts, trend_t = (1 + g)^(t−1). Structural growth reforms
-  raise g_current permanently, so trend accelerates from the year after each reform.
-- ε_t ~ N(0, σ²) is the investment shock for year t
+  raise g_current permanently, so trend accelerates from the quarter after each reform.
+- ε_t ~ N(0, σ²) is the investment shock for quarter t
 - δ_t = demand_shock_path[t] is a demand shock applied to both a and I
 - i is the central bank interest rate set by the Taylor Rule (see below)
-- G_path[t] is the player's real (year-1-equivalent) spending choice for year t
+- G_path[t] is the player's real (quarter-1-equivalent) spending choice for quarter t
 
 Y is solved analytically from these (since C depends on Y):
 
@@ -52,8 +56,8 @@ Y is solved analytically from these (since C depends on Y):
 
 ## Mandatory vs. discretionary spending
 
-G_path[t] represents the government's real spending level for year t, expressed
-in year-1-equivalent terms. The model automatically scales it up by trend growth:
+G_path[t] represents the government's real spending level for quarter t, expressed
+in quarter-1-equivalent terms. The model automatically scales it up by trend growth:
 
     G_t = G_path[t] · trend_t
 
@@ -65,7 +69,7 @@ this baseline; it is built in.
 
 Bills, therefore, represent real changes to spending priorities above or below
 the trend-adjusted baseline. A bill raising G_path from 270 to 285 commits the
-government to 5.6% more real spending every year from that point forward, not
+government to 5.6% more real spending every quarter from that point forward, not
 a one-time nominal boost.
 
 When the player does nothing (G_path constant), G grows in line with I, a, and
@@ -109,25 +113,38 @@ where ζ_t = inflation_shock_path[t]. A hot economy generates above-target
 inflation; a slack economy produces below-target inflation or deflation.
 Cost-push shocks add to π regardless of the output gap.
 
+β = 0.25 reflects a modern, relatively flat Phillips curve consistent with
+OECD post-1990 empirical estimates (typical range 0.1–0.2). A steeper slope
+(0.4–0.6) would model a pre-Volcker / 1970s economy where wage-price spirals
+were more responsive to slack and overheating.
+
 ## Central bank
 
-The central bank has a dual mandate: keep inflation near π_target (2%) and
-unemployment near u_natural (5%). It sets the interest rate each year using
-a Taylor Rule with interest rate smoothing, reacting to the previous year's
-outcomes with a one-year lag.
+The central bank has a dual mandate: keep inflation near its 2% annual target
+and unemployment near u_natural (5%). Internally, π_target = 0.00496 per quarter
+(0.496% per quarter ≈ 2% annualized). All player-facing text expresses this
+mandate in annual terms: "the independent central bank targets 2% annual inflation
+and full employment."
 
-First, a Taylor target is computed from last year's inflation and unemployment:
+The CB sets the interest rate each quarter using a Taylor Rule with interest rate
+smoothing, reacting to the previous quarter's outcomes with a one-quarter lag.
+
+First, a Taylor target is computed from last quarter's inflation and unemployment:
 
     i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
 
-Then the actual rate moves only part of the way toward that target:
+Then the actual rate moves only part of the way toward that target, with
+asymmetric smoothing depending on the direction of the move:
 
-    i_t = ρ · i_{t-1} + (1 − ρ) · i_target
+    i_t = rho · i_{t-1} + (1 - rho) · i_target
 
-With ρ = 0.8, the CB closes 20% of the gap to the Taylor target each year.
-A CB that wanted to raise rates from 2% to 12% would instead move to 4% in
-year 1, then 5.6%, then 6.9%, and so on — never jumping to the target in one
-step.
+    where rho = rho_cut  = 0.9   if i_target < i_{t-1}   (easing:     10% per quarter)
+               rho_hike = 0.8   if i_target >= i_{t-1}  (tightening: 20% per quarter)
+
+When tightening, the CB closes 20% of the gap to its Taylor target each quarter.
+When easing, it closes only 10% — moving half as fast toward lower rates as it
+does toward higher rates. This models a credibility-focused, hawkish CB that is
+quick to fight inflation but cautious about cutting rates prematurely.
 
 The interest rate feeds back into private investment through the sensitivity
 parameter d:
@@ -137,9 +154,19 @@ parameter d:
 When i > i_neutral (tightening), this factor is below 1 and suppresses
 investment. When i < i_neutral (easing), it is above 1 and boosts investment.
 
-**Initialisation.** For year 1, π_{0} = π_target, u_{0} = u_natural, and
+**Initialisation.** For quarter 1, π_{0} = π_target, u_{0} = u_natural, and
 i_{0} = i_neutral, so i_1 = i_neutral. The CB starts at neutral and only
 deviates once the economy generates an output gap.
+
+**Zero lower bound.** After asymmetric smoothing, the policy rate is clipped at
+zero:
+
+    i_t = max(0, rho · i_{t-1} + (1 - rho) · i_target)
+
+The CB cannot set a negative nominal rate. Once i_t hits zero the Taylor Rule
+becomes inoperative: further deterioration in inflation or unemployment no longer
+lowers the rate. The economy loses its automatic CB stabiliser and fiscal policy
+becomes the only remaining lever.
 
 ## Shocks
 
@@ -163,10 +190,11 @@ plans simultaneously. Hitting only investment would miss the consumer-confidence
 channel; hitting only consumption would miss the business-sentiment channel.
 
 **Recession signature:** deflationary slump — Y falls, unemployment rises,
-inflation drops below target. The CB responds with rate cuts, but the one-year
-lag and smoothing (ρ = 0.8) mean relief arrives slowly.
+inflation drops below target. The CB responds with rate cuts, but the one-quarter
+lag and the slower easing path (rho_cut = 0.9: only 10% per quarter) mean
+relief arrives slowly — slower than tightening would in the mirror scenario.
 
-Example — two-year financial crisis (years 4–5):
+Example — two-quarter financial crisis (quarters 4–5):
     demand_shock_path[4:5] <- -0.15
 
 ### Supply shock (supply_shock_path)
@@ -184,8 +212,8 @@ the real economy weakens in absolute terms. Inflation rises above target. The CB
 faces a dilemma: raising rates to fight inflation tightens an already-strained
 economy.
 
-Example — 1970s-style supply compression (years 3–7):
-    supply_shock_path[3:7] <- -0.08
+Example — 1970s-style supply compression (quarters 9–28, approximately 5 years):
+    supply_shock_path[9:28] <- -0.08
 
 ### Cost-push shock (inflation_shock_path)
 
@@ -199,19 +227,19 @@ raises prices without reducing real output:
 economy may be at or below potential. Raising rates to fight cost-push inflation
 induces unnecessary unemployment; ignoring it risks unanchored expectations.
 
-Example — three-year commodity price surge (years 2–4):
-    inflation_shock_path[2:4] <- 0.03
+Example — three-quarter commodity price surge (quarters 5–7):
+    inflation_shock_path[5:7] <- 0.03
 
-### Multi-year recessions
+### Multi-quarter recessions
 
-A single-year shock recovers quickly: the CB responds in t+1, investment
-rebounds in t+2, and the output gap closes within two to three years. To model
-a sustained recession, apply the shock across multiple consecutive years:
+A single-quarter shock recovers quickly: the CB responds in t+1, investment
+rebounds in t+2, and the output gap closes within two to three quarters. To model
+a sustained recession, apply the shock across multiple consecutive quarters:
 
-- 2008-style financial crisis:  demand_shock_path[4:6] <- -0.12
-- COVID shock:                  demand_shock_path[1:2] <- -0.20
-- 1970s stagflation combo:      supply_shock_path[3:8] <- -0.08
-                                inflation_shock_path[3:8] <- 0.05
+- 2008-style financial crisis:  demand_shock_path[13:21] <- -0.12
+- COVID shock:                  demand_shock_path[1:4] <- -0.20
+- 1970s stagflation combo:      supply_shock_path[9:28] <- -0.08
+                                inflation_shock_path[9:28] <- 0.05
 
 ## Hysteresis / scarring
 
@@ -247,7 +275,7 @@ shock, is what left economies permanently smaller.
 
 **Gameplay implication.** Aggressive recession response — spending to close
 negative gaps quickly — has a long-run payoff beyond the immediate stabilisation.
-Every year a gap remains negative, scar_factor ticks down and Y* is permanently
+Every quarter a gap remains negative, scar_factor ticks down and Y* is permanently
 reduced, compounding the damage over future turns. Conversely, a player who lets
 a recession run its course faces a permanently smaller economy in the back half
 of the session. The hysteresis mechanism gives players a reason to care about
@@ -260,17 +288,17 @@ demand management via G and tax_rate. They do not shift Y directly; they raise
 the economy's ceiling (potential output) over time, so the same level of demand
 produces less inflationary pressure and more sustainable growth.
 
-Two mechanisms are available, passed as per-year vectors alongside the shock paths:
+Two mechanisms are available, passed as per-quarter vectors alongside the shock paths:
 
 ### Trend growth boost (g_boost_path)
 
-Each year's value is permanently added to the running trend growth rate g_current:
+Each quarter's value is permanently added to the running trend growth rate g_current:
 
-    g_current_t = g_baseline + sum(g_boost_path[1:t])
+    g_current_t = g_current_{t-1} + g_boost_path[t]
 
-From the year after the boost, trend_t compounds at the higher g_current, so all
+From the quarter after the boost, trend_t compounds at the higher g_current, so all
 trend-scaled quantities (Y*, G, a, I) grow faster. The effect is permanent and
-cumulative: a reform in year 5 raises the growth rate for all subsequent years.
+cumulative: a reform in quarter 5 raises the growth rate for all subsequent quarters.
 
     trend_{t+1} = trend_t · (1 + g_current_t)
 
@@ -284,14 +312,14 @@ Example bills and magnitudes:
 | Immigration Expansion           | +0.0015  |
 
 **Compounding over decades.** Small g_boost values produce large effects over
-long horizons. A +0.001 boost held for 30 years raises trend_t by roughly 3%
-above the no-reform baseline — equivalent to three extra years of 1% growth.
-A +0.002 boost for 30 years adds ~6%. Because the boost is multiplicative and
-permanent, early reforms compound longer and are worth more than late reforms.
+long horizons. A +0.001 boost held for 120 quarters (30 years) raises trend_t by
+roughly 3% above the no-reform baseline. A +0.002 boost for 120 quarters adds ~6%.
+Because the boost is multiplicative and permanent, early reforms compound longer
+and are worth more than late reforms.
 
 ### Scar healing (heal_path)
 
-Each year's value is added directly to scar_factor, capped at 1.0:
+Each quarter's value is added directly to scar_factor, capped at 1.0:
 
     scar_factor_after_healing = min(1.0, scar_factor + heal_path[t])
 
@@ -318,28 +346,32 @@ before hysteresis compounds it.
 
 ## Parameters
 
+All rate parameters (g, π_target, i_neutral) are per-quarter internally.
+Player-facing text annualizes them: the CB "targets 2% annual inflation."
+
 | Parameter      | Value   | Meaning                                                  |
 |----------------|---------|----------------------------------------------------------|
 | mpc            | 0.75    | Marginal propensity to consume                           |
-| a_0            | 80      | Autonomous consumption in year 1 (trend-scaled after)   |
+| a_0            | 80      | Autonomous consumption in quarter 1 (trend-scaled after) |
 | τ              | 1.5     | Investment sensitivity to tax rate                       |
 | tax_baseline   | 0.25    | Reference tax rate (no investment effect at this level)  |
-| g              | 0.02    | Baseline trend growth rate; raised permanently by g_boost_path |
+| g              | 0.00496 | Baseline trend growth rate per quarter ((1.02)^(1/4)−1; ≈ 2% annualized) |
 | σ (shock_sd)   | 0.03    | Std dev of investment shock                              |
-| u_natural      | 0.05    | Natural rate of unemployment                             |
+| u_natural_baseline | 0.05 | Floor for natural rate of unemployment (u_natural_state starts here) |
 | okun           | 0.5     | Okun coefficient (output gap → unemployment)             |
-| π_target       | 0.02    | Target / expected inflation                              |
-| β              | 0.5     | Phillips slope (output gap → inflation)                  |
-| I_base_0       | 150     | Baseline investment in year 1                            |
-| Y*_0           | ≈1142.86| Potential output in year 1 (auto-computed; see below)    |
-| i_neutral      | 0.02    | CB neutral interest rate                                 |
+| π_target       | 0.00496 | Target inflation per quarter (≈ 2% annualized; CB mandate stated annually to player) |
+| β              | 0.25    | Phillips slope (output gap → inflation) — flat, post-1990 OECD range |
+| I_base_0       | 150     | Baseline investment in quarter 1                         |
+| Y*_0           | ≈1142.86| Potential output in quarter 1 (auto-computed; see below) |
+| i_neutral      | 0.005   | CB neutral interest rate per quarter (≈ 2% annualized)   |
 | φ_π            | 1.5     | CB response to inflation gap (Taylor Rule)               |
-| φ_u            | 0.5     | CB response to unemployment gap (Taylor Rule)            |
+| phi_u          | 0.25    | CB response to unemployment gap (Taylor Rule) — lower weight reflects price-stability priority |
 | d              | 5       | Investment sensitivity to interest rate deviation        |
-| ρ              | 0.8     | Interest rate smoothing (CB moves 20% toward target/yr) |
+| rho_hike       | 0.8     | Rate smoothing when tightening (CB closes 20% of gap per quarter) |
+| rho_cut        | 0.9     | Rate smoothing when easing (CB closes 10% of gap per quarter — slower) |
 | hysteresis_rate| 0.10    | Fraction of negative gap that permanently scars Y*       |
 
-**Y*_0 is auto-computed.** It is set equal to the year-1 equilibrium Y
+**Y*_0 is auto-computed.** It is set equal to the quarter-1 equilibrium Y
 (with no shocks and CB at neutral) so that the initial output gap is exactly
 zero. With the defaults above and G_path[1] = 270, tax_path[1] = 0.25:
 
@@ -350,7 +382,79 @@ zero. With the defaults above and G_path[1] = 270, tax_path[1] = 0.25:
 
 Override by passing Y_star_0 in the params list if you need a specific value.
 
-## Initial state (year 1)
+## Display conventions
+
+Internal model values (Y, Y_star, C, I, G, rates) are kept in raw model units
+and per-quarter rates throughout all calculations. The display layer converts
+these to player-facing quantities. All conversion code lives in display.R.
+
+### Normalization constants
+
+| Constant        | Value          | Meaning                                         |
+|-----------------|----------------|-------------------------------------------------|
+| POPULATION      | 80,000,000     | Country population                              |
+| BASE_GDP_CAPITA | 20,000 EUR     | GDP per capita at quarter 1                     |
+| BASE_Y_MODEL    | 1,142.857      | Model Y at quarter-1 equilibrium (auto-computed)|
+| PER_CAPITA_SCALE| ~17.5 EUR/unit | BASE_GDP_CAPITA / BASE_Y_MODEL                  |
+
+These constants are locked in for worldbuilding consistency. Model Y at quarter 1
+maps to exactly 20,000 EUR per capita for a population of 80 million. Aggregate
+GDP at quarter 1 is therefore 80M x 20,000 = 1.6 trillion EUR — a plausible
+mid-sized European economy.
+
+### Calendar
+
+Quarter 1 of the simulation corresponds to 1985 Q1. The conversion is:
+
+    year(t) = 1985 + floor((t - 1) / 4)
+    quarter_of_year(t) = ((t - 1) mod 4) + 1
+
+A 30-year run (120 quarters) spans 1985 Q1 through 2014 Q4. Plots show year
+labels at 5-year intervals (1985, 1990, 1995, ...) on the x-axis.
+
+### Presentation rules
+
+| Quantity                   | Display form           | Precision     |
+|----------------------------|------------------------|---------------|
+| GDP / Y_star / baseline Y* | EUR per capita         | Nearest EUR 100|
+| C, I, G                    | % of quarterly GDP     | 0.1 pp        |
+| Inflation (pi)             | Annualized, %          | 0.1 pp        |
+| CB interest rate (i)       | Annualized, %          | 0.1 pp        |
+| Trend growth rate (g)      | Annualized, %          | 0.1 pp        |
+| Unemployment (u, u*)       | Level %, as-is         | 0.1 pp        |
+| Scar factor                | Level (0–1)            | 3 decimal places|
+
+Annualization uses compound formula: (1 + r_quarterly)^4 - 1. Annual inflation
+target ~2.0%, annual neutral rate ~2.0% (both derived from 0.00496 and 0.005
+quarterly defaults).
+
+### Bills and spending units
+
+When bills are presented to the player, spending changes will be denominated in
+Euros. A bill that raises G_path by 15 (model units) translates to:
+
+    15 x PER_CAPITA_SCALE x POPULATION = 15 x ~17.5 x 80M = ~21 billion EUR/quarter
+
+Player-facing bill text will read "+21B EUR annual spending" (quarterly amount
+multiplied by 4 for the annual figure). This keeps bill pricing grounded in
+recognizable real-economy magnitudes rather than abstract model units.
+
+### Government size
+
+At baseline (G = 270 model units, Y ~= 1142.86 model units), G/Y ~= 23.6%.
+This is intentionally a middle ground between European social-democratic states
+(general government spending 40-50% of GDP) and the US (~38% of GDP). The
+worldbuilding represents a smaller-state economy where social spending is
+present but government has not yet expanded to EU norms. Structural reforms
+and spending bills can shift this ratio over the session.
+
+### Deferred
+
+Debt-to-GDP normalization is deferred until public debt is modeled. Once a
+debt accumulation module is added, the display scale above will provide the
+denominator (nominal GDP = Y_pc x POPULATION) needed for the ratio.
+
+## Initial state (quarter 1)
 
 At baseline tax rate, no shocks, CB at neutral:
 
@@ -362,10 +466,10 @@ At baseline tax rate, no shocks, CB at neutral:
 - T ≈ 285.71
 - Output gap = 0
 - u = 5%
-- π = 2%
-- i = 2% (neutral; i_prev = i_neutral)
+- π = 0.496% per quarter (≈ 2% annualized)
+- i = 0.5% per quarter (neutral; i_prev = i_neutral; ≈ 2% annualized)
 - scar_factor = 1.0 (no accumulated damage)
-- g_current = 2% (baseline; no structural boosts applied yet)
+- g_current = 0.496% per quarter (baseline; no structural boosts applied yet)
 - trend_state = 1.0
 
 ## Player levers
@@ -378,23 +482,24 @@ The player changes the economy by passing bills, which modify:
   investment (via the τ sensitivity term). Cuts boost short-run growth but
   reduce tax revenue.
 - **g_boost_path** (structural growth reform). Permanently raises g_current,
-  accelerating growth of Y*, G, a, and I from the following year onward. Small
-  per-year values (+0.001 to +0.002) compound into large long-run effects.
+  accelerating growth of Y*, G, a, and I from the following quarter onward. Small
+  per-quarter values (+0.001 to +0.002) compound into large long-run effects.
 - **heal_path** (scar healing). Directly restores scar_factor toward 1.0,
   immediately raising Y* and reducing the negative gap that would compound
   further hysteresis. Most effective when applied soon after a recession.
 
 ## Per-turn update loop
 
-For each year t:
+For each quarter t:
 
-1.  Apply structural policies for this year:
+1.  Apply structural policies for this quarter:
     g_current_t = g_current_{t-1} + g_boost_path[t]
     scar_factor = min(1.0, scar_factor + heal_path[t])
 2.  Apply this turn's bill effects to G_path[t] and/or tax_rate
     Scale G_path[t] to actual spending: G_t = G_path[t] · trend_t
-3.  Compute i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
-    Compute i_t = ρ · i_{t-1} + (1 − ρ) · i_target
+3.  Compute i_target = i_neutral + phi_pi · (pi_{t-1} - pi_target) + phi_u · (u_natural_state - u_{t-1})
+    Select rho = rho_cut (0.9) if i_target < i_{t-1}, else rho = rho_hike (0.8)
+    Compute i_t = max(0, rho · i_{t-1} + (1 - rho) · i_target)   [ZLB]
 4.  Generate investment shock: ε_t ~ N(0, σ²)
 5.  Read demand_shock_path[t] = δ_t, supply_shock_path[t] = σ_t, inflation_shock_path[t] = ζ_t
 6.  Compute Y* = Y*_0 · trend_t · (1 + σ_t) · scar_t
@@ -407,7 +512,7 @@ For each year t:
 13. Compute π = π_target + β · gap + ζ_t
 14. Update scar_t+1 = scar_t · (1 + min(0, gap) · hysteresis_rate)
 15. Update trend_{t+1} = trend_t · (1 + g_current_t)
-16. Record state (including scar_t+1, g_current_t); set π_{t}, u_{t}, i_{t} for next year's Taylor Rule
+16. Record state (including scar_t+1, g_current_t); set π_{t}, u_{t}, i_{t} for next quarter's Taylor Rule
 
 ## Design notes
 
@@ -417,62 +522,83 @@ and the economy idles at roughly natural unemployment and target inflation. The
 player's legislative choices determine whether the economy runs above or below
 potential; inaction is a stable baseline, not structural decay.
 
-**Structural reforms compound silently.** A g_boost of +0.001 in year 5 barely
-shows up in the rates plot — but over 25 remaining years it lifts trend_t by
-roughly 2.5% above the no-reform path. Two reforms (+0.002 total) applied early
-lift it by ~5%. The compounding is multiplicative: each subsequent year, trend
-grows at the new higher rate. A player who invests in structural reforms in
-the first half of the session will outperform a pure demand-side player in the
+**Structural reforms compound silently.** A g_boost of +0.001 in quarter 5 barely
+shows up in the rates plot — but over 95 remaining quarters it lifts trend_t
+meaningfully above the no-reform path. A player who invests in structural reforms
+in the first half of the session will outperform a pure demand-side player in the
 second half, even if both have the same G and tax_rate. The reverse is also true:
 structural reforms provide no short-run demand stimulus — they do not close gaps
 or prevent recessions, they only raise the long-run ceiling.
 
-**Why the economy is volatile.** The shock term ε_t means each year's
-investment lands above or below trend. Most years are near-trend, but
-occasional bad years can compound into recessions and good years into booms.
+**Why the economy is volatile.** The shock term ε_t means each quarter's
+investment lands above or below trend. Most quarters are near-trend, but
+occasional bad quarters can compound into recessions and good quarters into booms.
 Each playthrough is different.
 
 **Fiscal-monetary tug of war.** Expansionary fiscal policy (higher G or lower
 taxes) raises Y, narrows the output gap, and eventually pushes inflation above
-target. The CB responds with higher rates in subsequent years, which suppresses
+target. The CB responds with higher rates in subsequent quarters, which suppresses
 investment and partially offsets the fiscal stimulus. The player cannot simply
 spend their way to permanent prosperity — sustained stimulus will draw a CB
 response that crowds out private investment, though it arrives gradually.
 
 **Recessions trigger easing.** When a demand shock or fiscal tightening drives
 the output gap negative, unemployment rises and inflation falls. The CB responds
-with rate cuts in subsequent years, which boosts investment and provides
+with rate cuts in subsequent quarters, which boosts investment and provides
 automatic stabilisation. Bad luck is self-correcting to a degree, but the
-one-year lag plus smoothing means the medicine arrives slowly after the pain.
+one-quarter lag plus smoothing means the medicine arrives slowly after the pain.
 
-**Single-year shocks recover quickly.** A one-year demand or supply shock
-typically closes within two to three years as the CB adjusts and investment
-rebounds. To produce a multi-year recession — a 2008-style crisis or a pandemic
-— apply the shock across several consecutive years. The sustained gap between
+**Single-quarter shocks recover quickly.** A one-quarter demand or supply shock
+typically closes within two to three quarters as the CB adjusts and investment
+rebounds. To produce a multi-quarter recession — a 2008-style crisis or a pandemic
+— apply the shock across several consecutive quarters. The sustained gap between
 actual and potential output then compounds the CB response and prolongs recovery.
 
-**Stimulus that overheats triggers tightening.** A large spending bill in year t
+**Stimulus that overheats triggers tightening.** A large spending bill in quarter t
 may push Y well above Y*. Inflation rises. The CB begins raising rates in
-year t+1, but only 20% of the way toward the Taylor target. The tightening
-accumulates over several years. The net multi-year effect of fiscal stimulus is
-therefore smaller than the single-year Keynesian multiplier implies — and the
-drag arrives on a delay.
+quarter t+1, closing 20% of the gap toward its Taylor target (rho_hike = 0.8).
+Tightening accumulates over several quarters. The net multi-quarter effect of
+fiscal stimulus is therefore smaller than the single-quarter Keynesian multiplier
+implies — and the drag arrives on a delay.
 
-**Hysteresis compounds slow recoveries.** Each year the output gap stays
-negative, scar_factor ticks down and Y* is permanently reduced. A two-year
-recession with hysteresis_rate = 0.10 and average gap of −0.05 leaves
+**Hysteresis compounds slow recoveries.** Each quarter the output gap stays
+negative, scar_factor ticks down and Y* is permanently reduced. A two-quarter
+recession with hysteresis_rate = 0.10 and average gap of -0.05 leaves
 scar_factor at roughly 0.99 — a 1% permanent loss in potential. That sounds
-small, but it compounds: a five-year slump with the same gap drops scar_factor
-to ~0.975. The CB's slow-moving response (ρ = 0.8) means the economy can stay
-below potential for many years after an initial shock, accumulating scar damage
-long after the original cause is resolved.
+small, but it compounds: an eight-quarter slump with the same gap drops scar_factor
+to ~0.975. The CB's slow easing (rho_cut = 0.9: only 10% per quarter toward
+lower rates) means the economy can stay below potential for many quarters after
+an initial shock, accumulating scar damage long after the original cause is resolved.
 
-**The CB moves slowly.** With ρ = 0.8, the CB is a slow-moving force rather
-than an instant corrective. A single inflationary year will barely shift rates;
-sustained overheating compounds year on year into significant tightening.
-Players have more room to run the economy hot for a term than a fully reactive
-CB would allow, but a hot economy that is left unchecked will eventually face
-meaningful rate pressure.
+**The CB is asymmetrically slow.** The CB closes 20% of the gap toward its
+Taylor target when tightening (rho_hike = 0.8) but only 10% per quarter when
+easing (rho_cut = 0.9). A single inflationary quarter barely shifts rates; sustained
+overheating compounds into significant tightening over time. In recession, the
+medicine arrives even more slowly than the tightening did — the CB is reluctant
+to commit to lower rates until inflation is clearly under control. Players have
+more room to run the economy hot than a symmetric CB would allow, but rate
+relief during a downturn is also slower to materialise.
+
+**Hawkish bias and inflation-targeting asymmetry.** The combination of a lower
+phi_u (0.25 vs. the symmetric 0.5) and slower easing (rho_cut = 0.9) models a
+Volcker / pre-2008 Fed posture: price stability is the primary mandate, and
+employment is a secondary concern. The CB will not sacrifice inflation credibility
+to ease unemployment quickly. In practice this means: (1) the CB's reaction
+function is dominated by the inflation gap, not the unemployment gap; (2) when
+both unemployment is high and inflation is below target, the CB still eases slowly;
+and (3) a supply shock that raises both inflation and unemployment creates a
+genuine policy dilemma — the CB leans toward fighting inflation even at the cost
+of a prolonged slump.
+
+**Zero lower bound makes fiscal policy decisive.** In a deep or prolonged
+recession the CB rate reaches zero and stays there. The Taylor Rule still
+computes a negative i_target, but it cannot be implemented. This creates a
+qualitatively different regime: monetary policy is exhausted, and only the
+player's spending and tax decisions can lift output. Hysteresis compounds the
+problem — while i_t is stuck at zero, the output gap persists longer, scar damage
+accumulates faster, and the economy's potential output shrinks quarter by quarter.
+The player faces genuine stakes: fiscal inaction at the ZLB is not neutral; it
+leaves scarring damage that lowers the baseline permanently.
 
 ## Not yet modeled (future versions)
 
