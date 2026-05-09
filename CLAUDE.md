@@ -4,17 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Running the Game
 
-Because the JS uses ES modules (`import`/`export`), the game must be served over HTTP — opening `index.html` directly as a `file://` URL will not work. Use any local server:
-
 ```bash
-# Python (if installed)
-python -m http.server 8000
-
-# Node (if installed)
-npx serve .
+cd react-app
+npm install
+npm run dev
 ```
 
-Then open `http://localhost:8000` in a browser. There is no build step, no compilation, and no package manager.
+Open **http://localhost:5174**
+
+```bash
+npm run build    # production build → react-app/dist/
+npm run preview  # serve the production build on port 4174
+```
 
 ## Project Goal
 
@@ -22,26 +23,16 @@ A browser-based, single-player parliament simulator. The player leads a coalitio
 
 ## Architecture
 
-The game is pure HTML/CSS/JS — no frameworks, no bundler. The original `java/Parliament.java` was a code generator that produced the HTML file; it has been retired and is kept only as a reference.
+Vite + React + React Router + Zustand. All game code lives in `react-app/`.
 
-### Module dependency order
+### React module overview
 
-```
-data.js  ←  layout.js
-data.js  ←  render.js
-data.js + render.js  ←  vote.js
-data.js  ←  compact.js
-all of the above  ←  parliament.js  (entry point)
-```
-
-### What each JS module owns
-
-- **`js/data.js`** — All static content: `PARTIES` (with `goals` per party), `COALITIONS` (with `flagships` per party and `scenarios`/`partnerBlurbs`/`titles`), `BILLS`, `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, and `econLabel`/`socialLabel`/`leanLabel`/`leanCls`/`logoSrc` helpers.
-- **`js/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
-- **`js/render.js`** — All SVG and DOM manipulation. Key exports: `renderAgenda`, `renderBillDetail`, `renderVoteResult`, `renderLegend`, `renderProgramme`, `renderEnding`. No internal game state.
-- **`js/vote.js`** — Session state and game logic. `init(seats, party, partners)` must be called first. `initAgenda(flagships)` builds the 10-bill session pool. `proposeBill(bill)` runs the vote and updates loyalty + tracks session stats. Exports `getSessionStats()` returning `{ billsPassed, leftBillsPassed, domainsPassedCount }`.
-- **`js/compact.js`** — Programme for Government screen. `showCompact(party, partners, onBack, onConfirm)` renders goal-selection cards (one per partner, 3 goals each). `onConfirm` receives `{ [partnerName]: goalObj }`.
-- **`js/parliament.js`** — Entry point. Manages session flow, tracks `flagshipsPassed` and `turnsAbstained`, builds end-of-turn stats, and passes `committedGoals` through to `renderProgramme` and `renderEnding`.
+- **`src/lib/data.js`** — All static content: `PARTIES` (with `goals` and `mandates` per party), `COALITIONS` (with `scenarios`/`partnerBlurbs`/`titles`), `BILLS` (21 policy bills + 6 fiscal bills), `ENDINGS` (high/mid/low/collapse tiers), `LAYOUT` geometry, `DOMAIN_SCALES`, `DOMAIN_ORDER`, `STARTING_DOMAINS`, `ECON_PARAMS`, `STARTING_ECONOMY`, and `econLabel`/`socialLabel`/`leanLabel`/`leanCls`/`logoSrc` helpers.
+- **`src/lib/layout.js`** — Pure math. `calculateSeats(parties)` distributes seats across 8 semicircular rows. No DOM access.
+- **`src/lib/vote.js`** — Session state and game logic (singleton). `init(seats, party, partners)` must be called first. `initAgenda()` builds the 10-bill session pool (filters domain bills that can't move further). `proposeBill(bill)` runs the vote, updates loyalty, applies domain state changes, and returns `{ passed, ayes, nays, breakdown, votes, loyaltyChanges, newLoyalty, econEffect }`. Exports `getDomainState()` and `getSessionStats()`.
+- **`src/lib/store.js`** — Zustand global state. Fields: `playerParty`, `selectedCoalition`, `coalitionPartners`, `committedGoals`, `playerMandate`, `headerFlag`, `headerAccent`, `headerTurn`, `endingData`. Each has a `setFieldName(v)` setter plus `resetGame()`.
+- **`src/Layout.jsx`** — Masthead wrapper, renders on every route via `<Outlet />`.
+- **`src/App.jsx`** — React Router route definitions. Root redirects to `/select`.
 
 ### Game flow (full session)
 
@@ -78,11 +69,71 @@ Edit `PARTIES` in `js/data.js`. The seat layout recalculates automatically on lo
 
 ### Adding flagship bills
 
-Add entries to `COALITIONS[id].flagships[partyName]` in `js/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
+Add entries to `COALITIONS[id].flagships[partyName]` in `src/lib/data.js`. Each flagship is `{ title, type, score }`. Three per party/coalition combo is the current standard.
 
 ### Adding or editing party goals
 
-Edit the `goals` array in each party object in `js/data.js`. Each goal is `{ id, title, desc, check(policyState, stats) }`. `STARTING_POLICY` is accessible by closure (defined above `PARTIES` in the same module). Three goals per party is the current standard.
+Edit the `goals` array in each party object in `src/lib/data.js`. Each goal is `{ id, title, desc, check(policyState, stats) }`. Three goals per party is the current standard.
+
+### Bill schema
+
+```js
+{
+  title:       string,
+  domain:      'fiscal' | 'border' | 'social' | 'foreign' | 'civic',
+  type:        'economic' | 'social',   // which party axis the vote formula uses
+  score:       number,                  // -10 to +10, party ideological compatibility
+  domainDelta: +1 | -1,                 // absent for fiscal bills
+  econEffect:  { deltaG } | { deltaTax }, // fiscal bills only
+}
+```
+
+`DOMAIN_ORDER = ['fiscal', 'border', 'social', 'foreign', 'civic']` controls accordion sort order.
+
+## Economy
+
+### Current implementation (v1 — in game)
+
+`computeEcon(prev, billEffect, t)` lives in `ParliamentPage.jsx`. Called at the end of every turn (propose or abstain). Returns updated `econState`.
+
+```
+I = I_base · (1 + g)^(t−1) · (1 − τ · (tax_rate − tax_baseline))
+Y = (I + G) / (1 − mpc · (1 − tax_rate))
+T = tax_rate · Y
+C = mpc · (Y − T)
+growth = Y_t / Y_{t−1} − 1
+```
+
+`econState` fields: `{ I_base, G, tax_rate, I, Y, T, C, growth }`. Displayed in the right sidebar (GDP, growth, G, tax rate). Fiscal bills modify G or tax_rate on pass.
+
+**v1 is deterministic** — no shock term, no unemployment, no inflation, no potential output.
+
+### Planned upgrade (v2 — specified, not yet implemented)
+
+Full spec lives in `econ_simulation/ECONOMY.txt`. R simulation prototype in `econ_simulation/` (see below).
+
+v2 adds on top of v1:
+
+| Addition | Formula |
+|---|---|
+| Investment shock | `ε_t ~ N(0, σ²)` multiplied into I |
+| Potential output | `Y*_t = Y*_0 · (1 + g)^(t−1)` |
+| Output gap | `gap = (Y − Y*) / Y*` |
+| Unemployment | `u = u_natural − okun · gap` (Okun's law) |
+| Inflation | `π = π_target + β · gap` (Phillips curve) |
+
+New parameters needed: `shock_sd = 0.03`, `u_natural = 0.05`, `okun = 0.5`, `pi_target = 0.02`, `beta = 0.5`, `Y_star_0 = 960`.
+
+**Key design intent of v2:** if the player does nothing, G stays constant while Y* grows at trend `g`. Investment grows but G doesn't, so Y grows slower than Y*, the output gap drifts negative, unemployment rises, and inflation falls. This creates persistent legislative pressure.
+
+### R simulation (`econ_simulation/`)
+
+Three-file structure:
+- **`model.R`** — `simulate_economy(G_path, tax_path, params, seed)` function implementing the full v2 model including shock, Y*, gap, u, π.
+- **`plots.R`** — `plot_levels(results)` (Y/C/I/G/T/Y\*) and `plot_rates(results)` (gap/u/π).
+- **`run.R`** — User entry point. Set working directory, player paths, and param overrides; sources the above and prints results + plots.
+
+The R model is the **reference implementation** for v2. When implementing v2 in the game, match its formulas exactly.
 
 ## Balance Analysis
 
@@ -92,4 +143,4 @@ Edit the `goals` array in each party object in `js/data.js`. Each goal is `{ id,
 python test/analyze.py
 ```
 
-Writes CSVs to `test/output/`. The data mirrors `js/data.js` — if parties, bills, or formulas change there, update `analyze.py` to match.
+Writes CSVs to `test/output/`. The data mirrors `src/lib/data.js` — if parties, bills, or formulas change there, update `analyze.py` to match.

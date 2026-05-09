@@ -1,0 +1,240 @@
+# Game Economy — v2 Specification
+
+## Overview
+
+The economy simulates a closed national economy each turn (1 turn = 1 year).
+It tracks GDP and its three components, plus unemployment, inflation, and the
+central bank interest rate. Player actions (passing bills) change government
+spending and tax rates, which propagate through the model to produce yearly
+economic outcomes. The central bank responds to those outcomes with a one-year
+lag, adjusting the interest rate according to a Taylor Rule.
+
+The model is built from four classical macro relationships:
+- The Keynesian cross (GDP from aggregate demand)
+- Okun's law (output gap → unemployment)
+- The Phillips curve (output gap → inflation)
+- The Taylor Rule (inflation and unemployment → central bank rate)
+
+Plus a stochastic shock to private investment, representing the year-to-year
+variability of business sentiment.
+
+## Identity and equations
+
+GDP is the sum of consumption, investment, and government spending:
+
+    Y = C + I + G
+
+Each component:
+
+    C = mpc · (Y − T)
+    I = I_base · (1 + g)^(t−1) · (1 − τ · (tax_rate − tax_baseline)) ·
+                                  (1 − d · (i − i_neutral)) · (1 + ε_t)
+    G = G_path[t] · (1 + g)^(t−1)
+    T = tax_rate · Y
+
+Where ε_t ~ N(0, σ²) is the investment shock for year t, and i is the
+central bank interest rate set by the Taylor Rule (see below). G_path[t]
+is the player's real (year-1-equivalent) spending choice for year t.
+
+Y is solved analytically from these (since C depends on Y):
+
+    Y = (I + G) / (1 − mpc · (1 − tax_rate))
+
+## Mandatory vs. discretionary spending
+
+G_path[t] represents the government's real spending level for year t, expressed
+in year-1-equivalent terms. The model automatically scales it up by trend growth:
+
+    G_t = G_path[t] · (1 + g)^(t−1)
+
+This reflects how most government spending is mandatory or entitlement-driven —
+pensions, healthcare, statutory benefits — and grows automatically with
+population aging, indexation, and demographic pressures, roughly tracking the
+economy's trend growth rate. The player does not need to legislate to maintain
+this baseline; it is built in.
+
+Bills, therefore, represent real changes to spending priorities above or below
+the trend-adjusted baseline. A bill raising G_path from 270 to 285 commits the
+government to 5.6% more real spending every year from that point forward, not
+a one-time nominal boost.
+
+When the player does nothing (G_path constant), G grows in line with I and Y*,
+and the economy stays near potential output. The player's legislative choices
+determine whether the economy runs above or below potential — not whether it
+survives at all.
+
+**Future extension.** Splitting G into a mandatory component (grows at g
+automatically) and a discretionary component (set directly by the player) is
+a planned refinement. For now, all spending is treated as real and trend-scaled.
+
+## Output gap, unemployment, inflation
+
+Potential output grows at the trend rate:
+
+    Y*_t = Y*_0 · (1 + g)^(t−1)
+
+The output gap measures the economy relative to potential:
+
+    gap = (Y − Y*) / Y*
+
+When positive, the economy runs hot (above potential). When negative, slack
+(below potential).
+
+Okun's law translates the output gap into unemployment:
+
+    u = u_natural − okun · gap
+
+A hot economy → unemployment below natural rate. A slack economy → unemployment
+above natural rate.
+
+The Phillips curve translates the output gap into inflation:
+
+    π = π_target + β · gap
+
+A hot economy generates above-target inflation. A slack economy produces
+below-target inflation (or deflation).
+
+## Central bank
+
+The central bank has a dual mandate: keep inflation near π_target (2%) and
+unemployment near u_natural (5%). It sets the interest rate each year using
+a Taylor Rule with interest rate smoothing, reacting to the previous year's
+outcomes with a one-year lag.
+
+First, a Taylor target is computed from last year's inflation and unemployment:
+
+    i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
+
+Then the actual rate moves only part of the way toward that target:
+
+    i_t = ρ · i_{t-1} + (1 − ρ) · i_target
+
+With ρ = 0.8, the CB closes 20% of the gap to the Taylor target each year.
+A CB that wanted to raise rates from 2% to 12% would instead move to 4% in
+year 1, then 5.6%, then 6.9%, and so on — never jumping to the target in one
+step.
+
+The interest rate feeds back into private investment through the sensitivity
+parameter d:
+
+    (1 − d · (i − i_neutral))
+
+When i > i_neutral (tightening), this factor is below 1 and suppresses
+investment. When i < i_neutral (easing), it is above 1 and boosts investment.
+
+**Initialisation.** For year 1, π_{0} = π_target, u_{0} = u_natural, and
+i_{0} = i_neutral, so i_1 = i_neutral. The CB starts at neutral and only
+deviates once the economy generates an output gap.
+
+## Parameters
+
+| Parameter      | Value | Meaning                                                  |
+|----------------|-------|----------------------------------------------------------|
+| mpc            | 0.75  | Marginal propensity to consume                           |
+| τ              | 1.5   | Investment sensitivity to tax rate                       |
+| tax_baseline   | 0.25  | Reference tax rate (no investment effect at this level)  |
+| g              | 0.02  | Trend growth rate (productivity + capital + labor)       |
+| σ (shock_sd)   | 0.03  | Std dev of investment shock                              |
+| u_natural      | 0.05  | Natural rate of unemployment                             |
+| okun           | 0.5   | Okun coefficient (output gap → unemployment)             |
+| π_target       | 0.02  | Target / expected inflation                              |
+| β              | 0.5   | Phillips slope (output gap → inflation)                  |
+| I_base_0       | 150   | Baseline investment in year 1                            |
+| Y*_0           | 960   | Potential output in year 1                               |
+| i_neutral      | 0.02  | CB neutral interest rate                                 |
+| φ_π            | 1.5   | CB response to inflation gap (Taylor Rule)               |
+| φ_u            | 0.5   | CB response to unemployment gap (Taylor Rule)            |
+| d              | 5     | Investment sensitivity to interest rate deviation        |
+| ρ              | 0.8   | Interest rate smoothing (CB moves 20% toward target/yr) |
+
+## Initial state (year 1)
+
+At baseline tax rate, no shock, no policy change, CB at neutral:
+
+- Y = 960 (equals Y*)
+- C = 540 (56% of GDP)
+- I = 150 (16% of GDP)
+- G = 270 (28% of GDP)
+- T = 240
+- Output gap = 0
+- u = 5%
+- π = 2%
+- i = 2% (neutral; i_prev = i_neutral)
+
+## Player levers
+
+The player changes the economy by passing bills, which modify:
+
+- **G** (government spending). Direct multiplier effect on Y — each $1 of G
+  generates roughly $2.3 of GDP through the Keynesian multiplier.
+- **tax_rate**. Affects both consumption (via disposable income) and
+  investment (via the τ sensitivity term). Cuts boost short-run growth but
+  reduce tax revenue.
+
+## Per-turn update loop
+
+For each year t:
+
+1.  Apply this turn's bill effects to G_path[t] and/or tax_rate
+    Scale G_path[t] to actual spending: G_t = G_path[t] · (1 + g)^(t−1)
+2.  Compute i_target = i_neutral + φ_π · (π_{t-1} − π_target) + φ_u · (u_natural − u_{t-1})
+    Compute i_t = ρ · i_{t-1} + (1 − ρ) · i_target
+3.  Generate shock: ε_t ~ N(0, σ²)
+4.  Compute Y* = Y*_0 · (1 + g)^(t−1)
+5.  Compute I = I_base_0 · (1 + g)^(t−1) · (1 − τ · (tax_rate − tax_baseline)) · (1 − d · (i − i_neutral)) · (1 + ε_t)
+6.  Compute Y = (I + G) / (1 − mpc · (1 − tax_rate))
+7.  Compute T = tax_rate · Y, then C = mpc · (Y − T)
+8.  Compute gap = (Y − Y*) / Y*
+9.  Compute u = u_natural − okun · gap
+10. Compute π = π_target + β · gap
+11. Record state; set π_{t}, u_{t}, and i_{t} as inputs for next year's Taylor Rule
+
+## Design notes
+
+**What happens when the player does nothing.** Both I and G grow at trend g
+automatically (I via the investment trend term, G via the spending scale factor).
+Y therefore grows in line with Y*, the output gap stays near zero, and the
+economy idles at roughly natural unemployment and target inflation. The player's
+legislative choices determine whether the economy runs above or below potential;
+inaction is a stable baseline, not structural decay.
+
+**Why the economy is volatile.** The shock term ε_t means each year's
+investment lands above or below trend. Most years are near-trend, but
+occasional bad years can compound into recessions and good years into booms.
+Each playthrough is different.
+
+**Fiscal-monetary tug of war.** Expansionary fiscal policy (higher G or lower
+taxes) raises Y, narrows the output gap, and eventually pushes inflation above
+target. The CB responds with higher rates in subsequent years, which suppresses
+investment and partially offsets the fiscal stimulus. The player cannot simply
+spend their way to permanent prosperity — sustained stimulus will draw a CB
+response that crowds out private investment, though it arrives gradually.
+
+**Recessions trigger easing.** When a shock or fiscal tightening drives the
+output gap negative, unemployment rises and inflation falls. The CB responds
+with rate cuts in subsequent years, which boosts investment and provides
+automatic stabilisation. Bad luck is self-correcting to a degree, but the
+one-year lag plus smoothing means the medicine arrives slowly after the pain.
+
+**Stimulus that overheats triggers tightening.** A large spending bill in year t
+may push Y well above Y*. Inflation rises. The CB begins raising rates in
+year t+1, but only 20% of the way toward the Taylor target. The tightening
+accumulates over several years. The net multi-year effect of fiscal stimulus is
+therefore smaller than the single-year Keynesian multiplier implies — and the
+drag arrives on a delay.
+
+**The CB moves slowly.** With ρ = 0.8, the CB is a slow-moving force rather
+than an instant corrective. A single inflationary year will barely shift rates;
+sustained overheating compounds year on year into significant tightening.
+Players have more room to run the economy hot for a term than a fully reactive
+CB would allow, but a hot economy that is left unchecked will eventually face
+meaningful rate pressure.
+
+## Not yet modeled (future versions)
+
+- Capital accumulation (investment building long-run productive capacity)
+- Public debt accumulation and fiscal limits
+- International trade (closed economy assumption)
+- Adaptive inflation expectations (π_target is currently fixed)
+- Threshold crises (debt panic, currency crisis, banking crisis)
+- Endogenous Y* growth driven by productivity-boosting bills
