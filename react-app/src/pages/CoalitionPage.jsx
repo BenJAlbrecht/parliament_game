@@ -47,7 +47,7 @@ export default function CoalitionPage() {
       .map(n => PARTIES.find(p => p.name === n));
     setSelectedCoalition(activeCoalition);
     setCoalitionPartners(partners);
-    navigate('/programme');
+    navigate('/parliament');
   }
 
   const arcCoalition = activeCoalition ?? hoveredCoalition;
