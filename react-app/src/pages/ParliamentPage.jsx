@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { PARTIES, econLabel, socialLabel, logoSrc } from '$lib/data.js';
 import { calculateSeats } from '$lib/layout.js';
 import useGameStore from '$lib/store.js';
+import { PARAMS } from '$lib/economy/params.js';
+import { toGdpPerCapita, toAnnualRate, quarterToCalendar } from '$lib/economy/display.js';
 
 const TURNS_PER_YEAR = 4;
 const total          = PARTIES.reduce((s, p) => s + p.seats, 0);
@@ -16,6 +18,48 @@ function loyaltyCls(loy) {
 }
 const pct = n => Math.round(n / total * 100);
 
+const ROW_STYLE = {
+  display: 'flex', justifyContent: 'space-between',
+  padding: '0.2rem 0', borderBottom: '1px solid #1e293b',
+};
+
+function EconDebug({ economyState, economyHistory }) {
+  const stepsRun = economyHistory.length - 1;
+  const last     = stepsRun > 0 ? economyHistory.at(-1) : null;
+  const t        = stepsRun > 0 ? stepsRun : 1;
+
+  const Y    = last?.Y           ?? economyState?.Y_star_0 ?? 0;
+  const gap  = last?.gap         ?? 0;
+  const u    = last?.u           ?? PARAMS.u_natural_baseline;
+  const pi   = last?.pi          ?? PARAMS.pi_target;
+  const i    = last?.i           ?? PARAMS.i_neutral;
+  const scar = last?.scar_factor ?? 1.0;
+
+  const rows = [
+    ['Quarter',      quarterToCalendar(t).label],
+    ['GDP/capita',   `€${toGdpPerCapita(Y).toLocaleString()}`],
+    ['Inflation',    `${toAnnualRate(pi).toFixed(1)}%`],
+    ['Unemployment', `${(u * 100).toFixed(1)}%`],
+    ['Rate',         `${toAnnualRate(i).toFixed(1)}%`],
+    ['Output gap',   `${gap >= 0 ? '+' : ''}${(gap * 100).toFixed(1)}%`],
+    ['Scar',         `${((scar - 1) * 100).toFixed(1)}%`],
+  ];
+
+  return (
+    <div style={{ marginTop: '1.5rem', fontFamily: 'Inconsolata, monospace', fontSize: '0.8rem', color: '#94a3b8' }}>
+      <div style={{ marginBottom: '0.5rem', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569' }}>
+        Economy {stepsRun === 0 ? '(initial)' : ''}
+      </div>
+      {rows.map(([label, value]) => (
+        <div key={label} style={ROW_STYLE}>
+          <span>{label}</span>
+          <span style={{ color: '#e2e8f0' }}>{value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ParliamentPage() {
   const navigate = useNavigate();
 
@@ -23,6 +67,10 @@ export default function ParliamentPage() {
   const partners        = useGameStore((s) => s.coalitionPartners);
   const coalition       = useGameStore((s) => s.selectedCoalition);
   const setHeaderAccent = useGameStore((s) => s.setHeaderAccent);
+  const economyState    = useGameStore((s) => s.economyState);
+  const economyHistory  = useGameStore((s) => s.economyHistory);
+  const initEconomy     = useGameStore((s) => s.initEconomy);
+  const advanceQuarter  = useGameStore((s) => s.advanceQuarter);
 
   const [seats,        setSeats]        = useState([]);
   const [loyalty,      setLoyalty]      = useState({});
@@ -37,6 +85,7 @@ export default function ParliamentPage() {
     setSeats(computedSeats);
     setLoyalty(Object.fromEntries(partners.map(p => [p.name, 100])));
     setTurnCount(1);
+    initEconomy();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -91,10 +140,15 @@ export default function ParliamentPage() {
         </div>
 
         <div style={{ marginTop: '1.5rem' }}>
-          <button className="primary" onClick={() => setTurnCount(prev => prev + 1)}>
+          <button className="primary" onClick={() => {
+            advanceQuarter({ G_path: 270, tax_rate: 0.25 });
+            setTurnCount(prev => prev + 1);
+          }}>
             Next Turn →
           </button>
         </div>
+
+        <EconDebug economyState={economyState} economyHistory={economyHistory} />
 
       </div>{/* /.action-panel */}
 
