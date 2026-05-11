@@ -331,6 +331,94 @@ button:disabled {
   text-align: right;
 }
 
+/* ── Parliament unified widget ── */
+.parl-party-list {
+  padding: 0 0 0.75rem;
+}
+
+.parl-group-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 10px;
+  color: #64748b;
+  font-family: 'Inconsolata', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 0 0.25rem;
+  border-top: 1px solid #1c1a2c;
+}
+
+.parl-group-label--opp {
+  opacity: 0.75;
+}
+
+.parl-group-stat {
+  color: #475569;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.parl-row {
+  padding: 6px 0;
+  border-bottom: 1px solid #1a2438;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.parl-row:last-child { border-bottom: none; }
+
+.parl-row--player {
+  border-left: 2px solid #334155;
+  padding-left: 6px;
+  margin-left: -6px;
+}
+
+.parl-row--hovered {
+  background: #1c1a2c;
+}
+
+.parl-row--opp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.7;
+}
+
+.parl-row-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.parl-loyalty-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.parl-loyalty-row .sidebar-loyalty-track {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.parl-loyalty-pct {
+  font-size: 11px;
+  font-family: 'Inconsolata', monospace;
+  white-space: nowrap;
+  min-width: 38px;
+  text-align: right;
+}
+.parl-loyalty-pct.loyalty-up     { color: #22c55e; }
+.parl-loyalty-pct.loyalty-neutral { color: #d97706; }
+.parl-loyalty-pct.loyalty-down   { color: #f87171; }
+
+.parl-separator {
+  border: none;
+  border-top: 1px solid #2d2b42;
+  margin: 0.35rem 0 0;
+}
+
 svg {
   width: 100%;
   height: auto;
@@ -2355,10 +2443,6 @@ circle {
   transform-origin: center;
 }
 
-@keyframes seat-pop {
-  from { transform: scale(0); }
-  to   { transform: scale(1); }
-}
 
 .lede-text {
   border-left: 2px solid #2d2b42;
@@ -2431,15 +2515,21 @@ circle {
   margin-top: 4px;
 }
 
-/* ── Detail view: back + confirm action row ── */
+/* ── Detail view: back button row ── */
 .detail-action-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 1.25rem;
 }
 
-.detail-action-row .confirm-btn {
+/* ── Detail view: confirm button anchored below caucuses ── */
+.detail-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.detail-confirm-footer .confirm-btn {
   width: auto;
   margin-top: 0;
   flex-shrink: 0;
@@ -3066,5 +3156,431 @@ circle {
 
 .domain-fiscal-sep {
   color: #9ca3af;
+}
+
+/* ── Party-info drawer ────────────────────────────────────────────────────── */
+
+.party-drawer-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+}
+
+.party-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  max-width: 95vw;
+  background: #1a1625;
+  border-left: 1px solid #2d2640;
+  z-index: 201;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+}
+
+.party-drawer-close {
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 10px 14px 6px;
+  z-index: 1;
+  transition: color 0.15s;
+}
+
+.party-drawer-close:hover {
+  color: #e2e8f0;
+}
+
+/* Header */
+.party-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 18px 18px;
+  border-top: 3px solid transparent;
+  margin-top: -38px; /* slides under the sticky close button */
+  padding-top: 46px;
+}
+
+.party-drawer-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.party-drawer-header-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.party-drawer-name {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.party-drawer-meta {
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.party-drawer-tagline {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Sections */
+.party-drawer-section {
+  padding: 14px 18px;
+  border-top: 1px solid #2d2640;
+}
+
+.party-drawer-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+/* Compass */
+.party-drawer-compass {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto 8px;
+}
+
+.party-drawer-compass-caption {
+  text-align: center;
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 0.03em;
+}
+
+/* Bio */
+.party-drawer-bio {
+  font-size: 12.5px;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Caucuses */
+.party-drawer-caucus {
+  margin-bottom: 14px;
+}
+
+.party-drawer-caucus:last-child {
+  margin-bottom: 0;
+}
+
+.party-drawer-caucus-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.party-drawer-caucus-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.party-drawer-caucus-share {
+  font-size: 11px;
+  font-family: 'Inconsolata', monospace;
+  color: #64748b;
+}
+
+.party-drawer-caucus-bar {
+  height: 4px;
+  background: #2d2640;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.party-drawer-caucus-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  opacity: 0.75;
+}
+
+.party-drawer-caucus-desc {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Parliament page — fiscal state + loyalty readout ── */
+.parl-fiscal-state {
+  display: flex;
+  gap: 2rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #1c1a2c;
+  margin-bottom: 0.75rem;
+}
+
+.parl-fiscal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.parl-fiscal-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.parl-fiscal-value {
+  font-family: 'Inconsolata', monospace;
+  font-size: 16px;
+  color: #e2e8f0;
+}
+
+.parl-loyalty-readout {
+  padding: 0.5rem 0 0.65rem;
+  border-bottom: 1px solid #1c1a2c;
+  margin-bottom: 0.75rem;
+}
+
+.parl-loyalty-header {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+
+.parl-loyalty-name {
+  flex: 1;
+  font-size: 13px;
+  color: #e2e8f0;
+}
+
+.parl-action-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Finance Ministry page ── */
+.finance-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.finance-page-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  background: #1c1a2c;
+  padding: 0.55rem 1rem 0.45rem;
+  border: 1px solid #2d2b42;
+}
+
+.finance-chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.finance-chart-cell {
+  border: 1px solid #1e293b;
+}
+
+/* ── Legislature page ── */
+.leg-catalog {
+  margin-bottom: 1rem;
+}
+
+.leg-category {
+  margin-bottom: 0.85rem;
+}
+
+.leg-category-header {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #1c1a2c;
+  margin-bottom: 0.3rem;
+}
+
+.leg-bill-row {
+  padding: 8px 10px;
+  border: 1px solid #1e293b;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.leg-bill-row:hover {
+  background: #13111f;
+  border-color: #334155;
+}
+
+.leg-bill-row--selected {
+  background: #1c1a2c;
+  border-color: #475569;
+}
+
+.leg-bill-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.leg-bill-name {
+  font-size: 14px;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.leg-bill-pos {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  color: #475569;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.leg-bill-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.leg-bill-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.leg-effect-chip {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  color: #94a3b8;
+  background: #0d0c17;
+  border: 1px solid #2d2b42;
+  padding: 1px 6px;
+}
+
+.leg-preview {
+  border-top: 2px solid #334155;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.leg-preview-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  color: #f1f5f9;
+}
+
+.leg-vote-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.leg-vote-table th {
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: left;
+  padding: 3px 8px 3px 0;
+  border-bottom: 1px solid #1c1a2c;
+  white-space: nowrap;
+}
+
+.leg-vote-table td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid #0d0c17;
+  vertical-align: middle;
+}
+
+.leg-vote-coalition {
+  color: #e2e8f0;
+}
+
+.leg-vote-opp {
+  color: #64748b;
+}
+
+.leg-vote-total {
+  font-weight: 600;
+  font-size: 13px;
+  color: #e2e8f0;
+}
+
+.leg-vote-total td {
+  border-bottom: none;
+  border-top: 1px solid #334155;
+  padding-top: 7px;
+}
+
+.leg-threshold {
+  font-size: 10px;
+  color: #475569;
+  font-weight: 400;
+}
+
+.leg-delta-up { color: #22c55e; font-size: 10px; }
+.leg-delta-dn { color: #f87171; font-size: 10px; }
+
+.leg-player-tag {
+  color: #475569;
+  font-size: 11px;
+}
+
+.leg-preview-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
 }
 
